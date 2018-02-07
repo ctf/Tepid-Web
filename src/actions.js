@@ -259,10 +259,62 @@ export const refundJob = jobId => ({
 
 export const REQUEST_ACCOUNT = 'REQUEST_ACCOUNT';
 export const requestAccount = shortUser => ({
-	type: REQUEST_ACCOUNT
+	type: REQUEST_ACCOUNT,
+	shortUser
 });
 
-export const RECEIVE_ACCOUNT = 'REQUEST_ACCOUNT';
+export const RECEIVE_ACCOUNT = 'RECEIVE_ACCOUNT';
+export const receiveAccount = (shortUser, json) => ({
+	type: RECEIVE_ACCOUNT,
+	shortUser,
+	account: json,
+	receivedAt: Date.now()
+});
+
+const fetchAccount = (auth, shortUser) => dispatch => {
+	dispatch(requestAccount(shortUser));
+
+	const fetchObject = {
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+			'Authorization': `Token ${buildToken(auth)}`
+		}
+	};
+
+	// noinspection JSUnresolvedFunction
+	return fetch(`${API_URL}/users/${shortUser}`, fetchObject)
+		.then(response => {
+			if (response.status === 401) {
+				dispatch(invalidateAuth()); // To be used for redirection
+				return [];
+			} else if (!response.ok) {
+				// TODO: Handle error better
+				console.error(response);
+				return [];
+			}
+			return response.json();
+		})
+		.then(json => dispatch(receiveAccount(shortUser, json)));
+};
+
+const shouldFetchAccount = (state, shortUser) => {
+	const accounts = state.accounts.items;
+	if (!Object.keys(accounts).includes(shortUser)) {
+		return true;
+	} else {
+		return accounts[shortUser].didInvalidate;
+	}
+};
+
+export const fetchAccountIfNeeded = shortUser => (dispatch, getState) => {
+	const state = getState();
+	if (shouldFetchAccount(state, shortUser)) {
+		return dispatch(fetchAccount(state.auth, shortUser));
+	} else {
+		return Promise.resolve();
+	}
+};
 
 // Combined Actions ------------------------------------------------------------
 

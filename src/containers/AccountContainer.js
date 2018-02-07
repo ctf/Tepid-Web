@@ -1,19 +1,22 @@
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+
+import {fetchAccountIfNeeded} from '../actions';
+
 import Account from '../components/Account';
 
 const mapStateToProps = (state, ownProps) => ({
-	auth: this.state.auth
+	auth: state.auth,
+	shortUser: ownProps.match.params.shortUser,
+	account: state.accounts.items[ownProps.match.params.shortUser]
 });
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		fetchNeededData: (queueName) => {
-			// TODO dispatch(fetchQueueJobsIfNeeded(queueName));
-		}
-	};
-};
+const mapDispatchToProps = (dispatch, ownProps) => ({
+	fetchAccountIfNeeded: (shortUser) => {
+		dispatch(fetchAccountIfNeeded(shortUser));
+	}
+});
 
-const QueueContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(Account));
+const AccountContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(Account));
 
-export default QueueContainer;
+export default AccountContainer;

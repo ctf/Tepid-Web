@@ -16,7 +16,7 @@ class AccountPage extends React.Component {
 				<main>
 					<PageHeader />
 					<section id="page-content">
-						<CTFerRoute path={`${this.props.match.url}/:accountName`} component={AccountContainer} />
+						<CTFerRoute path={`${this.props.match.url}/:shortUser`} component={AccountContainer} />
 					</section>
 				</main>
 			</div>

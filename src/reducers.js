@@ -14,7 +14,10 @@ import {
 	RECEIVE_QUEUE_JOBS,
 
 	ADD_JOB,
-	REFUND_JOB
+	REFUND_JOB,
+
+	REQUEST_ACCOUNT,
+	RECEIVE_ACCOUNT
 } from './actions';
 
 const initialAuthState = {
@@ -54,7 +57,6 @@ const initialJobsState = {
 
 const initialAccountsState = {
 	isFetching: false,
-	didInvalidate: false,
 	items: {},
 	lastUpdated: null
 };
@@ -174,6 +176,24 @@ const jobs = function (state = initialJobsState, action) {
 
 const accounts = function (state = initialAccountsState, action) {
 	switch (action.type) {
+		case REQUEST_ACCOUNT:
+			return Object.assign({}, state, {
+				isFetching: true
+			});
+		case RECEIVE_ACCOUNT:
+			return Object.assign({}, state, {
+				isFetching: false,
+				items: {
+					...state.items,
+					[action.shortUser]: {
+						...state.items[action.shortUser],
+						isFetching: false,
+						didInvalidate: false,
+						data: action.account,
+						lastUpdated: action.receivedAt
+					}
+				}
+			});
 		default:
 			return state;
 	}
