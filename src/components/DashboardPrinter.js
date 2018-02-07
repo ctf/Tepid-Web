@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 
 import {fetchDestinationsIfNeeded, fetchQueueJobsIfNeeded} from "../actions";
 
@@ -32,7 +32,7 @@ class DashboardPrinter extends React.Component {
 			? (<tr style={{borderBottom: 'none'}}><td colSpan="3" style={{textAlign: 'center'}}>Loading...</td></tr>)
 			: this.props.queueJobs.slice(0, 25).map(job => (
 				<tr key={job._id}>
-					<td>{job.userIdentification}</td>
+					<td><Link to={`/accounts/${job.userIdentification}`}>{job.userIdentification}</Link></td>
 					<td>{this.props.destinations[job.destination]
 							? this.props.destinations[job.destination].name
 							: ''}</td>
