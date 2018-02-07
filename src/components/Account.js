@@ -17,6 +17,10 @@ class Account extends React.Component {
 
 		const account = this.props.account.data;
 
+		const self = Object.keys(this.props.auth.user).includes('shortUser')
+			? this.props.account.data.shortUser === this.props.auth.user.shortUser
+			: false;
+
 		const facultyOrDepartment = (() => {
 			if (!account.staff && account.faculty) {
 				return account.faculty;
@@ -27,13 +31,17 @@ class Account extends React.Component {
 			}
 		})();
 
+		const salutation = self
+			? (account.salutation ? account.salutation : account.displayName)
+			: account.displayName;
+
 		return (
 			<div>
 				<div className="card no-padding">
 					<div className="user-profile">
 						<div className="row">
 							<div className="col no-padding no-borders">
-								<h2>{account.displayName} <div className="badge">CTF Volunteer</div></h2>
+								<h2>{salutation} <div className="badge">CTF Volunteer</div></h2>
 							</div>
 							<div className="col no-padding no-borders">
 								<div className="faculty">{facultyOrDepartment}</div>
