@@ -7,8 +7,12 @@ import Account from '../components/Account';
 
 const mapStateToProps = (state, ownProps) => ({
 	auth: state.auth,
-	shortUser: ownProps.match.params.shortUser,
-	account: state.accounts.items[ownProps.match.params.shortUser]
+	shortUser: ownProps.match.params.shortUser
+		? ownProps.match.params.shortUser
+		: ownProps.shortUser,
+	account: state.accounts.items[ownProps.match.params.shortUser
+		? ownProps.match.params.shortUser
+		: ownProps.shortUser]
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
