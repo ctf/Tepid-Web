@@ -4,7 +4,6 @@ import JobTableRow from './JobTableRow';
 
 class JobTable extends React.Component {
 	render() {
-		let i = 1;
 		// TODO: Pagination
 		const jobList = this.props.jobs.slice(0, 100).map(job => (<JobTableRow key={job._id} job={job} />));
 		// TODO: Fix Name width
