@@ -7,7 +7,7 @@ import PageHeader from '../components/PageHeader';
 
 import AccountContainer from '../containers/AccountContainer';
 
-class AccountPage extends React.Component {
+class MyAccountPage extends React.Component {
 	// TODO: Use cached values whenever possible?
 	render() {
 		return (
@@ -34,6 +34,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 	return {};
 };
 
-const AccountPageContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(AccountPage));
+const MyAccountPageContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(MyAccountPage));
 
-export default AccountPageContainer;
+export default MyAccountPageContainer;
