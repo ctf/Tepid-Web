@@ -17,6 +17,8 @@ class Account extends React.Component {
 
 		const account = this.props.account.data;
 
+		const canPrint = true; // TODO: Exchange/paid into fund/CTF volunteer
+
 		const self = Object.keys(this.props.auth.user).includes('shortUser')
 			? this.props.account.data.shortUser === this.props.auth.user.shortUser
 			: false;
@@ -36,6 +38,9 @@ class Account extends React.Component {
 			: account.displayName;
 
 		const badges = ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
+
+		const jobs = this.props.account.jobs;
+		const jobTable = jobs.length > 0 && canPrint ? (<JobTable jobs={jobs} />) : '';
 
 		return (
 			<div>
@@ -78,7 +83,7 @@ class Account extends React.Component {
 				</div>
 
 				<div className="card no-padding">
-					{/*<JobTable />*/}
+					{jobTable}
 				</div>
 			</div>
 		);
