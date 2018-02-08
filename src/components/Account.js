@@ -35,13 +35,15 @@ class Account extends React.Component {
 			? (account.salutation ? account.salutation : account.displayName)
 			: account.displayName;
 
+		const badges = ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
+
 		return (
 			<div>
 				<div className="card no-padding">
 					<div className="user-profile">
 						<div className="row">
 							<div className="col no-padding no-borders">
-								<h2>{salutation} <div className="badge">CTF Volunteer</div></h2>
+								<h2>{salutation} {badges}</h2>
 							</div>
 							<div className="col no-padding no-borders">
 								<div className="faculty">{facultyOrDepartment}</div>
