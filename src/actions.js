@@ -316,6 +316,67 @@ export const fetchAccountIfNeeded = shortUser => (dispatch, getState) => {
 	}
 };
 
+export const REQUEST_ACCOUNT_QUOTA = 'REQUEST_ACCOUNT_QUOTA';
+export const requestAccountQuota = shortUser => ({
+	type: REQUEST_ACCOUNT_QUOTA,
+	shortUser
+});
+
+export const RECEIVE_ACCOUNT_QUOTA = 'RECEIVE_ACCOUNT_QUOTA';
+export const receiveAccountQuota = (shortUser, quota) => ({
+	type: RECEIVE_ACCOUNT_QUOTA,
+	shortUser,
+	quota,
+	receivedAt: Date.now()
+});
+
+const fetchAccountQuota = (auth, shortUser) => dispatch => {
+	dispatch(requestAccountQuota(shortUser));
+
+	const fetchObject = {
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+			'Authorization': `Token ${buildToken(auth)}`
+		}
+	};
+
+	// noinspection JSUnresolvedFunction
+	return fetch(`${API_URL}/users/${shortUser}/quota`, fetchObject)
+		.then(response => {
+			if (response.status === 401) {
+				dispatch(invalidateAuth()); // To be used for redirection
+				return [];
+			} else if (!response.ok) {
+				// TODO: Handle error better
+				console.error(response);
+				return [];
+			}
+			return response.json();
+		})
+		.then(json => dispatch(receiveAccountQuota(shortUser, json)));
+};
+
+const shouldFetchAccountQuota = (state, shortUser) => {
+	const accounts = state.accounts.items;
+	if (!Object.keys(accounts).includes(shortUser)) {
+		return false;
+	} else if (!accounts[shortUser].quota) { // TODO: Expiry time
+		return true;
+	} else {
+		return accounts[shortUser].didInvalidate;
+	}
+};
+
+export const fetchAccountQuotaIfNeeded = shortUser => (dispatch, getState) => {
+	const state = getState();
+	if (shouldFetchAccountQuota(state, shortUser)) {
+		return dispatch(fetchAccountQuota(state.auth, shortUser));
+	} else {
+		return Promise.resolve();
+	}
+};
+
 // Combined Actions ------------------------------------------------------------
 
 export const attemptAuthAndLoadInitialData = credentials => (dispatch, getState) => {

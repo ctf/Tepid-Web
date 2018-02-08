@@ -17,7 +17,10 @@ import {
 	REFUND_JOB,
 
 	REQUEST_ACCOUNT,
-	RECEIVE_ACCOUNT
+	RECEIVE_ACCOUNT,
+
+	REQUEST_ACCOUNT_QUOTA,
+	RECEIVE_ACCOUNT_QUOTA
 } from './actions';
 
 const initialAuthState = {
@@ -190,7 +193,36 @@ const accounts = function (state = initialAccountsState, action) {
 						isFetching: false,
 						didInvalidate: false,
 						data: action.account,
-						lastUpdated: action.receivedAt
+						quota: null,
+						jobs: [],
+						lastUpdated: action.receivedAt,
+						lastUpdatedQuota: -1
+					}
+				}
+			});
+		case REQUEST_ACCOUNT_QUOTA:
+			return Object.assign({}, state, {
+				isFetching: true,
+				items: {
+					...state.items,
+					[action.shortUser]: {
+						...state.items[action.shortUser],
+						isFetching: true,
+						didInvalidate: false
+					}
+				}
+			});
+		case RECEIVE_ACCOUNT_QUOTA:
+			return Object.assign({}, state, {
+				isFetching: false,
+				items: {
+					...state.items,
+					[action.shortUser]: {
+						...state.items[action.shortUser],
+						isFetching: false,
+						didInvalidate: false,
+						quota: action.quota,
+						lastUpdatedQuota: action.receivedAt
 					}
 				}
 			});
