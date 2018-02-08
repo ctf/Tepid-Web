@@ -16,6 +16,8 @@ class Account extends React.Component {
 		}
 
 		const account = this.props.account.data;
+		const quota = this.props.account.quota;
+		const maxQuota = 4000; // TODO: Fetch from somewhere
 
 		const canPrint = true; // TODO: Exchange/paid into fund/CTF volunteer
 
@@ -54,13 +56,20 @@ class Account extends React.Component {
 								<div className="faculty">{facultyOrDepartment}</div>
 							</div>
 						</div>
-						<div className="flex-row-container">
-							<div className="quota-label">Quota</div>
-							<div className="quota-bar">
-								<div className="quota-inner-bar" style={{width: '69.3%'}}>2772 pages remaining</div>
+						{canPrint ? (
+							<div>
+								<div className="flex-row-container">
+									<div className="quota-label">Quota</div>
+									<div className={'quota-bar' + (quota === null ? ' loading' : '')}>
+										<div className="quota-inner-bar"
+											 style={{width: `${quota / maxQuota * 100}%`}}>
+											<strong>{quota}</strong> pages remaining
+										</div>
+									</div>
+								</div>
+								<hr />
 							</div>
-						</div>
-						<hr />
+						) : ''}
 						<div className="user-profile-details">
 							<div className="row">
 								<div className="col">
