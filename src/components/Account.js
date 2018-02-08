@@ -70,7 +70,7 @@ class Account extends React.Component {
 									<strong>Preferred Salutation:</strong> <br />
 									<input type="text" value="David" style={{marginBottom: '0.6rem'}} /> <br />
 									<strong>Jobs Expire After:</strong> 1 Week <br />
-									<strong>Colour Printing:</strong> Off
+									<strong>Colour Printing:</strong> {account.colorPrinting ? 'On' : 'Off'}
 								</div>
 							</div>
 						</div>
