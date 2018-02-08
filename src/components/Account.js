@@ -4,11 +4,11 @@ import JobTable from './JobTable';
 
 class Account extends React.Component {
 	componentDidMount() {
-		this.props.fetchAccountIfNeeded(this.props.shortUser);
+		this.props.fetchNeededData(this.props.shortUser);
 	}
 
 	componentWillReceiveProps(nextProps, nextContext) {
-		this.props.fetchAccountIfNeeded(nextProps.shortUser);
+		this.props.fetchNeededData(nextProps.shortUser);
 	}
 	render() {
 		if (this.props.account === undefined) {

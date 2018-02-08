@@ -377,6 +377,15 @@ export const fetchAccountQuotaIfNeeded = shortUser => (dispatch, getState) => {
 	}
 };
 
+// TODO: ACCOUNT JOBS
+
+export const fetchAccountAndRelatedDataIfNeeded = shortUser => (dispatch, getState) => {
+	return Promise.all([
+		dispatch(fetchAccountIfNeeded(shortUser)),
+		dispatch(fetchAccountQuotaIfNeeded(shortUser))
+	]);
+};
+
 // Combined Actions ------------------------------------------------------------
 
 export const attemptAuthAndLoadInitialData = credentials => (dispatch, getState) => {

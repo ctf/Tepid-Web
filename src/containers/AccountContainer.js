@@ -1,7 +1,7 @@
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import {fetchAccountIfNeeded} from '../actions';
+import {fetchAccountAndRelatedDataIfNeeded} from '../actions';
 
 import Account from '../components/Account';
 
@@ -16,8 +16,8 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-	fetchAccountIfNeeded: (shortUser) => {
-		dispatch(fetchAccountIfNeeded(shortUser));
+	fetchNeededData: (shortUser) => {
+		dispatch(fetchAccountAndRelatedDataIfNeeded(shortUser));
 	}
 });
 
