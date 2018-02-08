@@ -361,6 +361,8 @@ const shouldFetchAccountQuota = (state, shortUser) => {
 	const accounts = state.accounts.items;
 	if (!Object.keys(accounts).includes(shortUser)) {
 		return false;
+	} else if (accounts[shortUser].isFetching) {
+		return false;
 	} else if (!accounts[shortUser].quota) { // TODO: Expiry time
 		return true;
 	} else {
