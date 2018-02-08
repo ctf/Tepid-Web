@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { jobStatus } from '../tepid-utils';
+
 class JobTableRow extends React.Component {
 	render() {
 		return (
@@ -13,7 +15,7 @@ class JobTableRow extends React.Component {
 					</Link>
 				</td>
 				<td>{`${this.props.job.pages} ${this.props.job.colorPages === 0 ? '' : ` (${this.props.job.colorPages} color)`}`}</td>
-				<td>TODO</td>
+				<td>{jobStatus(this.props.job)}</td>
 				<td>{this.props.job.originalHost}</td>
 				<td>{this.props.job.name}</td>
 				<td><i className="material-icons">more_vert</i></td>

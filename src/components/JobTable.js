@@ -15,7 +15,7 @@ class JobTable extends React.Component {
 						<th style={{width: '11.7em'}}>Started</th>
 						<th style={{width: '6.1em'}}>User</th>
 						<th style={{width: '6.2em'}}>Pages</th>
-						<th style={{width: '6.5em'}}>Status</th>
+						<th style={{width: '8.5em'}}>Status</th>
 						<th style={{width: '8.1em'}}>Host</th>
 						<th style={{minWidth: '16em'}}>Name</th>
 						<th style={{width: '1.7em'}}>&nbsp;</th>
