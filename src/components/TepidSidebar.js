@@ -39,6 +39,11 @@ class TepidSidebar extends React.Component {
 							</NavLink>
 						</li>
 						<li><i className="material-icons">settings</i> Queue Configuration</li>
+						<li>
+							<NavLink to="/destinations" activeClassName="active">
+								<i className="material-icons">print</i> Destinations
+							</NavLink>
+						</li>
 
 						<hr />
 
