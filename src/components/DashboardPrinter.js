@@ -51,7 +51,7 @@ class DashboardPrinter extends React.Component {
 				<table className="dash-printer-queue">
 					<thead>
 					<tr>
-						<th style={{width: '5.5rem'}}>User</th>
+						<th style={{width: '5.8rem'}}>User</th>
 						<th style={{width: '5.8rem'}}>Printer</th>
 						<th style={{minWidth: '12.3rem'}}>Status</th>
 						<th style={{width: '2.9rem'}}>&nbsp;</th>
