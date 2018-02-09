@@ -240,6 +240,36 @@ const accounts = function (state = initialAccountsState, action) {
 					}
 				}
 			});
+		case REQUEST_ACCOUNT_JOBS:
+			return Object.assign({}, state, {
+				items: {
+					...state.items,
+					[action.shortUser]: {
+						...state.items[action.shortUser],
+						jobs: {
+							...state.items[action.shortUser].jobs,
+							isFetching: true,
+							didInvalidate: false
+						}
+					}
+				}
+			});
+		case RECEIVE_ACCOUNT_JOBS:
+			return Object.assign({}, state, {
+				items: {
+					...state.items,
+					[action.shortUser]: {
+						...state.items[action.shortUser],
+						jobs: {
+							...state.items[action.shortUser].jobs,
+							items: action.jobs,
+							isFetching: false,
+							didInvalidate: false,
+							lastUpdated: action.receivedAt
+						}
+					}
+				}
+			});
 		default:
 			return state;
 	}
