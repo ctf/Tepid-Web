@@ -14,7 +14,8 @@ class DashboardPage extends React.Component {
 	}
 
 	render() {
-		const dashboardPrinters = this.props.queues.map(queue => (<DashboardPrinter key={queue.name} queue={queue} />));
+		const dashboardPrinters = this.props.queues.filter(queue => queue.name !== '1B18')
+			.map(queue => (<DashboardPrinter key={queue.name} queue={queue} />));
 
 		return (
 			<div>
