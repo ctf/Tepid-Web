@@ -214,10 +214,10 @@ const shouldFetchQueueJobs = (state, queueName) => {
 	}
 
 	const queueJobs = state.queues.jobsByQueue[queueName];
-	if (queueJobs.items.length === 0) {
-		return true;
-	} else if (queueJobs.isFetching) {
+	if (queueJobs.isFetching) {
 		return false;
+	} else if (queueJobs.items.length === 0) {
+		return true;
 	} else {
 		return queueJobs.didInvalidate;
 	}
