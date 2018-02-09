@@ -62,7 +62,7 @@ class JobTable extends React.Component {
 						{this.props.jobs.length} jobs
 					</div>
 					<div className="page-buttons">
-						<nav className="card-tabs icons-only small">
+						{this.state.pageSize < this.props.jobs.length ? (<nav className="card-tabs icons-only small">
 							<ul>
 								<a onClick={this.handlePageBack}>
 									<li><i className="material-icons">keyboard_arrow_left</i></li>
@@ -71,7 +71,7 @@ class JobTable extends React.Component {
 									<li><i className="material-icons">keyboard_arrow_right</i></li>
 								</a>
 							</ul>
-						</nav>
+						</nav>) : ''}
 					</div>
 				</div>
 			</div>
