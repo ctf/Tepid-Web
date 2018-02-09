@@ -5,9 +5,9 @@ import { jobStatus, jobHasFailed } from '../tepid-utils';
 
 class JobTableRow extends React.Component {
 	render() {
+		const colorPages = this.props.job.colorPages;
 		return (
 			<tr className={jobHasFailed(this.props.job) ? 'failed' : ''}>
-				{/*<td>{i++}</td>*/}
 				<td>{this.props.job.started === -1 ? '' : new Date(this.props.job.started).toLocaleString('en-CA')}</td>
 				{this.props.showUser ? (
 					<td>
@@ -16,7 +16,7 @@ class JobTableRow extends React.Component {
 						</Link>
 					</td>
 				) : ''}
-				<td>{`${this.props.job.pages} ${this.props.job.colorPages === 0 ? '' : ` (${this.props.job.colorPages} color)`}`}</td>
+				<td>{`${this.props.job.pages} ${colorPages === 0 ? '' : ` (${colorPages} color)`}`}</td>
 				<td>{jobStatus(this.props.job)}</td>
 				<td>{this.props.job.originalHost}</td>
 				<td>{this.props.job.name}</td>
