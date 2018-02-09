@@ -422,14 +422,15 @@ table.dash-printer-queue {
 
 table.dash-printer-queue thead {
 	background-color: #F5F5F5;
-	border-top: 1px solid #EEE;
-	border-bottom: 1px solid #EEE;
+	border-top: 1px solid #EBEBEB;
+	border-bottom: 1px solid #EBEBEB;
 }
 
 table.dash-printer-queue thead th {
-	padding: 0.35rem 0.7rem;
-	font-size: 0.8rem;
-	color: #666;
+	padding: 0.35rem 0.6rem;
+	box-sizing: border-box;
+	font-size: 0.75rem;
+	color: #777;
 	text-transform: uppercase;
 	text-align: left;
 	font-weight: 600;
@@ -468,7 +469,7 @@ table.dash-printer-queue tbody td {
 	text-overflow: ellipsis;
 	overflow: hidden;
 	font-size: 0.82rem;
-	color: #444;
+	color: #5A5A5A;
 
 	&:first-child {
 		padding-left: 1rem;
@@ -482,7 +483,7 @@ table.dash-printer-queue tbody td i.material-icons {
 	position: relative;
 	top: 0.2rem;
 	font-size: 1.1rem;
-	color: #999;
+	color: #AAA;
 }
 
 
@@ -494,15 +495,16 @@ table.job-list {
 
 table.job-list thead {
 	background-color: #F5F5F5;
-	border-top: 1px solid #EEE;
-	border-bottom: 1px solid #EEE;
+	border-top: 1px solid #EBEBEB;
+	border-bottom: 1px solid #EBEBEB;
 }
 
 table.job-list thead th {
+	padding: 0.35rem 0.6rem;
 	box-sizing: border-box;
-	padding: 0.35rem 0.7rem;
+
 	font-size: 0.75rem;
-	color: #666;
+	color: #777;
 	text-transform: uppercase;
 	text-align: left;
 	font-weight: 600;
@@ -544,7 +546,7 @@ table.job-list tbody td {
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	font-size: 0.82rem;
-	color: #444;
+	color: #5A5A5A;
 
 	&:first-child {
 		padding-left: 1rem;
@@ -558,7 +560,7 @@ table.job-list tbody td i.material-icons {
 	position: relative;
 	top: 0.2rem;
 	font-size: 1.1rem;
-	color: #999;
+	color: #AAA;
 }
 
 
