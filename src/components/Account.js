@@ -54,7 +54,7 @@ class Account extends React.Component {
 								<h2>{salutation} {badges}</h2>
 							</div>
 							<div className="col no-padding no-borders">
-								<div className="faculty">{facultyOrDepartment}</div>
+								<div className="fac-dept">{facultyOrDepartment}</div>
 							</div>
 						</div>
 						{canPrint ? (
