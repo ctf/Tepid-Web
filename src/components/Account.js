@@ -12,18 +12,19 @@ class Account extends React.Component {
 	}
 
 	render() {
-		if (this.props.account === undefined) {
-			return (<div><div className="card">Loading...</div></div>);
-		}
-
-		const account = this.props.account.data;
-		const quota = this.props.account.quota.amount;
+		const account = this.props.account === undefined ? {
+			displayName: (<span>&nbsp;</span>),
+			shortUser: (<span>&nbsp;</span>),
+			longUser: (<span>&nbsp;</span>),
+			colorPrinting: false
+		} : this.props.account.data;
+		const quota = this.props.account === undefined ? null : this.props.account.quota.amount;
 		const maxQuota = 4000; // TODO: Fetch from somewhere
 
 		const canPrint = true; // TODO: Exchange/paid into fund/CTF volunteer
 
 		const self = Object.keys(this.props.auth.user).includes('shortUser')
-			? this.props.account.data.shortUser === this.props.auth.user.shortUser
+			? account.shortUser === this.props.auth.user.shortUser
 			: false;
 
 		const facultyOrDepartment = (() => {
@@ -40,10 +41,12 @@ class Account extends React.Component {
 			? (account.salutation ? account.salutation : account.displayName)
 			: account.displayName;
 
-		const badges = ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
+		const badges = this.props.account === undefined
+			? ''
+			: ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
-		const jobs = this.props.account.jobs.items;
-		const jobTable = jobs.length > 0 && canPrint ? (<JobTable jobs={jobs} showUser={false} />) : '';
+		const jobs = this.props.account === undefined ? [] : this.props.account.jobs.items;
+		const jobTable = canPrint ? (<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false} />) : '';
 
 		return (
 			<div>
