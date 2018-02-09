@@ -88,11 +88,11 @@ class Account extends React.Component {
 								</div>
 							</div>
 						</div>
-					</div>
-				</div>
+						<hr />
 
-				<div className="card no-padding">
-					{jobTable}
+						<h3>Jobs</h3>
+						{jobTable}
+					</div>
 				</div>
 			</div>
 		);
