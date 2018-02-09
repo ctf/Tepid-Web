@@ -2,7 +2,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Link, withRouter} from 'react-router-dom';
 
-import {fetchDestinationsIfNeeded, fetchQueueJobsIfNeeded} from "../actions";
+import {fetchDestinationsIfNeeded, fetchQueueJobsIfNeeded} from '../actions';
+import {jobStatus} from '../tepid-utils';
 
 class DashboardPrinter extends React.Component {
 	componentWillMount() {
@@ -36,7 +37,7 @@ class DashboardPrinter extends React.Component {
 					<td>{this.props.destinations[job.destination]
 							? this.props.destinations[job.destination].name
 							: ''}</td>
-					<td>.</td>
+					<td>{jobStatus(job)}</td>
 				</tr>
 			));
 
@@ -51,9 +52,9 @@ class DashboardPrinter extends React.Component {
 				<table className="dash-printer-queue">
 					<thead>
 					<tr>
-						<th style={{width: '32%'}}>User</th>
-						<th style={{width: '38%'}}>Printer</th>
-						<th style={{width: '30%'}}>Status</th>
+						<th style={{width: '5.5rem'}}>User</th>
+						<th style={{width: '5.8rem'}}>Printer</th>
+						<th style={{minWidth: '12.3rem'}}>Status</th>
 					</tr>
 					</thead>
 					<tbody>{queueJobs}</tbody>
