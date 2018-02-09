@@ -27,7 +27,7 @@ a {
 aside {
 	position: absolute;
 	top: 0; left: 0; bottom: 0;
-	width: 15rem;
+	width: 14.5rem;
 	overflow-y: auto;
 
 	@if $colored-sidebar == 'true' {
@@ -114,7 +114,7 @@ aside nav ul li:hover i.material-icons {
 
 
 main {
-	position: absolute; top: 0; left: 15rem; right: 0; bottom: 0;
+	position: absolute; top: 0; left: 14.5rem; right: 0; bottom: 0;
 	overflow-y: auto;
 }
 main.no-sidebar, main.hidden-sidebar {
@@ -129,7 +129,7 @@ main header {
 	flex-direction: row;
 	height: 4.6rem;
 
-	position: fixed; top: 0; left: 15rem; right: 1.4rem;
+	position: fixed; top: 0; left: 14.5rem; right: 1.4rem;
 	z-index: 10;
 }
 main header .header-left {
