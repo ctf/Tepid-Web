@@ -140,20 +140,87 @@ main header .header-right {
 	flex: 1;
 	text-align: right;
 }
-main header .header-right span#header-user-dropdown {
+main header .header-right div#header-user-dropdown {
+	position: relative;
 	display: inline-block;
 	font-weight: 600;
 	font-size: 0.9rem;
 	color: #666;
 	text-decoration: none;
 	line-height: 2rem;
-}
-main header .header-right span#header-user-dropdown i.material-icons {
-	vertical-align: top;
-	font-size: 1.2rem;
-	margin-top: 0.4rem;
-}
 
+	cursor: pointer;
+
+	transition: color 0.15s;
+
+	i.material-icons {
+		vertical-align: top;
+		font-size: 1.2rem;
+		margin-top: 0.4rem;
+	}
+
+	ul {
+		position: absolute;
+		top: 1rem; right: 0;
+		background-color: #FEFEFE;
+		list-style: none;
+		padding: 0; margin: 0;
+		border-radius: 4px;
+
+		opacity: 0;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+		pointer-events: none;
+
+		li {
+			padding: 0 1.4rem;
+			height: 1.8rem;
+			line-height: 1.8rem;
+			font-weight: normal;
+			text-align: left;
+
+			color: #666;
+			transition: color 0.15s;
+
+			a {
+				color: #666;
+				text-decoration: none;
+				transition: color 0.15s;
+			}
+
+			&:hover {
+				color: #7A7A7A;
+				transition: color 0.15s;
+
+				a {
+					color: #7A7A7A;
+					transition: color 0.15s;
+				}
+			}
+
+			&:first-child {
+				padding-top: 0.5rem;
+			}
+			&:last-child {
+				padding-bottom: 0.5rem;
+			}
+		}
+
+		transition: opacity 0.2s ease-in-out, top 0.2s ease-in;
+	}
+
+	&:hover {
+		color: #777;
+		transition: color 0.15s;
+
+		ul {
+			top: 2rem;
+			opacity: 1;
+			transition: opacity 0.2s ease-in-out, top 0.2s ease-out;
+			pointer-events: all;
+		}
+	}
+}
 main header .header-left i.material-icons {
 	color: #AAA;
 	position: absolute;

@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+import {NavLink} from 'react-router-dom';
 
 class PageHeader extends React.Component {
 	render() {
@@ -9,10 +10,14 @@ class PageHeader extends React.Component {
 					<input type="text" name="user-search" id="header-user-search" placeholder="Search for users..." />
 				</div>
 				<div className="header-right">
-					<span id="header-user-dropdown">
+					<div id="header-user-dropdown">
 						David Lougheed
 						<i className="material-icons">keyboard_arrow_down</i>
-					</span>
+						<ul>
+							<li><NavLink to="/my-account">My Account</NavLink></li>
+							<li>Sign Out</li>
+						</ul>
+					</div>
 				</div>
 			</header>
 		);
