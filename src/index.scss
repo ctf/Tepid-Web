@@ -323,6 +323,13 @@ nav.card-tabs ul li {
 	text-align: center;
 	line-height: 2rem;
 	border-left: 1px solid rgba(0, 0, 0, 0.06);
+
+	i.material-icons {
+		line-height: 2rem;
+	}
+}
+nav.card-tabs.icons-only ul li {
+	padding: 0 0.5rem;
 }
 nav.card-tabs ul a:first-child li {
 	border-top-left-radius: 3px;
@@ -561,6 +568,25 @@ table.job-list tbody td i.material-icons {
 	top: 0.2rem;
 	font-size: 1.1rem;
 	color: #AAA;
+}
+
+div.table-nav {
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+	padding: 1rem 1.8rem;
+
+	display: flex;
+
+	.page-text {
+		flex: 1;
+		color: #999;
+		font-size: 0.8rem;
+		line-height: 2rem;
+	}
+
+	.page-buttons {
+		flex: 1;
+		text-align: right;
+	}
 }
 
 
