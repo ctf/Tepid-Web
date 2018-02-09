@@ -30,7 +30,7 @@ class DashboardPrinter extends React.Component {
 		});
 
 		const queueJobs = this.props.loadingQueueJobs
-			? (<tr style={{borderBottom: 'none'}}><td colSpan="3" style={{textAlign: 'center'}}>Loading...</td></tr>)
+			? (<tr style={{borderBottom: 'none'}}><td colSpan="4" style={{textAlign: 'center'}}>Loading...</td></tr>)
 			: this.props.queueJobs.slice(0, 25).map(job => (
 				<tr key={job._id}>
 					<td><Link to={`/accounts/${job.userIdentification}`}>{job.userIdentification}</Link></td>
@@ -38,6 +38,7 @@ class DashboardPrinter extends React.Component {
 							? this.props.destinations[job.destination].name
 							: ''}</td>
 					<td>{jobStatus(job)}</td>
+					<td><i className="material-icons">more_vert</i></td>
 				</tr>
 			));
 
@@ -55,6 +56,7 @@ class DashboardPrinter extends React.Component {
 						<th style={{width: '5.5rem'}}>User</th>
 						<th style={{width: '5.8rem'}}>Printer</th>
 						<th style={{minWidth: '12.3rem'}}>Status</th>
+						<th style={{width: '2.9rem'}}>&nbsp;</th>
 					</tr>
 					</thead>
 					<tbody>{queueJobs}</tbody>
