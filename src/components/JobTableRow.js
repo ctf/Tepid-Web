@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { jobStatus } from '../tepid-utils';
+import { jobStatus, jobHasFailed } from '../tepid-utils';
 
 class JobTableRow extends React.Component {
 	render() {
 		return (
-			<tr>
+			<tr className={jobHasFailed(this.props.job) ? 'failed' : ''}>
 				{/*<td>{i++}</td>*/}
 				<td>{this.props.job.started === -1 ? '' : new Date(this.props.job.started).toLocaleString('en-CA')}</td>
 				{this.props.showUser ? (
