@@ -66,10 +66,9 @@ const store = createStore(
 
 const persistor = persistStore(store);
 
-// TODO: Loading state
 ReactDOM.render(
 	<Provider store={store}>
-		<PersistGate loading={null} persistor={persistor}>
+		<PersistGate persistor={persistor}>
 			<BrowserRouter>
 				<Tepid auth={store.getState().auth} />
 			</BrowserRouter>
