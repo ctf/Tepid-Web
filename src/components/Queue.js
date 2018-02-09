@@ -9,7 +9,7 @@ class Queue extends React.Component {
 
 	render() {
 		return (
-			<JobTable queueName={this.props.match.params.queueName} jobs={this.props.jobs} />
+			<JobTable queueName={this.props.match.params.queueName} jobs={this.props.jobs} showUser={true} />
 		);
 	}
 }

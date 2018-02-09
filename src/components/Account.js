@@ -10,13 +10,14 @@ class Account extends React.Component {
 	componentWillReceiveProps(nextProps, nextContext) {
 		this.props.fetchNeededData(nextProps.shortUser);
 	}
+
 	render() {
 		if (this.props.account === undefined) {
 			return (<div><div className="card">Loading...</div></div>);
 		}
 
 		const account = this.props.account.data;
-		const quota = this.props.account.quota;
+		const quota = this.props.account.quota.amount;
 		const maxQuota = 4000; // TODO: Fetch from somewhere
 
 		const canPrint = true; // TODO: Exchange/paid into fund/CTF volunteer
@@ -41,8 +42,8 @@ class Account extends React.Component {
 
 		const badges = ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
-		const jobs = this.props.account.jobs;
-		const jobTable = jobs.length > 0 && canPrint ? (<JobTable jobs={jobs} />) : '';
+		const jobs = this.props.account.jobs.items;
+		const jobTable = jobs.length > 0 && canPrint ? (<JobTable jobs={jobs} showUser={false} />) : '';
 
 		return (
 			<div>

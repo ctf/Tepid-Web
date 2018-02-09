@@ -193,36 +193,50 @@ const accounts = function (state = initialAccountsState, action) {
 						isFetching: false,
 						didInvalidate: false,
 						data: action.account,
-						quota: null,
-						jobs: [],
-						lastUpdated: action.receivedAt,
-						lastUpdatedQuota: -1
+						quota: {
+							amount: null,
+							max: null,
+							isFetching: false,
+							didInvalidate: false,
+							lastUpdated: -1
+						},
+						jobs: {
+							items: [],
+							isFetching: false,
+							didInvalidate: false,
+							lastUpdated: -1
+						},
+						lastUpdated: action.receivedAt
 					}
 				}
 			});
 		case REQUEST_ACCOUNT_QUOTA:
 			return Object.assign({}, state, {
-				isFetching: true,
 				items: {
 					...state.items,
 					[action.shortUser]: {
 						...state.items[action.shortUser],
-						isFetching: true,
-						didInvalidate: false
+						quota: {
+							...state.items[action.shortUser].quota,
+							isFetching: true,
+							didInvalidate: false
+						}
 					}
 				}
 			});
 		case RECEIVE_ACCOUNT_QUOTA:
 			return Object.assign({}, state, {
-				isFetching: false,
 				items: {
 					...state.items,
 					[action.shortUser]: {
 						...state.items[action.shortUser],
-						isFetching: false,
-						didInvalidate: false,
-						quota: action.quota,
-						lastUpdatedQuota: action.receivedAt
+						quota: {
+							...state.items[action.shortUser].quota,
+							amount: action.quota,
+							isFetching: false,
+							didInvalidate: false,
+							lastUpdated: action.receivedAt
+						}
 					}
 				}
 			});

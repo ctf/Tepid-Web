@@ -9,11 +9,13 @@ class JobTableRow extends React.Component {
 			<tr>
 				{/*<td>{i++}</td>*/}
 				<td>{this.props.job.started === -1 ? '' : new Date(this.props.job.started).toLocaleString('en-CA')}</td>
-				<td>
-					<Link to={`/accounts/${this.props.job.userIdentification}`}>
-						{this.props.job.userIdentification}
-					</Link>
-				</td>
+				{this.props.showUser ? (
+					<td>
+						<Link to={`/accounts/${this.props.job.userIdentification}`}>
+							{this.props.job.userIdentification}
+						</Link>
+					</td>
+				) : ''}
 				<td>{`${this.props.job.pages} ${this.props.job.colorPages === 0 ? '' : ` (${this.props.job.colorPages} color)`}`}</td>
 				<td>{jobStatus(this.props.job)}</td>
 				<td>{this.props.job.originalHost}</td>

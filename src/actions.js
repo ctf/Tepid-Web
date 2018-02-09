@@ -361,12 +361,12 @@ const shouldFetchAccountQuota = (state, shortUser) => {
 	const accounts = state.accounts.items;
 	if (!Object.keys(accounts).includes(shortUser)) {
 		return false;
-	} else if (accounts[shortUser].isFetching) {
+	} else if (accounts[shortUser].quota.isFetching) {
 		return false;
-	} else if (!accounts[shortUser].quota) { // TODO: Expiry time
+	} else if (!accounts[shortUser].quota.amount) { // TODO: Expiry time
 		return true;
 	} else {
-		return accounts[shortUser].didInvalidate;
+		return accounts[shortUser].quota.didInvalidate;
 	}
 };
 
