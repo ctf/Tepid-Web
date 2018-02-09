@@ -8,7 +8,8 @@ const mapStateToProps = (state, ownProps) => {
 
 	return {
 		match: ownProps.match,
-		jobs: queueJobs ? queueJobs.items : []
+		jobs: queueJobs ? queueJobs.items : [],
+		loadingJobs: queueJobs === undefined || queueJobs.isFetching
 	};
 };
 
