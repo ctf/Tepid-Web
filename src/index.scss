@@ -376,19 +376,32 @@ table.dash-printer-queue thead th {
 }
 
 table.dash-printer-queue tbody tr {
-	border-bottom: 1px solid #F3F3F3;
+	border-top: 1px solid #F3F3F3;
 }
 table.dash-printer-queue tbody tr:nth-child(2n) {
 	background-color: #FAFAFA;
 }
 
+table.dash-printer-queue tbody tr.failed {
+	background-color: #FFF0F0;
+	border-top: 1px solid #EDD;
+	td {
+		color: #6d4849;
+	}
+
+	& + tr {
+		border-top: 1px solid #EDD;
+	}
+}
+
 table.dash-printer-queue tbody td {
-	padding: 0.4rem 0.7rem;
+	padding: 0.45rem 0.6rem;
+	box-sizing: border-box;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
-	font-size: 0.85rem;
-	color: #333;
+	font-size: 0.82rem;
+	color: #444;
 
 	&:first-child {
 		padding-left: 1rem;
@@ -491,6 +504,9 @@ table.job-list tbody td i.material-icons {
 .no-side-padding {
 	padding-left: 0 !important;
 	padding-right: 0 !important;
+}
+.no-bottom-padding {
+	padding-bottom: 0 !important;
 }
 
 
