@@ -599,6 +599,10 @@ div.table-nav {
 	.page-buttons {
 		flex: 1;
 		text-align: right;
+
+		a {
+			cursor: pointer;
+		}
 	}
 }
 
