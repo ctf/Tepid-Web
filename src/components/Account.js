@@ -76,7 +76,6 @@ class Account extends React.Component {
 								<div className="col">
 									<strong>Short Username:</strong> {account.shortUser} <br />
 									<strong>Long Username:</strong> {account.longUser} <br />
-									<strong>ID:</strong> <a href="">Click to show...</a> <br />
 									<strong>Current Status:</strong> Active <br />
 									<strong>Student Since:</strong> May 2015 <br />
 									User <strong>has</strong> paid into the 21st Century Fund
