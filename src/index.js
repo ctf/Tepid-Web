@@ -19,6 +19,7 @@ import { CTFerRoute, UserRoute, GuestRoute } from './components/auth_routes';
 import DashboardPage from './pages/DashboardPage';
 import SignInPage from './pages/SignInPage';
 import QueuesPage from './pages/QueuesPage';
+import DestinationsPage from './pages/DestinationsPage';
 import LogsPage from './pages/LogsPage';
 import ConstitutionPage from './pages/ConstitutionPage';
 import StatisticsPage from './pages/StatisticsPage';
@@ -36,6 +37,7 @@ class Tepid extends React.Component {
 				<CTFerRoute path="/accounts" component={AccountPage} />
 				<UserRoute path="/my-account" component={MyAccountPage} />
 				<CTFerRoute path="/queues" component={QueuesPage} />
+				<CTFerRoute path="/destinations" component={DestinationsPage} />
 				<CTFerRoute path="/statistics" component={StatisticsPage} />
 				<CTFerRoute path="/logs" component={LogsPage} />
 				<CTFerRoute path="/constitution" component={ConstitutionPage} />
