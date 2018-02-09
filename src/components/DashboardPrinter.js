@@ -18,9 +18,7 @@ class DashboardPrinter extends React.Component {
 			.sort((d1, d2) => d1.name.localeCompare(d2));
 
 		const queueDestinationClickers = queueDestinations.map(dest => {
-			// noinspection JSUnresolvedVariable
 			const iconClass = dest.up ? 'up' :'down';
-			// noinspection JSUnresolvedVariable
 			const iconText = dest.up ? 'arrow_upward' :'arrow_downward';
 			return (
 				<a href="" key={dest._id}>
