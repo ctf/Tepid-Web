@@ -30,9 +30,14 @@ class JobTable extends React.Component {
 	}
 
 	render() {
-		// TODO: Pagination
-		const jobList = this.props.jobs.slice(this.state.offset, this.state.offset + this.state.pageSize)
+		const colSpan = this.props.showUser ? 7 : 6;
+
+		let jobList = this.props.jobs.slice(this.state.offset, this.state.offset + this.state.pageSize)
 			.map(job => (<JobTableRow key={job._id} job={job} showUser={this.props.showUser} />));
+
+		if (this.props.loading) {
+			jobList = (<tr><td colSpan={colSpan} style={{textAlign: 'center'}}>Loading...</td></tr>);
+		}
 
 		return (
 			<div>
@@ -46,7 +51,7 @@ class JobTable extends React.Component {
 								: ''
 						}
 						<th style={{width: '6.1rem'}}>Pages</th>
-						<th style={{width: '12.3rem'}}>Status</th>
+						<th style={{width: '12.5rem'}}>Status</th>
 						<th style={{width: '7.7rem'}}>Host</th>
 						<th style={{minWidth: '16rem'}}>Name</th>
 						<th style={{width: '2.9rem'}}>&nbsp;</th>
@@ -56,24 +61,32 @@ class JobTable extends React.Component {
 					{jobList}
 					</tbody>
 				</table>
-				<div className="table-nav">
-					<div className="page-text">
-						Showing {this.state.offset + 1} to {Math.min(this.state.offset + this.state.pageSize, this.props.jobs.length)} of&nbsp;
-						{this.props.jobs.length} jobs
-					</div>
-					<div className="page-buttons">
-						{this.state.pageSize < this.props.jobs.length ? (<nav className="card-tabs icons-only small">
-							<ul>
-								<a onClick={this.handlePageBack}>
-									<li><i className="material-icons">keyboard_arrow_left</i></li>
-								</a>
-								<a onClick={this.handlePageForward}>
-									<li><i className="material-icons">keyboard_arrow_right</i></li>
-								</a>
-							</ul>
-						</nav>) : ''}
-					</div>
-				</div>
+				{this.props.loading
+					? ''
+					: (
+						<div className="table-nav">
+							<div className="page-text">
+						<span>
+							Showing {this.state.offset + 1} to&nbsp;
+							{Math.min(this.state.offset + this.state.pageSize, this.props.jobs.length)} of&nbsp;
+							{this.props.jobs.length} jobs
+						</span>
+							</div>
+							<div className="page-buttons">
+								{this.state.pageSize < this.props.jobs.length ? (<nav className="card-tabs icons-only small">
+									<ul>
+										<a onClick={this.handlePageBack}>
+											<li><i className="material-icons">keyboard_arrow_left</i></li>
+										</a>
+										<a onClick={this.handlePageForward}>
+											<li><i className="material-icons">keyboard_arrow_right</i></li>
+										</a>
+									</ul>
+								</nav>) : ''}
+							</div>
+						</div>
+					)
+				}
 			</div>
 		);
 	}
