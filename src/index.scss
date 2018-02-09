@@ -304,6 +304,19 @@ nav.card-tabs {
 	border-radius: 4px;
 	border: 1px solid rgba(0, 0, 0, 0.13);
 	background-color: #FDFDFD;
+
+	&.small ul li {
+		height: 1.8rem;
+		line-height: 1.8rem;
+
+		i.material-icons {
+			line-height: 1.8rem;
+		}
+	}
+
+	&.small.icons-only ul li {
+		padding: 0 0.3rem;
+	}
 }
 nav.card-tabs ul {
 	display: flex;
@@ -580,7 +593,7 @@ div.table-nav {
 		flex: 1;
 		color: #999;
 		font-size: 0.8rem;
-		line-height: 2rem;
+		line-height: 1.8rem;
 	}
 
 	.page-buttons {

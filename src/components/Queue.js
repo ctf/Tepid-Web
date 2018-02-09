@@ -19,7 +19,7 @@ class Queue extends React.Component {
 						Showing 1 to 100 of {this.props.jobs.length} jobs
 					</div>
 					<div className="page-buttons">
-						<nav className="card-tabs icons-only">
+						<nav className="card-tabs icons-only small">
 							<ul>
 								<a><li><i className="material-icons">keyboard_arrow_left</i></li></a>
 								<a><li><i className="material-icons">keyboard_arrow_right</i></li></a>
