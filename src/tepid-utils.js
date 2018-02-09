@@ -7,13 +7,13 @@ export const jobStatus = job => {
 	//'Refunded' : (j.failed !== -1 ? 'Failed' : (j.printed !== -1 ? 'Printed' : ('Process' + (j.processed !== -1 ? 'ed' : 'ing'))))
 
 	let status = 'Processing...';
-	if (job.processed || job.processed !== -1) {
+	if (job.processed !== null && job.processed !== -1 && job.processed !== undefined) {
 		status = 'Processed';
 	}
 
-	if (job.printed || job.printed !== -1) {
+	if (job.printed !== null && job.printed !== -1 && job.printed !== undefined) {
 		status = `Sent ${new Date(job.printed).toLocaleString('en-CA')}`;
-	} else if(job.failed || job.failed !== -1) {
+	} else if(job.failed !== null && job.failed !== -1 && job.failed !== undefined) {
 		status = 'Failed';
 		if (job.error) {
 			status = job.error;
@@ -32,5 +32,5 @@ export const jobIsProcessing = job => {
 };
 
 export const jobHasFailed = job => {
-	return job.failed || job.failed !== -1;
+	return (job.failed !== null && job.failed !== -1 && job.failed !== undefined);
 };
