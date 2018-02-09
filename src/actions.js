@@ -379,12 +379,74 @@ export const fetchAccountQuotaIfNeeded = shortUser => (dispatch, getState) => {
 	}
 };
 
-// TODO: ACCOUNT JOBS
+export const REQUEST_ACCOUNT_JOBS = 'REQUEST_ACCOUNT_JOBS';
+export const requestAccountJobs = shortUser => ({
+	type: REQUEST_ACCOUNT_JOBS,
+	shortUser
+});
+
+export const RECEIVE_ACCOUNT_JOBS = 'RECEIVE_ACCOUNT_JOBS';
+export const receiveAccountJobs = (shortUser, jobs) => ({
+	type: RECEIVE_ACCOUNT_JOBS,
+	shortUser,
+	jobs,
+	receivedAt: Date.now()
+});
+
+const fetchAccountJobs = (auth, shortUser) => dispatch => {
+	dispatch(requestAccountJobs(shortUser));
+
+	const fetchObject = {
+		method: 'GET',
+		headers: {
+			'Accept': 'application/json',
+			'Authorization': `Token ${buildToken(auth)}`
+		}
+	};
+
+	// noinspection JSUnresolvedFunction
+	return fetch(`${API_URL}/jobs/${shortUser}`, fetchObject)
+		.then(response => {
+			if (response.status === 401) {
+				dispatch(invalidateAuth()); // To be used for redirection
+				return [];
+			} else if (!response.ok) {
+				// TODO: Handle error better
+				console.error(response);
+				return [];
+			}
+			return response.json();
+		})
+		.then(json => dispatch(receiveAccountJobs(shortUser, json)));
+};
+
+const shouldFetchAccountJobs = (state, shortUser) => {
+	const accounts = state.accounts.items;
+	if (!Object.keys(accounts).includes(shortUser)) {
+		return false;
+	} else if (accounts[shortUser].jobs.isFetching) {
+		return false;
+	} else if (accounts[shortUser].jobs.items.length === 0) { // TODO: Expiry time
+		return true;
+	} else {
+		return accounts[shortUser].jobs.didInvalidate;
+	}
+};
+
+export const fetchAccountJobsIfNeeded = shortUser => (dispatch, getState) => {
+	const state = getState();
+	if (shouldFetchAccountJobs(state, shortUser)) {
+		return dispatch(fetchAccountJobs(state.auth, shortUser));
+	} else {
+		return Promise.resolve();
+	}
+};
 
 export const fetchAccountAndRelatedDataIfNeeded = shortUser => (dispatch, getState) => {
 	return Promise.all([
 		dispatch(fetchAccountIfNeeded(shortUser)),
-		dispatch(fetchAccountQuotaIfNeeded(shortUser))
+		dispatch(fetchAccountQuotaIfNeeded(shortUser)),
+		dispatch(fetchAccountJobsIfNeeded(shortUser))
 	]);
 };
 
