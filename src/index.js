@@ -14,37 +14,9 @@ import { PersistGate } from 'redux-persist/lib/integration/react'
 
 import tepidReducer from './reducers';
 
-import { CTFerRoute, UserRoute, GuestRoute } from './components/auth_routes';
-
-import DashboardPage from './pages/DashboardPage';
-import SignInPage from './pages/SignInPage';
-import QueuesPage from './pages/QueuesPage';
-import DestinationsPage from './pages/DestinationsPage';
-import LogsPage from './pages/LogsPage';
-import ConstitutionPage from './pages/ConstitutionPage';
-import StatisticsPage from './pages/StatisticsPage';
-import AccountPage from './pages/AccountPage';
-import MyAccountPage from './pages/MyAccountPage';
+import Tepid from './components/Tepid';
 
 import './index.css';
-
-class Tepid extends React.Component {
-	render() {
-		return (
-			<div>
-				<GuestRoute path="/sign-in" component={SignInPage} />
-				<UserRoute exact path="/" component={DashboardPage} />
-				<CTFerRoute path="/accounts" component={AccountPage} />
-				<UserRoute path="/my-account" component={MyAccountPage} />
-				<CTFerRoute path="/queues" component={QueuesPage} />
-				<CTFerRoute path="/destinations" component={DestinationsPage} />
-				<CTFerRoute path="/statistics" component={StatisticsPage} />
-				<CTFerRoute path="/logs" component={LogsPage} />
-				<CTFerRoute path="/constitution" component={ConstitutionPage} />
-			</div>
-		);
-	}
-}
 
 // -----------------------------------------------------------------------------
 
