@@ -20,6 +20,9 @@ import './index.css';
 
 // -----------------------------------------------------------------------------
 
+const preloadedState = window.__PRELOADED_STATE__;
+delete window.__PRELOADED_STATE__;
+
 const loggerMiddleware = createLogger();
 
 const persistConfig = {
@@ -38,9 +41,9 @@ const store = createStore(
 	)
 );
 
-const persistor = persistStore(store);
+const persistor = persistStore(store, preloadedState);
 
-ReactDOM.render(
+ReactDOM.hydrate(
 	<Provider store={store}>
 		<PersistGate persistor={persistor}>
 			<BrowserRouter>
