@@ -84,10 +84,10 @@ const fetchQueues = () => dispatch => {
 
 const shouldFetchQueues = state => {
 	const queues = state.queues;
-	if (queues.items.length === 0) {
-		return true;
-	} else if (queues.isFetching) {
+	if (queues.isFetching) {
 		return false;
+	} else if (queues.items.length === 0) {
+		return true;
 	} else {
 		return queues.didInvalidate;
 	}
@@ -95,6 +95,7 @@ const shouldFetchQueues = state => {
 
 export const fetchQueuesIfNeeded = () => (dispatch, getState) => {
 	if (shouldFetchQueues(getState())) {
+		console.log('fetching qs', getState());
 		return dispatch(fetchQueues());
 	} else {
 		return Promise.resolve();
@@ -144,10 +145,10 @@ const fetchDestinations = auth => dispatch => {
 
 const shouldFetchDestinations = state => {
 	const destinations = state.destinations;
-	if (Object.keys(destinations.items).length === 0) {
-		return true;
-	} else if (destinations.isFetching) {
+	if (destinations.isFetching) {
 		return false;
+	} else if (Object.keys(destinations.items).length === 0) {
+		return true;
 	} else {
 		return destinations.didInvalidate;
 	}
@@ -235,10 +236,8 @@ export const fetchQueueJobsIfNeeded = (queueName) => (dispatch, getState) => {
 };
 
 export const fetchAllQueueJobsIfNeeded = () => (dispatch, getState) => {
-	return dispatch(fetchQueuesIfNeeded()).then(() => {
-		const state = getState();
-		return Promise.all(state.queues.items.map(queue => dispatch(fetchQueueJobsIfNeeded(queue.name))));
-	});
+	const state = getState();
+	return Promise.all(state.queues.items.map(queue => dispatch(fetchQueueJobsIfNeeded(queue.name))));
 };
 
 // -- Job Actions --------------------------------------------------------------
