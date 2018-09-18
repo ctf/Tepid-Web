@@ -16,7 +16,7 @@ import tepidReducer from './reducers';
 
 import Tepid from './components/Tepid';
 
-import './index.scss';
+import './index.css';
 
 // -----------------------------------------------------------------------------
 
