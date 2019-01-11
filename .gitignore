@@ -1,3 +1,6 @@
+# Ignore test json servers
+db-*.json
+
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
 # dependencies
@@ -46,3 +49,4 @@ yarn-error.log*
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
+.idea/httpRequests/

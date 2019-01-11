@@ -25,6 +25,7 @@
     "start-ssr": "babel-node ./src/server.js",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "mock": "json-server --watch db.js --port 3000",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
