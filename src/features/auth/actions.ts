@@ -1,8 +1,14 @@
-import {action, createStandardAction} from "typesafe-actions";
-import {LOGIN, LOGOUT} from "./constants";
-import {LoginRequest} from "./models";
-import {EmptyAction, NoArgCreator} from "typesafe-actions/dist/types";
+import {createAsyncAction} from 'typesafe-actions';
+import {LoginRequest, Session} from "../../api/models/auth";
 
-export const login = createStandardAction(LOGIN)<LoginRequest>();
+export const loginAsync = createAsyncAction(
+    'LOGIN_REQUEST',
+    'LOGIN_SUCCESS',
+    'LOGIN_FAILURE'
+)<LoginRequest, Session, string>();
 
-export const logout = createStandardAction(LOGOUT)<void>();
+export const logoutAsync = createAsyncAction(
+    'LOGOUT_REQUEST',
+    'LOGOUT_SUCCESS',
+    'LOGOUT_FAILURE'
+)<void, boolean, string>();

@@ -1,26 +1,27 @@
-import {ActionType} from "typesafe-actions";
-import * as actions from './actions'
-import {LOGIN, LOGOUT} from "./constants";
-import {Session, User} from "./models";
-import {combineReducers} from "redux";
+import {RootAction} from 'TepidTypes';
+import {combineReducers} from 'redux';
+import {getType} from 'typesafe-actions';
+
+import * as actions from './actions';
+import {User} from "../../api/models/user";
+import {Session} from "../../api/models/auth";
 
 export type AuthState = Readonly<{
-    user?: User
-    session?: Session
+    user: User | null,
+    session: Session | null
 }>;
 
-export type AuthAction = ActionType<typeof actions>;
-
-// TODO this isn't correct
-export default combineReducers<AuthState, AuthAction>({
-    user: (state = undefined, action) => {
+export default combineReducers<AuthState, RootAction>({
+    session: (state = null, action) => {
         switch (action.type) {
-            case LOGIN:
-                return {...<User>state};
-            case LOGOUT:
-                return undefined;
+            case getType(actions.loginAsync.success):
+                return action.payload;
+            case getType(actions.loginAsync.failure):
+                return null;
             default:
                 return state;
         }
-    }
+    },
+    // TODO
+    user: (state = null, action) => state
 });

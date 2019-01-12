@@ -1,4 +1,4 @@
-import {authReducer as reducer, authActions as actions} from './'
+import {authReducer as reducer} from './'
 
 const initialState = reducer(undefined, {} as any);
 
@@ -6,7 +6,7 @@ const initialState = reducer(undefined, {} as any);
 describe('Auth Login', () => {
     describe('initial state', () => {
         it('should match', () => {
-            expect(initialState).toMatchSnapshot()
+            expect(initialState).toMatchObject({})
         })
     })
 });

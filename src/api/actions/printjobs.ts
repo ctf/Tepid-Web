@@ -1,4 +1,4 @@
-import {PrintJob} from "../features/rooms/models";
+import {PrintJob} from "../models/printjobs";
 
 export function loadPrintJobs(room: string): Promise<PrintJob[]> {
     return new Promise((resolve, reject) => {
@@ -20,19 +20,3 @@ export function loadPrintJobs(room: string): Promise<PrintJob[]> {
         }, 500)
     })
 }
-
-export type PrintJob = Readonly<{
-    name: string
-    queueName?: string
-    originalHost?: string
-    error?: string
-    colorPages: number
-    pages: number
-    started: number
-    processed: number
-    printed: number
-    failed: number
-    received: number
-    isRefunded: boolean
-    eta: number
-}>

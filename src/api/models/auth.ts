@@ -1,7 +1,3 @@
-export type User = Readonly<{
-    shortUser: string
-    email?: string
-}>
 
 export type Session = Readonly<{
     id: string

@@ -1,10 +1,10 @@
-import {loadPrintJobs} from "./printjobs";
+import * as printJobActions from "./actions/printjobs";
+import * as authActions from "./actions/auth";
 
 
 const api = {
-    printJobs: {
-        load: loadPrintJobs
-    }
+    printJobActions,
+    authActions
 };
 
 export default api;
