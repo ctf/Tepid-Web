@@ -12,7 +12,12 @@ import {of, throwError} from "rxjs";
 const initialState = reducer(undefined, {} as any);
 
 const loginObservable = () => ActionsObservable.of(
-    loginAsync.request({user: "testUser", password: "testPassword"})
+    loginAsync.request({
+        user: "testUser",
+        password: "testPassword",
+        persistent: false,
+        permanent: false
+    })
 );
 
 describe('Auth Login', () => {

@@ -1,4 +1,3 @@
-
 export type Session = Readonly<{
     id: string
     expiration: number
@@ -8,4 +7,6 @@ export type Session = Readonly<{
 export type LoginRequest = Readonly<{
     user: string
     password: string
+    persistent: boolean
+    permanent: boolean
 }>

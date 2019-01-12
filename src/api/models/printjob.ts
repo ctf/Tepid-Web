@@ -1,8 +1,10 @@
 export type PrintJob = Readonly<{
     name: string
-    queueName?: string
-    originalHost?: string
-    error?: string
+    queueName?: string | null
+    originalHost?: string | null
+    userIdentification?: string | null
+    destination?: string | null
+    error?: string | null
     colorPages: number
     pages: number
     started: number
