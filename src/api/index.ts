@@ -3,8 +3,8 @@ import * as authActions from "./actions/auth";
 
 
 const api = {
-    printJobActions,
-    authActions
+    ...printJobActions,
+    ...authActions
 };
 
 export default api;
