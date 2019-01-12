@@ -1,5 +1,9 @@
 import {INVALIDATE_AUTH, RECEIVE_AUTH, REQUEST_AUTH} from '../actions';
 
+const enum ActionType {
+    A = "", B = "", C = ""
+}
+
 interface User {
     shortUser: string
     // TODO verify
@@ -38,6 +42,32 @@ const initialAuthState: AuthState = {
     session: null,
     lastUpdated: null
 };
+
+interface UpdateAction {
+    type: "UPDATE_ACTION",
+    value: string;
+}
+
+interface RemoveAction {
+    type: "REMOVE_ACTION",
+    index: number;
+}
+
+type Action2 = UpdateAction | RemoveAction;
+
+// our switch cases know the type now
+const reducer = (state: any, action: Action2) => {
+    switch (action.type) {
+        case "UPDATE_ACTION":
+            // recognizes "value" and that it is a string
+            action.value
+            break;
+        case "REMOVE_ACTION":
+            // recognizes "index" and that it is a number
+            action.index
+            break;
+    }
+}
 
 interface Action {
     type: string

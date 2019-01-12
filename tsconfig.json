@@ -25,6 +25,6 @@
     "allowUnusedLabels": true
   },
   "include": [
-    "src"
+    "src", "typings"
   ]
 }
