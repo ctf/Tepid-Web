@@ -1,15 +1,11 @@
-import {RootAction, RootService, RootState} from "TepidTypes";
 import {isActionOf} from "typesafe-actions";
-import {Epic} from "redux-observable";
 import {from, of} from "rxjs";
 import {catchError, filter, map, switchMap} from "rxjs/operators";
 
 import {loginAsync, logoutAsync} from "./actions";
+import {RootEpic} from "../utils";
 
-export const loginEpic: Epic<RootAction,
-    RootAction,
-    RootState,
-    RootService> = (action$, state$, api) =>
+export const loginEpic: RootEpic = (action$, state$, api) =>
     action$.pipe(
         filter(isActionOf(loginAsync.request)),
         switchMap(action =>
@@ -20,10 +16,7 @@ export const loginEpic: Epic<RootAction,
         )
     );
 
-export const logoutEpic: Epic<RootAction,
-    RootAction,
-    RootState,
-    RootService> = (action$, state$, api) =>
+export const logoutEpic: RootEpic = (action$, state$, api) =>
     action$.pipe(
         filter(isActionOf(logoutAsync.request)),
         switchMap(() =>

@@ -1,14 +1,15 @@
-import {createAsyncAction} from 'typesafe-actions';
 import {LoginRequest, Session} from "../../api/models/auth";
+import {TepidAction} from "../constants";
+import {createTepidAsyncAction} from "../utils";
 
-export const loginAsync = createAsyncAction(
-    'LOGIN_REQUEST',
-    'LOGIN_SUCCESS',
-    'LOGIN_FAILURE'
+export const loginAsync = createTepidAsyncAction(
+    TepidAction.LoginRequest,
+    TepidAction.LoginSuccess,
+    TepidAction.LoginFailure
 )<LoginRequest, Session, string>();
 
-export const logoutAsync = createAsyncAction(
-    'LOGOUT_REQUEST',
-    'LOGOUT_SUCCESS',
-    'LOGOUT_FAILURE'
+export const logoutAsync = createTepidAsyncAction(
+    TepidAction.LoginRequest,
+    TepidAction.LogoutSuccess,
+    TepidAction.LoginFailure
 )<void, boolean, string>();

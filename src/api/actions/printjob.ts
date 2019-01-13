@@ -1,6 +1,6 @@
-import {PrintJob} from "../models/printjobs";
+import {PrintJob} from "../models/printjob";
 
-export function loadPrintJobs(room: string): Promise<PrintJob[]> {
+export function getPrintJobs(room: string): Promise<PrintJob[]> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve([

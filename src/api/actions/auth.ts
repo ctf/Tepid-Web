@@ -1,17 +1,10 @@
-import {Session, LoginRequest} from "../models/auth";
+import {LoginRequest, Session} from "../models/auth";
+import {tepidDelete, tepidPostJson} from "../base";
 
 export function login(request: LoginRequest): Promise<Session> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                id: "asdf",
-                token: "asdff",
-                expiration: 1000
-            })
-        }, 500)
-    })
+    return tepidPostJson('sessions', request);
 }
 
-export function logout(): Promise<boolean> {
-    return new Promise((resolve) => resolve(true))
+export function logout(id: string): Promise<void> {
+    return tepidDelete(`sessions/${id}`);
 }
