@@ -1,4 +1,4 @@
-import * as printJobActions from "./actions/printjobs";
+import * as printJobActions from "./actions/printjob";
 import * as authActions from "./actions/auth";
 
 

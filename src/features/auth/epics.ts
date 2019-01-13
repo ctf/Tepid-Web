@@ -4,6 +4,7 @@ import {catchError, filter, map, switchMap} from "rxjs/operators";
 
 import {loginAsync, logoutAsync} from "./actions";
 import {RootEpic} from "../utils";
+import {RootService, RootState} from "TepidTypes";
 
 export const loginEpic: RootEpic = (action$, state$, api) =>
     action$.pipe(
@@ -16,11 +17,19 @@ export const loginEpic: RootEpic = (action$, state$, api) =>
         )
     );
 
+function logout(state: RootState, api: RootService): Promise<void> {
+    const session = state.auth.session;
+    if (session)
+        return api.logout(session.id);
+    else
+        return Promise.resolve();
+}
+
 export const logoutEpic: RootEpic = (action$, state$, api) =>
     action$.pipe(
         filter(isActionOf(logoutAsync.request)),
         switchMap(() =>
-            from(api.logout()).pipe(
+            from(logout(state$.value, api)).pipe(
                 map(logoutAsync.success),
                 catchError((message: string) => of(logoutAsync.failure(message)))
             )

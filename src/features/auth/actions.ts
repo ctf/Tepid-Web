@@ -12,4 +12,4 @@ export const logoutAsync = createTepidAsyncAction(
     TepidAction.LoginRequest,
     TepidAction.LogoutSuccess,
     TepidAction.LoginFailure
-)<void, boolean, string>();
+)<void, void, string>();

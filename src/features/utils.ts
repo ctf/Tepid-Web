@@ -15,3 +15,8 @@ export function createTepidAsyncAction<T1 extends TepidAction,
 }
 
 export type RootEpic = Epic<RootAction, RootAction, RootState, RootService>
+
+export type TepidState = Readonly<{
+    isFetching: boolean
+    lastUpdate: number
+}>
