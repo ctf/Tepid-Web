@@ -14,7 +14,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
 const InnerElderRoute = ({ component: Component, auth, ...rest }) => (
 	<Route {...rest} render={props => (
-		(props.auth.role === 'elder' && !auth.didInvalidate) ? (
+		(auth.role === 'elder' && !auth.didInvalidate) ? (
 			<Component {...props} />
 		) : (
 			<Redirect to={{
