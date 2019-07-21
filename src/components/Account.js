@@ -2,6 +2,22 @@ import React from 'react';
 
 import JobTable from './JobTable';
 
+function NoUserCard() {
+	return (
+		<div>
+			<div className="card no-padding">
+				<div className="user-profile">
+					<div className="row">
+						<div className="col no-padding no-borders">
+							<h2> Could not find user</h2>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	)
+}
+
 class Account extends React.Component {
 	componentDidMount() {
 		this.props.fetchNeededData(this.props.shortUser);
@@ -12,13 +28,13 @@ class Account extends React.Component {
 	}
 
 	render() {
-		const account = this.props.account === undefined ? {
-			displayName: (<span>&nbsp;</span>),
-			shortUser: (<span>&nbsp;</span>),
-			longUser: (<span>&nbsp;</span>),
-			colorPrinting: false
-		} : this.props.account.data;
-		const quota = this.props.account === undefined ? null : this.props.account.quota.amount;
+		if (!this.props.account || !this.props.account.data.type) {
+			return (
+				NoUserCard()
+			)
+		}
+		const account = this.props.account.data;
+		const quota = this.props.account.quota.amount;
 		const maxQuota = 4000; // TODO: Fetch from somewhere
 
 		const canPrint = true; // TODO: Exchange/paid into fund/CTF volunteer
@@ -30,7 +46,7 @@ class Account extends React.Component {
 		const facultyOrDepartment = (() => {
 			if (!account.staff && account.faculty) {
 				return account.faculty;
-			} else if(account.staff && account.department) {
+			} else if (account.staff && account.department) {
 				return account.department;
 			} else {
 				return ''
@@ -46,7 +62,7 @@ class Account extends React.Component {
 			: ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
 		const jobs = this.props.account === undefined ? [] : this.props.account.jobs.items;
-		const jobTable = canPrint ? (<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false} />) : '';
+		const jobTable = canPrint ? (<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false}/>) : '';
 
 		return (
 			<div>
@@ -71,27 +87,27 @@ class Account extends React.Component {
 										</div>
 									</div>
 								</div>
-								<hr />
+								<hr/>
 							</div>
 						) : ''}
 						<div className="user-profile-details">
 							<div className="row">
 								<div className="col">
-									<strong>Short Username:</strong> {account.shortUser} <br />
-									<strong>Long Username:</strong> {account.longUser} <br />
-									<strong>Current Status:</strong> Active <br />
-									<strong>Student Since:</strong> May 2015 <br />
+									<strong>Short Username:</strong> {account.shortUser} <br/>
+									<strong>Long Username:</strong> {account.longUser} <br/>
+									<strong>Current Status:</strong> Active <br/>
+									<strong>Student Since:</strong> May 2015 <br/>
 									User <strong>has</strong> paid into the 21st Century Fund
 								</div>
 								<div className="col">
-									<strong>Preferred Salutation:</strong> <br />
-									<input type="text" value="David" style={{marginBottom: '0.6rem'}} /> <br />
-									<strong>Jobs Expire After:</strong> 1 Week <br />
+									<strong>Preferred Salutation:</strong> <br/>
+									<input type="text" value="David" style={{marginBottom: '0.6rem'}}/> <br/>
+									<strong>Jobs Expire After:</strong> 1 Week <br/>
 									<strong>Colour Printing:</strong> {account.colorPrinting ? 'On' : 'Off'}
 								</div>
 							</div>
 						</div>
-						<hr />
+						<hr/>
 
 						<h3>Jobs</h3>
 						{jobTable}
