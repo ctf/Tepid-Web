@@ -59,7 +59,7 @@ export const UserRoute = withRouter(connect(mapStateToProps, mapDispatchToProps)
 
 const InnerGuestRoute = ({ component: Component, auth, ...rest }) => (
 	<Route {...rest} render={props => (
-		(auth.role === '' || auth.didInvalidate) ? (
+		(!auth.role || auth.role === '' || auth.didInvalidate) ? (
 			<Component {...props} />
 		) : (
 			<Redirect to={{
