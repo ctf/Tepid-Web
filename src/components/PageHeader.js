@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {connect} from "react-redux"
-import {NavLink} from 'react-router-dom';
+import {NavLink, Redirect, withRouter} from 'react-router-dom';
 
 
 function HeaderSearchBar(props){
@@ -8,7 +8,8 @@ function HeaderSearchBar(props){
     const [searchTarget, setSearchTarget] = useState("");
 
     function handleSubmit(event){
-        alert(searchTarget.toString());
+        event.preventDefault();
+        props.history.push('/accounts/'+searchTarget)
     }
 
     function handleChange(event) {
@@ -29,15 +30,15 @@ const mapStateToProps = state => {
     return {auth: state.auth}
 };
 
-const PageHeaderContent = ({auth})=> {
+const PageHeaderContent = (props)=> {
     return (
         <header>
-            { (auth.user.role === "ctfer" || auth.user.role === "elder") && (
-                <HeaderSearchBar/>
+            { (props.auth.user.role === "ctfer" || props.auth.user.role === "elder") && (
+                <HeaderSearchBar history={props.history}/>
             )}
             <div className="header-right">
                 <div id="header-user-dropdown">
-                    {auth.user.displayName}
+                    {props.auth.user.displayName}
                     <i className="material-icons">keyboard_arrow_down</i>
                     <ul>
                         <li><NavLink to="/my-account">My Account</NavLink></li>
@@ -49,6 +50,6 @@ const PageHeaderContent = ({auth})=> {
     );
 };
 
-const PageHeader = connect(mapStateToProps)(PageHeaderContent);
+const PageHeader = withRouter(connect(mapStateToProps)(PageHeaderContent));
 
 export default PageHeader;
