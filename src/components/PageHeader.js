@@ -10,10 +10,11 @@ const mapStateToProps = state => {
 const PageHeaderContent = ({auth})=> {
     return (
         <header>
+            { (auth.user.role === "ctfer" || auth.user.role === "elder") && (
             <div className="header-left">
                 <i className="material-icons">search</i>
                 <input type="text" name="user-search" id="header-user-search" placeholder="Search for users..."/>
-            </div>
+            </div>)}
             <div className="header-right">
                 <div id="header-user-dropdown">
                     {auth.user.displayName}
