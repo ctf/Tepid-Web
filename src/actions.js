@@ -2,8 +2,7 @@ import fetch from 'cross-fetch';
 
 import { buildToken } from './tepid-utils';
 
-// TEMPORARY:
-export const API_URL = 'https://tepid.science.mcgill.ca:8443/tepid';
+export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
 
 // Auth ------------------------------------------------------------------------
 
