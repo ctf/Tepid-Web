@@ -34,10 +34,12 @@ class Account extends React.Component {
 			)
 		}
 		const account = this.props.account.data;
+
 		const quota = this.props.account.quota.amount;
 		const maxQuota = 4000; // TODO: Fetch from somewhere
 
-		const canPrint = true; // TODO: Exchange/paid into fund/CTF volunteer
+		const role = account.role;
+		const canPrint = role === "user" || role === "ctfer" || role === "elder";
 
 		const self = Object.keys(this.props.auth.user).includes('shortUser')
 			? account.shortUser === this.props.auth.user.shortUser
@@ -97,7 +99,7 @@ class Account extends React.Component {
 									<strong>Long Username:</strong> {account.longUser} <br/>
 									<strong>Current Status:</strong> Active <br/>
 									<strong>Student Since:</strong> May 2015 <br/>
-									User <strong>has</strong> paid into the 21st Century Fund
+									User <strong>has {canPrint? '' : 'not '}</strong>paid into the 21st Century Fund
 								</div>
 								<div className="col">
 									<strong>Preferred Salutation:</strong> <br/>
