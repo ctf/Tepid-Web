@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
 
-import { buildToken } from './tepid-utils';
+import {buildToken} from './tepid-utils';
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
 
@@ -446,6 +446,33 @@ export const fetchAccountAndRelatedDataIfNeeded = shortUser => (dispatch, getSta
 		dispatch(fetchAccountQuotaIfNeeded(shortUser)),
 		dispatch(fetchAccountJobsIfNeeded(shortUser))
 	]);
+};
+
+function handleError(error) {
+	console.log(error)
+}
+
+export const doSetColorPrinting = (shortUser, enabled) => {
+	return (dispatch, getState) => {
+		const state = getState();
+		const fetchObject = {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'text/plain',
+				'Accept': 'application/json',
+				'Authorization': `Token ${buildToken(state.auth)}`
+			},
+			body: enabled.toString()
+			// body: JSON.stringify(enabled)
+		};
+		return fetch(`${API_URL}/users/${shortUser}/color`, fetchObject)
+			.then(
+				response => response.json(),
+				error => handleError(error)
+			).then(() => {
+				dispatch(fetchAccount(state.auth, shortUser))
+			})
+	}
 };
 
 // Combined Actions ------------------------------------------------------------

@@ -1,6 +1,8 @@
 import React from 'react';
 
 import JobTable from './JobTable';
+import Grid from "@material-ui/core/Grid";
+import Switch from "@material-ui/core/Switch";
 
 function NoUserCard() {
 	return (
@@ -15,6 +17,20 @@ function NoUserCard() {
 				</div>
 			</div>
 		</div>
+	)
+}
+
+function ToggleColorSwitch({value, onChange}){
+	return(
+	<div>
+		<Grid component={"label"} container alignItems={"center"} spacing={1}>
+			<Grid item>Disabled</Grid>
+			<Grid item>
+				<Switch checked={value} onChange={onChange}/>
+			</Grid>
+			<Grid item>Enabled</Grid>
+		</Grid>
+	</div>
 	)
 }
 
@@ -66,6 +82,10 @@ class Account extends React.Component {
 		const jobs = this.props.account === undefined ? [] : this.props.account.jobs.items;
 		const jobTable = canPrint ? (<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false}/>) : '';
 
+		const handleSetColorPrinting = (e) => {
+			this.props.setColorPrinting(account.shortUser, e.target.checked)
+		};
+
 		return (
 			<div>
 				<div className="card no-padding">
@@ -105,7 +125,7 @@ class Account extends React.Component {
 									<strong>Preferred Salutation:</strong> <br/>
 									<input type="text" value="David" style={{marginBottom: '0.6rem'}}/> <br/>
 									<strong>Jobs Expire After:</strong> 1 Week <br/>
-									<strong>Colour Printing:</strong> {account.colorPrinting ? 'On' : 'Off'}
+									<strong>Colour Printing:</strong> <ToggleColorSwitch value={account.colorPrinting} onChange={handleSetColorPrinting}/>
 								</div>
 							</div>
 						</div>

@@ -1,7 +1,7 @@
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import {fetchAccountAndRelatedDataIfNeeded} from '../actions';
+import {doSetColorPrinting, fetchAccountAndRelatedDataIfNeeded} from '../actions';
 
 import Account from '../components/Account';
 
@@ -18,7 +18,10 @@ const mapStateToProps = (state, ownProps) => ({
 const mapDispatchToProps = (dispatch, ownProps) => ({
 	fetchNeededData: (shortUser) => {
 		dispatch(fetchAccountAndRelatedDataIfNeeded(shortUser));
-	}
+	},
+	setColorPrinting: (shortUser, enabled)=>{
+		dispatch(doSetColorPrinting(shortUser, enabled))
+	},
 });
 
 const AccountContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(Account));
