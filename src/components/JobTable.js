@@ -1,6 +1,10 @@
 import React from 'react';
 
 import JobTableRow from './JobTableRow';
+import TableHead from "@material-ui/core/TableHead";
+import {TableRow} from "@material-ui/core";
+import TableCell from "@material-ui/core/TableCell";
+import TableBody from "@material-ui/core/TableBody";
 
 class JobTable extends React.Component {
 	constructor(props) {
@@ -42,24 +46,24 @@ class JobTable extends React.Component {
 		return (
 			<div>
 				<table className="job-list">
-					<thead>
-					<tr>
-						<th style={{width: '11rem'}}>Started</th>
+					<TableHead>
+					<TableRow>
+						<TableCell style={{width: '20%'}}>Started</TableCell>
 						{
 							this.props.showUser
-								? (<th style={{width: '5.8rem'}}>User</th>)
+								? (<th style={{width: '15%'}}>User</th>)
 								: ''
 						}
-						<th style={{width: '6.1rem'}}>Pages</th>
-						<th style={{width: '12.5rem'}}>Status</th>
-						<th style={{width: '7.7rem'}}>Host</th>
-						<th style={{minWidth: '16rem'}}>Name</th>
-						<th style={{width: '2.9rem'}}>&nbsp;</th>
-					</tr>
-					</thead>
-					<tbody>
+						<TableCell style={{width: '10%' }}>Pages</TableCell>
+						<TableCell style={{width: '20%'}}>Status</TableCell>
+						<TableCell style={{width: '15%'}}>Host</TableCell>
+						<TableCell style={{}}>Name</TableCell>
+						<TableCell style={{width: '6%'}}>&nbsp;</TableCell>
+					</TableRow>
+					</TableHead>
+					<TableBody>
 					{jobList}
-					</tbody>
+					</TableBody>
 				</table>
 				{this.props.loading
 					? ''
