@@ -4,6 +4,12 @@ import {buildToken} from './tepid-utils';
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
 
+const standardHeaders = (auth) => ({
+	'Content-Type': 'application/json',
+	'Accept': 'application/json',
+	'Authorization': `Token ${buildToken(auth)}`
+});
+
 // Auth ------------------------------------------------------------------------
 
 export const REQUEST_AUTH = 'REQUEST_AUTH';
@@ -163,6 +169,7 @@ export const fetchDestinationsIfNeeded = () => (dispatch, getState) => {
 };
 
 // Jobs ------------------------------------------------------------------------
+// see also Job Actions
 
 // -- Queue Jobs ---------------------------------------------------------------
 
@@ -247,11 +254,42 @@ export const addJob = job => ({
 	job
 });
 
-export const REFUND_JOB = 'REFUND_JOB';
-export const refundJob = jobId => ({
-	type: REFUND_JOB,
-	jobId
+export const REQUEST_JOB_REFUNDED = 'REQUEST_JOB_REFUNDED';
+export const requestJobRefunded = (jobId, refunded = true) => ({
+	type: REQUEST_JOB_REFUNDED,
+	jobId,
+	refunded,
 });
+
+export const RECEIVE_JOB_REFUNDED = 'RECEIVE_JOB_REFUNDED';
+export const receiveJobRefunded = (jobId, ok = false) => ({
+	type: RECEIVE_JOB_REFUNDED,
+	jobId,
+	ok,
+});
+
+export const doSetJobRefunded = (job, refunded) => {
+	return (dispatch, getState) => {
+		const state = getState();
+		const fetchObject = {
+			method: 'PUT',
+			headers: standardHeaders(state.auth),
+			body: refunded.toString()
+		};
+
+		dispatch(requestJobRefunded(job._id, refunded));
+
+
+		return fetch(`${API_URL}/jobs/job/${job._id}/refunded`, fetchObject)
+			.then(
+				response => response.json(),
+				error => handleError(error)
+			).then((json) => {
+					dispatch(receiveJobRefunded(job._id, json.ok));
+				}
+			)
+	}
+};
 
 // Accounts --------------------------------------------------------------------
 
@@ -470,8 +508,9 @@ export const doSetColorPrinting = (shortUser, enabled) => {
 				response => response.json(),
 				error => handleError(error)
 			).then(() => {
-				dispatch(fetchAccount(state.auth, shortUser))
-			})
+					dispatch(fetchAccount(state.auth, shortUser))
+				}
+			)
 	}
 };
 

@@ -42,7 +42,6 @@ class SignInPage extends React.Component {
 							   onChange={this.handlePasswordChange} />
 						<button className="primary" onClick={(event) => {
 							event.preventDefault();
-							console.log(this.props);
 							return this.props.onSignInClick(this.state);
 						}}>
 							Sign In
