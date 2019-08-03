@@ -56,6 +56,7 @@ class Account extends React.Component {
 
 		const role = account.role;
 		const canPrint = role === "user" || role === "ctfer" || role === "elder";
+		const canRefund = role === "ctfer" || role === "elder";
 
 		const self = Object.keys(this.props.auth.user).includes('shortUser')
 			? account.shortUser === this.props.auth.user.shortUser
@@ -80,7 +81,7 @@ class Account extends React.Component {
 			: ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
 		const jobs = this.props.account === undefined ? [] : this.props.account.jobs.items;
-		const jobTable = canPrint ? (<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false}/>) : '';
+		const jobTable = canPrint ? (<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false} canRefund={canRefund}/>) : '';
 
 		const handleSetColorPrinting = (e) => {
 			this.props.setColorPrinting(account.shortUser, e.target.checked)

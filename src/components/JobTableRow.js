@@ -8,32 +8,31 @@ import Menu from "@material-ui/core/Menu";
 import {TableRow} from "@material-ui/core";
 import TableCell from "@material-ui/core/TableCell";
 
-function JobTableRow (props) {
+function JobTableRow ({showUser, canRefund, job }) {
 
-		const colorPages = props.job.colorPages;
+		const colorPages = job.colorPages;
 		return (
-			<TableRow className={jobHasFailed(props.job) ? 'failed' : ''}>
-				<TableCell>{props.job.started === -1 ? '' : new Date(props.job.started).toLocaleString('en-CA')}</TableCell>
-				{props.showUser ? (
+			<TableRow className={jobHasFailed(job) ? 'failed' : ''}>
+				<TableCell>{job.started === -1 ? '' : new Date(job.started).toLocaleString('en-CA')}</TableCell>
+				{showUser ? (
 					<TableCell>
-						<Link to={`/accounts/${props.job.userIdentification}`}>
-							{props.job.userIdentification}
+						<Link to={`/accounts/${job.userIdentification}`}>
+							{job.userIdentification}
 						</Link>
 					</TableCell>
 				) : ''}
-				<TableCell>{`${props.job.pages} ${colorPages === 0 ? '' : ` (${colorPages} color)`}`}</TableCell>
-				<TableCell>{jobStatus(props.job)}</TableCell>
-				<TableCell>{props.job.originalHost}</TableCell>
-				<TableCell>{props.job.name}</TableCell>
+				<TableCell>{`${job.pages} ${colorPages === 0 ? '' : ` (${colorPages} color)`}`}</TableCell>
+				<TableCell>{jobStatus(job)}</TableCell>
+				<TableCell>{job.originalHost}</TableCell>
+				<TableCell>{job.name}</TableCell>
 				<TableCell>
 					<MoreMenu>
-						<MenuItem>Refund</MenuItem>
+						{canRefund && <MenuItem>Refund</MenuItem>}
 						<MenuItem>Reprint</MenuItem>
 					</MoreMenu>
 				</TableCell>
 			</TableRow>
 		);
-
 }
 
 export default JobTableRow;
