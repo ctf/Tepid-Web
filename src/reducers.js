@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import {
 	ADD_JOB,
-	REFUND_JOB,
+	RECEIVE_JOB_REFUNDED,
 } from './actions';
 
 import auth from './reducers/auth';
@@ -22,10 +22,12 @@ const jobs = function (state = initialJobsState, action) {
 			return Object.assign({}, state, {
 
 			});
-		case REFUND_JOB:
+		case RECEIVE_JOB_REFUNDED:{
+			console.log(state);
 			return Object.assign({}, state, {
 
 			});
+			}
 		default:
 			return state;
 	}
