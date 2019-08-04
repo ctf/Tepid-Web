@@ -11,15 +11,15 @@ class DashboardPrinter extends React.Component {
 	}
 
 	render() {
-		if (this.props.loadingDestinations) return (<div className="col"> </div>);
+		if (this.props.loadingDestinations) return (<div className="col"></div>);
 
 		const queueDestinations = this.props.queue.destinations
 			.map(dest => this.props.destinations[dest])
 			.sort((d1, d2) => d1.name.localeCompare(d2));
 
 		const queueDestinationClickers = queueDestinations.map(dest => {
-			const iconClass = dest.up ? 'up' :'down';
-			const iconText = dest.up ? 'arrow_upward' :'arrow_downward';
+			const iconClass = dest.up ? 'up' : 'down';
+			const iconText = dest.up ? 'arrow_upward' : 'arrow_downward';
 			return (
 				<a href="" key={dest._id}>
 					<i className={`material-icons ${iconClass}`}>{iconText}</i> {dest.name}
@@ -27,14 +27,17 @@ class DashboardPrinter extends React.Component {
 			);
 		});
 
+		const jobsToShow = this.props.queueJobs.slice(0, 25).map(it => this.props.jobs.items[it]);
 		const queueJobs = this.props.loadingQueueJobs
-			? (<tr style={{borderBottom: 'none'}}><td colSpan="4" style={{textAlign: 'center'}}>Loading...</td></tr>)
-			: this.props.queueJobs.slice(0, 25).map(job => (
+			? (<tr style={{borderBottom: 'none'}}>
+				<td colSpan="4" style={{textAlign: 'center'}}>Loading...</td>
+			</tr>)
+			: jobsToShow.map(job => (
 				<tr key={job._id} className={jobHasFailed(job) ? 'failed' : ''}>
 					<td><Link to={`/accounts/${job.userIdentification}`}>{job.userIdentification}</Link></td>
 					<td>{this.props.destinations[job.destination]
-							? this.props.destinations[job.destination].name
-							: ''}</td>
+						? this.props.destinations[job.destination].name
+						: ''}</td>
 					<td>{jobStatus(job)}</td>
 					<td><i className="material-icons">more_vert</i></td>
 				</tr>
@@ -76,7 +79,8 @@ const mapStateToProps = (state, ownProps) => {
 		destinations: state.destinations.items,
 		loading: unloaded || loading || loadingDestinations,
 		loadingDestinations: loadingDestinations,
-		loadingQueueJobs: unloaded || loading
+		loadingQueueJobs: unloaded || loading,
+		jobs: state.jobs
 	};
 };
 
