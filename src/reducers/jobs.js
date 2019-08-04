@@ -43,7 +43,7 @@ const jobs = function (state = initialJobsState, action) {
 		}
 
 		case RECEIVE_QUEUE_JOBS:{
-			return updatePrintJobs(state, action.items);
+			return updatePrintJobs(state, action.jobs);
 		}
 
 		case REQUEST_ACCOUNT_JOBS:{

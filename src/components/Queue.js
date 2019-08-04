@@ -14,7 +14,7 @@ class Queue extends React.Component {
 	render() {
 		return (
 			<JobTable queueName={this.props.match.params.queueName}
-					  jobs={this.props.jobs}
+					  jobs={this.props.items.map(it=>this.props.jobs.items[it])}
 					  loading={this.props.loadingJobs}
 					  showUser={true} />
 		);
