@@ -1,70 +1,69 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {connect} from 'react-redux';
 import {Link, withRouter} from 'react-router-dom';
 
 import {fetchDestinationsIfNeeded, fetchQueueJobsIfNeeded} from '../actions';
 import {jobHasFailed, jobStatus} from '../tepid-utils';
 
-class DashboardPrinter extends React.Component {
-	componentWillMount() {
-		this.props.fetchNeededData();
-	}
+function DashboardPrinter({queue, destinations,loadingDestinations, jobs, queueJobs, loadingQueueJobs, fetchNeededData}) {
 
-	render() {
-		if (this.props.loadingDestinations) return (<div className="col"></div>);
+	useEffect(() => {
+		fetchNeededData()
+	});
 
-		const queueDestinations = this.props.queue.destinations
-			.map(dest => this.props.destinations[dest])
-			.sort((d1, d2) => d1.name.localeCompare(d2));
+	if (loadingDestinations) return (<div className="col"></div>);
 
-		const queueDestinationClickers = queueDestinations.map(dest => {
-			const iconClass = dest.up ? 'up' : 'down';
-			const iconText = dest.up ? 'arrow_upward' : 'arrow_downward';
-			return (
-				<a href="" key={dest._id}>
-					<i className={`material-icons ${iconClass}`}>{iconText}</i> {dest.name}
-				</a>
-			);
-		});
+	const queueDestinations = queue.destinations
+		.map(dest => destinations[dest])
+		.sort((d1, d2) => d1.name.localeCompare(d2));
 
-		const jobsToShow = this.props.queueJobs.slice(0, 25).map(it => this.props.jobs.items[it]);
-		const queueJobs = this.props.loadingQueueJobs
-			? (<tr style={{borderBottom: 'none'}}>
-				<td colSpan="4" style={{textAlign: 'center'}}>Loading...</td>
-			</tr>)
-			: jobsToShow.map(job => (
-				<tr key={job._id} className={jobHasFailed(job) ? 'failed' : ''}>
-					<td><Link to={`/accounts/${job.userIdentification}`}>{job.userIdentification}</Link></td>
-					<td>{this.props.destinations[job.destination]
-						? this.props.destinations[job.destination].name
-						: ''}</td>
-					<td>{jobStatus(job)}</td>
-					<td><i className="material-icons">more_vert</i></td>
-				</tr>
-			));
-
+	const queueDestinationClickers = queueDestinations.map(dest => {
+		const iconClass = dest.up ? 'up' : 'down';
+		const iconText = dest.up ? 'arrow_upward' : 'arrow_downward';
 		return (
-			<div className="col dash-printer no-side-padding no-bottom-padding">
-				<div className="printer-status-display">
-					<i className="material-icons">print</i>
-					<i className="material-icons">print</i>
-				</div>
-				<h2>{this.props.queue.name}</h2>
-				<div className="printer-status">{queueDestinationClickers}</div>
-				<table className="dash-printer-queue">
-					<thead>
-					<tr>
-						<th style={{width: '5.8rem'}}>User</th>
-						<th style={{width: '5.8rem'}}>Printer</th>
-						<th style={{minWidth: '12.3rem'}}>Status</th>
-						<th style={{width: '2.9rem'}}>&nbsp;</th>
-					</tr>
-					</thead>
-					<tbody>{queueJobs}</tbody>
-				</table>
-			</div>
+			<a href="" key={dest._id}>
+				<i className={`material-icons ${iconClass}`}>{iconText}</i> {dest.name}
+			</a>
 		);
-	}
+	});
+
+	const jobsToShow = queueJobs.slice(0, 25).map(it => jobs.items[it]);
+	const queueJobsElement = loadingQueueJobs
+		? (<tr style={{borderBottom: 'none'}}>
+			<td colSpan="4" style={{textAlign: 'center'}}>Loading...</td>
+		</tr>)
+		: jobsToShow.map(job => (
+			<tr key={job._id} className={jobHasFailed(job) ? 'failed' : ''}>
+				<td><Link to={`/accounts/${job.userIdentification}`}>{job.userIdentification}</Link></td>
+				<td>{destinations[job.destination]
+					? destinations[job.destination].name
+					: ''}</td>
+				<td>{jobStatus(job)}</td>
+				<td><i className="material-icons">more_vert</i></td>
+			</tr>
+		));
+
+	return (
+		<div className="col dash-printer no-side-padding no-bottom-padding">
+			<div className="printer-status-display">
+				<i className="material-icons">print</i>
+				<i className="material-icons">print</i>
+			</div>
+			<h2>{queue.name}</h2>
+			<div className="printer-status">{queueDestinationClickers}</div>
+			<table className="dash-printer-queue">
+				<thead>
+				<tr>
+					<th style={{width: '5.8rem'}}>User</th>
+					<th style={{width: '5.8rem'}}>Printer</th>
+					<th style={{minWidth: '12.3rem'}}>Status</th>
+					<th style={{width: '2.9rem'}}>&nbsp;</th>
+				</tr>
+				</thead>
+				<tbody>{queueJobsElement}</tbody>
+			</table>
+		</div>
+	);
 }
 
 const mapStateToProps = (state, ownProps) => {
