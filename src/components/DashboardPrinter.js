@@ -4,6 +4,30 @@ import {Link, withRouter} from 'react-router-dom';
 
 import {fetchDestinationsIfNeeded, fetchQueueJobsIfNeeded} from '../actions';
 import {jobHasFailed, jobStatus} from '../tepid-utils';
+import {Modal} from "@material-ui/core";
+import useModal from "../hooks/useModal";
+
+function AddTicketDialog(){
+	return null
+}
+
+function QueueDestinationClicker({dest}){
+	const addTicketModal = useModal();
+	{
+		const iconClass = dest.up ? 'up' : 'down';
+		const iconText = dest.up ? 'arrow_upward' : 'arrow_downward';
+		return (
+			<React.Fragment>
+			<div key={dest._id} onClick={addTicketModal.handleOpen}>
+				<i className={`material-icons ${iconClass}`}>{iconText}</i> {dest.name}
+			</div>
+			<Modal open={addTicketModal.open} onClose={addTicketModal.handleClose}>
+				<AddTicketDialog/>
+			</Modal>
+			</React.Fragment>
+		);
+	}
+}
 
 function DashboardPrinter({queue, destinations,loadingDestinations, jobs, queueJobs, loadingQueueJobs, fetchNeededData}) {
 
@@ -17,15 +41,7 @@ function DashboardPrinter({queue, destinations,loadingDestinations, jobs, queueJ
 		.map(dest => destinations[dest])
 		.sort((d1, d2) => d1.name.localeCompare(d2));
 
-	const queueDestinationClickers = queueDestinations.map(dest => {
-		const iconClass = dest.up ? 'up' : 'down';
-		const iconText = dest.up ? 'arrow_upward' : 'arrow_downward';
-		return (
-			<a href="" key={dest._id}>
-				<i className={`material-icons ${iconClass}`}>{iconText}</i> {dest.name}
-			</a>
-		);
-	});
+	const queueDestinationClickers = queueDestinations.map(dest => <QueueDestinationClicker dest={dest}/> );
 
 	const jobsToShow = queueJobs.slice(0, 25).map(it => jobs.items[it]);
 	const queueJobsElement = loadingQueueJobs
