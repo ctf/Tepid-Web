@@ -20,17 +20,21 @@ function NoUserCard() {
 	)
 }
 
-function ToggleColorSwitch({value, onChange}){
-	return(
-	<div>
-		<Grid component={"label"} container alignItems={"center"} spacing={1}>
-			<Grid item>Disabled</Grid>
-			<Grid item>
-				<Switch checked={value} onChange={onChange}/>
-			</Grid>
-			<Grid item>Enabled</Grid>
-		</Grid>
-	</div>
+function ToggleColorSwitch({value, onChange, ...rest}) {
+	return (
+		<div>
+			<FormControlLabel control={<Switch checked={value} onChange={onChange}/>} label={"Colour Printing"}
+							  labelPlacement="end" {...rest}/>
+		</div>
+	)
+}
+
+function ToggleExchangeSwitch({value, onChange, ...rest}) {
+	return (
+		<div>
+			<FormControlLabel control={<Switch checked={value} onChange={onChange}/>} label={'Exchange Student'}
+							  labelPlacement="end" {...rest}/>
+		</div>
 	)
 }
 
