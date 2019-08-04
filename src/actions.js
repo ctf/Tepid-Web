@@ -508,6 +508,31 @@ export const doSetColorPrinting = (shortUser, enabled) => {
 				response => response.json(),
 				error => handleError(error)
 			).then(() => {
+				dispatch(fetchAccount(state.auth, shortUser))
+				}
+			)
+	}
+};
+
+export const doSetExchangeStatus = (shortUser, exchange) => {
+	return (dispatch, getState) => {
+		const state = getState();
+		const fetchObject = {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+				'Authorization': `Token ${buildToken(state.auth)}`
+			},
+			body: exchange.toString()
+			// body: JSON.stringify(enabled)
+		};
+		console.log(exchange.toString())
+		return fetch(`${API_URL}/users/${shortUser}/exchange`, fetchObject)
+			.then(
+				response => response.json(),
+				error => handleError(error)
+			).then(() => {
 					dispatch(fetchAccount(state.auth, shortUser))
 				}
 			)
