@@ -86,9 +86,14 @@ class Account extends React.Component {
 			? (account.salutation ? account.salutation : account.displayName)
 			: account.displayName;
 
+		const badgeables = [];
+		if (isVolunteer) { badgeables.push('CTF Volunteer')}
+		if (isExchangeStudent) {badgeables.push('Exchange')}
+		if (account.shortUser === this.props.auth.user.shortUser) {badgeables.push('You!')}
+
 		const badges = this.props.account === undefined
 			? ''
-			: ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
+			: badgeables.map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
 		const jobs = (this.props.account === undefined || this.props.jobs.isFetching) ? [] : this.props.account.jobs.items.map(it => this.props.jobs.items[it]);
 		const jobTable = canPrint ? (
