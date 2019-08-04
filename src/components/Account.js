@@ -1,8 +1,8 @@
 import React from 'react';
 
 import JobTable from './JobTable';
-import Grid from "@material-ui/core/Grid";
 import Switch from "@material-ui/core/Switch";
+import {FormControlLabel} from "@material-ui/core";
 
 function NoUserCard() {
 	return (
@@ -103,6 +103,10 @@ class Account extends React.Component {
 			this.props.setColorPrinting(account.shortUser, e.target.checked)
 		};
 
+		const handleSetExchange = (e) => {
+			this.props.setExchangeStatus(account.shortUser, e.target.checked)
+		};
+
 		return (
 			<div>
 				<div className="card no-padding">
@@ -136,13 +140,15 @@ class Account extends React.Component {
 									<strong>Long Username:</strong> {account.longUser} <br/>
 									<strong>Current Status:</strong> Active <br/>
 									<strong>Student Since:</strong> May 2015 <br/>
-									User <strong>has {canPrint? '' : 'not '}</strong>paid into the 21st Century Fund
+									User <strong>has {paidFund ? '' : 'not '}</strong>paid into the 21st Century Fund
 								</div>
 								<div className="col">
 									<strong>Preferred Salutation:</strong> <br/>
 									<input type="text" value="David" style={{marginBottom: '0.6rem'}}/> <br/>
 									<strong>Jobs Expire After:</strong> 1 Week <br/>
-									<strong>Colour Printing:</strong> <ToggleColorSwitch value={account.colorPrinting} onChange={handleSetColorPrinting}/>
+									<ToggleColorSwitch value={account.colorPrinting}
+													   onChange={handleSetColorPrinting}/>
+									<ToggleExchangeSwitch value={isExchangeStudent} onChange={handleSetExchange} disabled={!permissionCanSetExchange}/>
 								</div>
 							</div>
 						</div>

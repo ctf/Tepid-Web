@@ -1,7 +1,7 @@
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import {doSetColorPrinting, fetchAccountAndRelatedDataIfNeeded} from '../actions';
+import {doSetColorPrinting, doSetExchangeStatus, fetchAccountAndRelatedDataIfNeeded} from '../actions';
 
 import Account from '../components/Account';
 
@@ -23,6 +23,9 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 	setColorPrinting: (shortUser, enabled)=>{
 		dispatch(doSetColorPrinting(shortUser, enabled))
 	},
+	setExchangeStatus: (shortUser, exchange)=>{
+		dispatch(doSetExchangeStatus(shortUser, exchange))
+	}
 });
 
 const AccountContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(Account));

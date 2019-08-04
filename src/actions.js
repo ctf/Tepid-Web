@@ -527,7 +527,6 @@ export const doSetExchangeStatus = (shortUser, exchange) => {
 			body: exchange.toString()
 			// body: JSON.stringify(enabled)
 		};
-		console.log(exchange.toString())
 		return fetch(`${API_URL}/users/${shortUser}/exchange`, fetchObject)
 			.then(
 				response => response.json(),
