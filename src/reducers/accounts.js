@@ -8,6 +8,7 @@ import {
 	REQUEST_ACCOUNT_JOBS,
 	RECEIVE_ACCOUNT_JOBS
 } from '../actions';
+import {dbObjToIds} from "./helpers";
 
 const initialAccountsState = {
 	isFetching: false,
@@ -100,7 +101,7 @@ const accounts = function (state = initialAccountsState, action) {
 						...state.items[action.shortUser],
 						jobs: {
 							...state.items[action.shortUser].jobs,
-							items: action.jobs,
+							items: dbObjToIds(action.jobs),
 							isFetching: false,
 							didInvalidate: false,
 							lastUpdated: action.receivedAt

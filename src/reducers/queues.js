@@ -5,6 +5,7 @@ import {
 	RECEIVE_QUEUE_JOBS,
 	REQUEST_QUEUE_JOBS
 } from '../actions';
+import {dbObjToIds} from "./helpers";
 
 const initialQueuesState = {
 	isFetching: false,
@@ -53,7 +54,7 @@ const queues = function (state = initialQueuesState, action) {
 						...state.jobsByQueue[action.queue],
 						isFetching: false,
 						didInvalidate: false,
-						items: action.jobs,
+						items: dbObjToIds(action.jobs),
 						lastUpdated: action.receivedAt
 					}
 				}
