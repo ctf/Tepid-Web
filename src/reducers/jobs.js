@@ -32,9 +32,22 @@ const jobs = function (state = initialJobsState, action) {
 
 			});
 		case RECEIVE_JOB_REFUNDED:{
-			return Object.assign({}, state, {
+			if (action.ok) {
+				const job = state.items[action.jobId];
+				const newRefundedStatus = action.ok ? !job.refunded : job.refunded;
 
-			});
+				return Object.assign({}, state, {
+					items: {
+						...state.items,
+						[action.jobId]: {
+							...job,
+							refunded:newRefundedStatus
+						}
+					}
+				});
+			} else {
+				return state
+			}
 		}
 		case REQUEST_QUEUE_JOBS:{
 			return Object.assign({}, state, {
