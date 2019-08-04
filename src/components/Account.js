@@ -60,7 +60,13 @@ class Account extends React.Component {
 
 		const role = account.role;
 		const canPrint = role === "user" || role === "ctfer" || role === "elder";
-		const canRefund = role === "ctfer" || role === "elder";
+		const isVolunteer = role === "ctfer" || role === "elder";
+		const paidFund = account.groups.reduce((acc, it)=>acc || it.name ==='000-21st Century Fund', false);
+		const isExchangeStudent = canPrint && !paidFund;
+
+		console.log(this.props.auth);
+		const permissionIsVolunteer = this.props.auth.role === "ctfer" || this.props.auth.role === "elder";
+		const permissionCanSetExchange = this.props.auth.role === "ctfer" || this.props.auth.role === "elder";
 
 		const self = Object.keys(this.props.auth.user).includes('shortUser')
 			? account.shortUser === this.props.auth.user.shortUser
@@ -84,8 +90,9 @@ class Account extends React.Component {
 			? ''
 			: ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
-		const jobs = (this.props.account === undefined || this.props.jobs.isFetching) ? [] : this.props.account.jobs.items.map(it=>this.props.jobs.items[it]);
-		const jobTable = canPrint ? (<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false} canRefund={canRefund}/>) : '';
+		const jobs = (this.props.account === undefined || this.props.jobs.isFetching) ? [] : this.props.account.jobs.items.map(it => this.props.jobs.items[it]);
+		const jobTable = canPrint ? (
+			<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false} canRefund={permissionIsVolunteer}/>) : '';
 
 		const handleSetColorPrinting = (e) => {
 			this.props.setColorPrinting(account.shortUser, e.target.checked)
