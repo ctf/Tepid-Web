@@ -18,8 +18,6 @@ const initialJobsState = {
 };
 
 const updatePrintJobs = function (state = initialJobsState, actionItems) {
-	console.log('q1', state);
-	console.log('q2', dbObjToSpreadable(actionItems));
 	return Object.assign({}, state, {
 		isFetching: false,
 		didInvalidate: false,
@@ -55,7 +53,6 @@ const jobs = function (state = initialJobsState, action) {
 		}
 
 		case RECEIVE_ACCOUNT_JOBS:{
-			console.log(dbObjToSpreadable(action.jobs));
 			return updatePrintJobs(state, action.jobs);
 		}
 

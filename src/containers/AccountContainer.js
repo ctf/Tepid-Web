@@ -12,7 +12,8 @@ const mapStateToProps = (state, ownProps) => ({
 		: ownProps.shortUser,
 	account: state.accounts.items[ownProps.match.params.shortUser
 		? ownProps.match.params.shortUser
-		: ownProps.shortUser]
+		: ownProps.shortUser],
+	jobs: state.jobs
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

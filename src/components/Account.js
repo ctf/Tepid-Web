@@ -80,7 +80,7 @@ class Account extends React.Component {
 			? ''
 			: ['CTF Volunteer'].map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
-		const jobs = this.props.account === undefined ? [] : this.props.account.jobs.items;
+		const jobs = (this.props.account === undefined || this.props.jobs.isFetching) ? [] : this.props.account.jobs.items.map(it=>this.props.jobs.items[it]);
 		const jobTable = canPrint ? (<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false} canRefund={canRefund}/>) : '';
 
 		const handleSetColorPrinting = (e) => {
