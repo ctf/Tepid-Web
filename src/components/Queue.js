@@ -7,10 +7,6 @@ class Queue extends React.Component {
 		this.props.fetchNeededData(this.props.match.params.queueName);
 	}
 
-	componentWillReceiveProps(nextProps, nextContext) {
-		this.props.fetchNeededData(nextProps.match.params.queueName);
-	}
-
 	render() {
 		return (
 			<JobTable queueName={this.props.match.params.queueName}
