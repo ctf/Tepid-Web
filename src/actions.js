@@ -168,6 +168,55 @@ export const fetchDestinationsIfNeeded = () => (dispatch, getState) => {
 	}
 };
 
+// Tickets ---------------------------------------------------------------------
+
+export const MANAGE_DESTINATION_TICKET = 'MANAGE_DESTINATION_TICKET';
+export const manageDestinationTicket = (destination, ticket) => ({
+	type: MANAGE_DESTINATION_TICKET,
+	ticket,
+	destination,
+});
+
+export const CONFIRM_DESTINATION_TICKET = 'CONFIRM_DESTINATION_TICKET';
+export const confirmDestinationTicket = (destination, ticket) => ({
+	type: CONFIRM_DESTINATION_TICKET,
+	ticket,
+	destination,
+});
+
+const doManageDestinationTicket = (destination, up, reason) => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		const ticket = {
+			up:false,
+			reason,
+		};
+		const fetchObject = {
+			method: 'POST',
+			headers: standardHeaders(state.auth),
+			body: JSON.stringify(ticket)
+		};
+
+		dispatch(manageDestinationTicket(destination, ticket));
+		return fetch(`${API_URL}/destinations/${destination.name}`, fetchObject)
+			.then(
+				response => response.json(),
+				error => handleError(error),
+			).then(()=>{
+				dispatch(confirmDestinationTicket(destination, ticket))
+			})
+	}
+};
+export const submitDestinationTicket = (destination, reason) => {
+	return doManageDestinationTicket(destination, false, reason)
+};
+export const resolveDestinationTicket = (destination) => {
+	return doManageDestinationTicket(destination, true, '')
+}
+
+
+
 // Jobs ------------------------------------------------------------------------
 // see also Job Actions
 

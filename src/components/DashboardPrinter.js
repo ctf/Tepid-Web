@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react';
-import {connect} from 'react-redux';
+import {connect, useDispatch} from 'react-redux';
 import {Link, withRouter} from 'react-router-dom';
 
-import {fetchDestinationsIfNeeded, fetchQueueJobsIfNeeded} from '../actions';
+import {fetchDestinationsIfNeeded, fetchQueueJobsIfNeeded, submitDestinationTicket} from '../actions';
 import {jobHasFailed, jobStatus} from '../tepid-utils';
 import useModal from "../hooks/useModal";
 import TextField from "@material-ui/core/TextField";
@@ -14,11 +14,13 @@ import Button from "@material-ui/core/Button";
 import {useFormField} from "../hooks/useFormField";
 
 function AddTicketDialog({destination,}) {
+	const dispatch = useDispatch();
+
 	const text = useFormField('');
 
 	const handleSubmit=(event) => {
 		event.preventDefault();
-		console.log (event.target)
+		dispatch(submitDestinationTicket(destination, text.value));
 	};
 
 	return (
