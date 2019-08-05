@@ -406,24 +406,22 @@ div.col.no-borders {
 
 .printer-status {
 	text-align: center;
+	justify-content: center;
 	display: flex;
 	margin-bottom: 0.8rem;
-}
-.printer-status a {
 	flex: 1;
-	text-align: center;
 	text-decoration: none;
 	color: #555;
 }
-.printer-status a i.material-icons {
+.printer-status i.material-icons {
 	font-size: 1.2rem;
 	vertical-align: top;
 	margin-top: 1px;
 }
-.printer-status a i.material-icons.up {
+.printer-status i.material-icons.up {
 	color: #4D983E;
 }
-.printer-status a i.material-icons.down {
+.printer-status i.material-icons.down {
 	color: #F44336;
 }
 

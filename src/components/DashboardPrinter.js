@@ -4,32 +4,58 @@ import {Link, withRouter} from 'react-router-dom';
 
 import {fetchDestinationsIfNeeded, fetchQueueJobsIfNeeded} from '../actions';
 import {jobHasFailed, jobStatus} from '../tepid-utils';
-import {Modal} from "@material-ui/core";
 import useModal from "../hooks/useModal";
+import TextField from "@material-ui/core/TextField";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import {DialogActions} from "@material-ui/core";
+import DialogContent from "@material-ui/core/DialogContent";
+import Button from "@material-ui/core/Button";
+import {useFormField} from "../hooks/useFormField";
 
-function AddTicketDialog(){
-	return null
+function AddTicketDialog({destination,}) {
+	const text = useFormField('');
+
+	const handleSubmit=(event) => {
+		event.preventDefault();
+		console.log (event.target)
+	};
+
+	return (
+		<React.Fragment>
+			<form>
+				<DialogTitle> {`Add ticket for destination ${destination.name}`}</DialogTitle>
+				<DialogContent>
+					<TextField rows={4} label={'Ticket'} variant={'outlined'} InputLabelProps={{shrink: true}}
+							   fullWidth name={'ticketContents'} {...text}/>
+				</DialogContent>
+				<DialogActions>
+					<Button variant={"outlined"} type={'submit'} onClick={handleSubmit}>Submit</Button>
+				</DialogActions>
+			</form>
+		</React.Fragment>
+	)
 }
 
-function QueueDestinationClicker({dest}){
+function QueueDestinationClicker({dest}) {
 	const addTicketModal = useModal();
 	{
 		const iconClass = dest.up ? 'up' : 'down';
 		const iconText = dest.up ? 'arrow_upward' : 'arrow_downward';
 		return (
 			<React.Fragment>
-			<div key={dest._id} onClick={addTicketModal.handleOpen}>
-				<i className={`material-icons ${iconClass}`}>{iconText}</i> {dest.name}
-			</div>
-			<Modal open={addTicketModal.open} onClose={addTicketModal.handleClose}>
-				<AddTicketDialog/>
-			</Modal>
+				<div key={dest._id} onClick={addTicketModal.handleOpen}>
+					<i className={`material-icons ${iconClass}`}>{iconText}</i> {dest.name}
+				</div>
+				<Dialog open={addTicketModal.open} onClose={addTicketModal.handleClose}>
+					<AddTicketDialog destination={dest}/>
+				</Dialog>
 			</React.Fragment>
 		);
 	}
 }
 
-function DashboardPrinter({queue, destinations,loadingDestinations, jobs, queueJobs, loadingQueueJobs, fetchNeededData}) {
+function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queueJobs, loadingQueueJobs, fetchNeededData}) {
 
 	useEffect(() => {
 		fetchNeededData()
@@ -41,7 +67,7 @@ function DashboardPrinter({queue, destinations,loadingDestinations, jobs, queueJ
 		.map(dest => destinations[dest])
 		.sort((d1, d2) => d1.name.localeCompare(d2));
 
-	const queueDestinationClickers = queueDestinations.map(dest => <QueueDestinationClicker dest={dest}/> );
+	const queueDestinationClickers = queueDestinations.map(dest => <QueueDestinationClicker dest={dest}/>);
 
 	const jobsToShow = queueJobs.slice(0, 25).map(it => jobs.items[it]);
 	const queueJobsElement = loadingQueueJobs
