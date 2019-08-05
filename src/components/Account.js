@@ -39,12 +39,9 @@ function ToggleExchangeSwitch({value, onChange, ...rest}) {
 }
 
 class Account extends React.Component {
-	componentDidMount() {
-		this.props.fetchNeededData(this.props.shortUser);
-	}
 
-	componentWillReceiveProps(nextProps, nextContext) {
-		this.props.fetchNeededData(nextProps.shortUser);
+	componentWillMount() {
+		this.props.fetchNeededData(this.props.shortUser);
 	}
 
 	render() {
@@ -64,7 +61,6 @@ class Account extends React.Component {
 		const paidFund = account.groups.reduce((acc, it)=>acc || it.name ==='000-21st Century Fund', false);
 		const isExchangeStudent = canPrint && !paidFund;
 
-		console.log(this.props.auth);
 		const permissionIsVolunteer = this.props.auth.role === "ctfer" || this.props.auth.role === "elder";
 		const permissionCanSetExchange = this.props.auth.role === "ctfer" || this.props.auth.role === "elder";
 
