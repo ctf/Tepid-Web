@@ -17,11 +17,13 @@ import {DialogActions} from "@material-ui/core";
 import DialogContent from "@material-ui/core/DialogContent";
 import Button from "@material-ui/core/Button";
 import {useFormField} from "../hooks/useFormField";
+import styled from 'styled-components'
+
 
 function AddTicketDialog({destination, ticket}) {
 	const dispatch = useDispatch();
 
-	const text = useFormField((ticket&&ticket.reason) || '');
+	const text = useFormField((ticket && ticket.reason) || '');
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -66,6 +68,28 @@ function QueueDestinationClicker({dest}) {
 
 }
 
+const PrinterUpIcon = styled.i`
+	color: #4D983E
+`;
+const PrinterDownIcon = styled.i`
+	color: #F44336;
+`;
+
+function PrinterIconHalf({up}) {
+	return up ? <PrinterUpIcon className="material-icons"> print </PrinterUpIcon> :
+		<PrinterDownIcon className="material-icons"> print </PrinterDownIcon>
+}
+
+function QueueIcon({destinations}) {
+	const hasUp = destinations.reduce((acc, it) => (acc || it.up), false);
+	const allUp = destinations.reduce((acc, it) => (acc && it.up), true);
+
+	return <div className="printer-status-display">
+		<PrinterIconHalf up={allUp}/>
+		<PrinterIconHalf up={hasUp}/>
+	</div>;
+}
+
 function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queueJobs, loadingQueueJobs, fetchNeededData}) {
 
 	useEffect(() => {
@@ -98,10 +122,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 
 	return (
 		<div className="col dash-printer no-side-padding no-bottom-padding">
-			<div className="printer-status-display">
-				<i className="material-icons">print</i>
-				<i className="material-icons">print</i>
-			</div>
+			<QueueIcon destinations={Object.values(destinations)}/>
 			<h2>{queue.name}</h2>
 			<div className="printer-status">{queueDestinationClickers}</div>
 			<table className="dash-printer-queue">
