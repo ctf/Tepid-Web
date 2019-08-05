@@ -2,7 +2,12 @@ import React, {useEffect} from 'react';
 import {connect, useDispatch} from 'react-redux';
 import {Link, withRouter} from 'react-router-dom';
 
-import {fetchDestinationsIfNeeded, fetchQueueJobsIfNeeded, submitDestinationTicket} from '../actions';
+import {
+	fetchDestinationsIfNeeded,
+	fetchQueueJobsIfNeeded,
+	resolveDestinationTicket,
+	submitDestinationTicket
+} from '../actions';
 import {jobHasFailed, jobStatus} from '../tepid-utils';
 import useModal from "../hooks/useModal";
 import TextField from "@material-ui/core/TextField";
@@ -13,14 +18,17 @@ import DialogContent from "@material-ui/core/DialogContent";
 import Button from "@material-ui/core/Button";
 import {useFormField} from "../hooks/useFormField";
 
-function AddTicketDialog({destination,}) {
+function AddTicketDialog({destination, ticket}) {
 	const dispatch = useDispatch();
 
 	const text = useFormField('');
 
-	const handleSubmit=(event) => {
+	const handleSubmit = (event) => {
 		event.preventDefault();
 		dispatch(submitDestinationTicket(destination, text.value));
+	};
+	const handleResolve = () => {
+		dispatch(resolveDestinationTicket(destination))
 	};
 
 	return (
@@ -32,7 +40,9 @@ function AddTicketDialog({destination,}) {
 							   fullWidth name={'ticketContents'} {...text}/>
 				</DialogContent>
 				<DialogActions>
+					{ticket && <Button variant={"outlined"} onClick={handleResolve}> Resolve</Button>}
 					<Button variant={"outlined"} type={'submit'} onClick={handleSubmit}>Submit</Button>
+
 				</DialogActions>
 			</form>
 		</React.Fragment>
@@ -41,20 +51,19 @@ function AddTicketDialog({destination,}) {
 
 function QueueDestinationClicker({dest}) {
 	const addTicketModal = useModal();
-	{
-		const iconClass = dest.up ? 'up' : 'down';
-		const iconText = dest.up ? 'arrow_upward' : 'arrow_downward';
-		return (
-			<React.Fragment>
-				<div key={dest._id} onClick={addTicketModal.handleOpen}>
-					<i className={`material-icons ${iconClass}`}>{iconText}</i> {dest.name}
-				</div>
-				<Dialog open={addTicketModal.open} onClose={addTicketModal.handleClose}>
-					<AddTicketDialog destination={dest}/>
-				</Dialog>
-			</React.Fragment>
-		);
-	}
+	const iconClass = dest.up ? 'up' : 'down';
+	const iconText = dest.up ? 'arrow_upward' : 'arrow_downward';
+	return (
+		<React.Fragment>
+			<div key={dest._id} onClick={addTicketModal.handleOpen}>
+				<i className={`material-icons ${iconClass}`}>{iconText}</i> {dest.name}
+			</div>
+			<Dialog open={addTicketModal.open} onClose={addTicketModal.handleClose}>
+				<AddTicketDialog destination={dest} ticket={dest.ticket}/>
+			</Dialog>
+		</React.Fragment>
+	);
+
 }
 
 function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queueJobs, loadingQueueJobs, fetchNeededData}) {
