@@ -1,4 +1,4 @@
-import {RECEIVE_DESTINATIONS, REQUEST_DESTINATIONS} from '../actions';
+import {CONFIRM_DESTINATION_TICKET, RECEIVE_DESTINATIONS, REQUEST_DESTINATIONS} from '../actions';
 
 const initialDestinationsState = {
 	isFetching: false,
@@ -20,6 +20,18 @@ const destinations = function (state = initialDestinationsState, action) {
 				didInvalidate: false,
 				items: action.destinations,
 				lastUpdated: action.receivedAt
+			});
+		case CONFIRM_DESTINATION_TICKET:
+			console.log(state.items);
+			return Object.assign({}, state, {
+				items: {
+					...state.items,
+					[action.destination.name]:{
+						...state.items[action.destination.name],
+						ticket:action.ticket,
+						up:action.up,
+					}
+				}
 			});
 		default:
 			return state;

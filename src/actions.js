@@ -178,17 +178,18 @@ export const manageDestinationTicket = (destination, ticket) => ({
 });
 
 export const CONFIRM_DESTINATION_TICKET = 'CONFIRM_DESTINATION_TICKET';
-export const confirmDestinationTicket = (destination, ticket) => ({
+export const confirmDestinationTicket = (destination, ticket, up) => ({
 	type: CONFIRM_DESTINATION_TICKET,
 	ticket,
+	up,
 	destination,
 });
 
 const parseTicketUpdateToStatus = (response) => {
 	const match = response.match(/.* marked as (.*)/)[1];
-	if (match === 'up' || match === 'down') {
-		return match
-	} else return null
+	if (match === 'up') return true;
+	if (match === 'down') return false;
+	return null;
 };
 
 const doManageDestinationTicket = (destination, up, reason) => {
@@ -212,8 +213,8 @@ const doManageDestinationTicket = (destination, up, reason) => {
 				error => handleError(error),
 			).then((body) => {
 				const status = parseTicketUpdateToStatus(body);
-				if (status === (up?"up": "down")) {
-					dispatch(confirmDestinationTicket(destination, ticket))
+				if (status !== null) {
+					dispatch(confirmDestinationTicket(destination, ticket, status))
 				}
 			})
 	}
