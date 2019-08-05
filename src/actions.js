@@ -538,11 +538,14 @@ export const fetchAccountJobsIfNeeded = shortUser => (dispatch, getState) => {
 };
 
 export const fetchAccountAndRelatedDataIfNeeded = shortUser => (dispatch, getState) => {
-	return Promise.all([
-		dispatch(fetchAccountIfNeeded(shortUser)),
-		dispatch(fetchAccountQuotaIfNeeded(shortUser)),
-		dispatch(fetchAccountJobsIfNeeded(shortUser))
-	]);
+	dispatch(fetchAccountIfNeeded(shortUser))
+		.then(() => {
+				Promise.all([
+					dispatch(fetchAccountQuotaIfNeeded(shortUser)),
+					dispatch(fetchAccountJobsIfNeeded(shortUser)),
+				])
+			}
+		)
 };
 
 function handleError(error) {
