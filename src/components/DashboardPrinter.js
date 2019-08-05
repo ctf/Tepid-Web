@@ -21,7 +21,7 @@ import {useFormField} from "../hooks/useFormField";
 function AddTicketDialog({destination, ticket}) {
 	const dispatch = useDispatch();
 
-	const text = useFormField('');
+	const text = useFormField((ticket&&ticket.reason) || '');
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
