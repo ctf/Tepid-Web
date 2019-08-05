@@ -184,12 +184,19 @@ export const confirmDestinationTicket = (destination, ticket) => ({
 	destination,
 });
 
+const parseTicketUpdateToStatus = (response) => {
+	const match = response.match(/.* marked as (.*)/)[1];
+	if (match === 'up' || match === 'down') {
+		return match
+	} else return null
+};
+
 const doManageDestinationTicket = (destination, up, reason) => {
 	return (dispatch, getState) => {
 		const state = getState();
 
 		const ticket = {
-			up:false,
+			up: up,
 			reason,
 		};
 		const fetchObject = {
@@ -201,10 +208,13 @@ const doManageDestinationTicket = (destination, up, reason) => {
 		dispatch(manageDestinationTicket(destination, ticket));
 		return fetch(`${API_URL}/destinations/${destination.name}`, fetchObject)
 			.then(
-				response => response.json(),
+				response => response.text(),
 				error => handleError(error),
-			).then(()=>{
-				dispatch(confirmDestinationTicket(destination, ticket))
+			).then((body) => {
+				const status = parseTicketUpdateToStatus(body);
+				if (status === (up?"up": "down")) {
+					dispatch(confirmDestinationTicket(destination, ticket))
+				}
 			})
 	}
 };
@@ -213,8 +223,7 @@ export const submitDestinationTicket = (destination, reason) => {
 };
 export const resolveDestinationTicket = (destination) => {
 	return doManageDestinationTicket(destination, true, '')
-}
-
+};
 
 
 // Jobs ------------------------------------------------------------------------
@@ -557,7 +566,7 @@ export const doSetColorPrinting = (shortUser, enabled) => {
 				response => response.json(),
 				error => handleError(error)
 			).then(() => {
-				dispatch(fetchAccount(state.auth, shortUser))
+					dispatch(fetchAccount(state.auth, shortUser))
 				}
 			)
 	}
