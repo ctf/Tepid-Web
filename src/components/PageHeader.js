@@ -1,11 +1,15 @@
-import React, {useState} from 'react';
-import {connect} from "react-redux"
+import React, {useEffect, useState} from 'react';
+import {connect, useDispatch} from "react-redux"
 import {NavLink, Redirect, withRouter} from 'react-router-dom';
+import {DebounceInput} from "react-debounce-input";
+import {fetchAutoSuggest} from "../actions";
 
 
 function HeaderSearchBar(props){
+    const dispatch = useDispatch();
 
     const [searchTarget, setSearchTarget] = useState("");
+    const [suggestions, setSuggestions] = useState([]);
 
     function handleSubmit(event){
         event.preventDefault();
@@ -14,13 +18,30 @@ function HeaderSearchBar(props){
 
     function handleChange(event) {
         setSearchTarget(event.target.value);
+        console.log(event.target.value)
     }
+    useEffect(()=> {
+        const f = async() =>{
+            if (searchTarget!=="") {
+                console.log("DISPATCH");
+                console.log(await dispatch(fetchAutoSuggest(searchTarget)));
+            }
+        };
+        console.log(f());
+        },[searchTarget]
+
+    );
+
 
     return (
         <div className="header-left">
             <form onSubmit={handleSubmit}>
             <i className="material-icons">search</i>
-            <input type="text" name="user-search" id="header-user-search" placeholder="Search for users..." value ={searchTarget} onChange={handleChange}/>
+            <DebounceInput type="text" name="user-search" id="header-user-search"
+                           placeholder="Search for users..." value ={searchTarget}
+                           onChange={handleChange}
+                           minLength={2} debounceTimeout={300}
+            />
             </form>
         </div>
     )
