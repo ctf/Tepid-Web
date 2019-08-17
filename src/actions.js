@@ -600,6 +600,26 @@ export const doSetExchangeStatus = (shortUser, exchange) => {
 	}
 };
 
+// Account Actions -------------------------------------------------------------
+
+export const fetchAutoSuggest = (like, limit = 10) => {
+	return  (dispatch, getState) => {
+		const state = getState();
+		const fetchObject = {
+			method: 'GET',
+			headers: standardHeaders(state.auth)
+		};
+		return fetch(`${API_URL}/users/autosuggest/${like}?limit=${limit}`, fetchObject)
+			.then(
+				response => response.json(),
+				error => handleError(error)
+			).then((json)=>{
+				return json
+			}
+		)
+	}
+};
+
 // Combined Actions ------------------------------------------------------------
 
 export const attemptAuthAndLoadInitialData = credentials => (dispatch, getState) => {
