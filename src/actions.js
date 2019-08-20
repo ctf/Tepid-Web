@@ -602,6 +602,12 @@ export const doSetExchangeStatus = (shortUser, exchange) => {
 
 // Account Actions -------------------------------------------------------------
 
+export const RECEIVE_USER_AUTOSUGGEST = 'RECEIVE_USER_AUTOSUGGEST';
+export const receiveUserAutosuggest = (autosuggest) => ({
+	type: RECEIVE_USER_AUTOSUGGEST,
+	autosuggest,
+});
+
 export const fetchAutoSuggest = (like, limit = 10) => {
 	return  (dispatch, getState) => {
 		const state = getState();
@@ -614,7 +620,7 @@ export const fetchAutoSuggest = (like, limit = 10) => {
 				response => response.json(),
 				error => handleError(error)
 			).then((json)=>{
-				return json
+				dispatch(receiveUserAutosuggest(json))
 			}
 		)
 	}
