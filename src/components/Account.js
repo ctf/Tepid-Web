@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import JobTable from './JobTable';
 import Switch from "@material-ui/core/Switch";
@@ -38,21 +38,21 @@ function ToggleExchangeSwitch({value, onChange, ...rest}) {
 	)
 }
 
-class Account extends React.Component {
+function Account (props) {
 
-	componentWillMount() {
-		this.props.fetchNeededData(this.props.shortUser);
-	}
+	useEffect(()=>{
+		props.fetchNeededData(props.shortUser);
+	},[props.shortUser]);
 
-	render() {
-		if (!this.props.account || !this.props.account.data.type) {
+
+		if (!props.account || !props.account.data.type) {
 			return (
 				NoUserCard()
 			)
 		}
-		const account = this.props.account.data;
+		const account = props.account.data;
 
-		const quota = this.props.account.quota.amount;
+		const quota = props.account.quota.amount;
 		const maxQuota = 4000; // TODO: Fetch from somewhere
 
 		const role = account.role;
@@ -61,11 +61,11 @@ class Account extends React.Component {
 		const paidFund = account.groups.reduce((acc, it)=>acc || it.name ==='000-21st Century Fund', false);
 		const isExchangeStudent = canPrint && !paidFund;
 
-		const permissionIsVolunteer = this.props.auth.role === "ctfer" || this.props.auth.role === "elder";
-		const permissionCanSetExchange = this.props.auth.role === "ctfer" || this.props.auth.role === "elder";
+		const permissionIsVolunteer = props.auth.role === "ctfer" || props.auth.role === "elder";
+		const permissionCanSetExchange = props.auth.role === "ctfer" || props.auth.role === "elder";
 
-		const self = Object.keys(this.props.auth.user).includes('shortUser')
-			? account.shortUser === this.props.auth.user.shortUser
+		const self = Object.keys(props.auth.user).includes('shortUser')
+			? account.shortUser === props.auth.user.shortUser
 			: false;
 
 		const facultyOrDepartment = (() => {
@@ -85,22 +85,22 @@ class Account extends React.Component {
 		const badgeables = [];
 		if (isVolunteer) { badgeables.push('CTF Volunteer')}
 		if (isExchangeStudent) {badgeables.push('Exchange')}
-		if (account.shortUser === this.props.auth.user.shortUser) {badgeables.push('You!')}
+		if (account.shortUser === props.auth.user.shortUser) {badgeables.push('You!')}
 
-		const badges = this.props.account === undefined
+		const badges = props.account === undefined
 			? ''
 			: badgeables.map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
-		const jobs = (this.props.account === undefined || this.props.jobs.isFetching) ? [] : this.props.account.jobs.items.map(it => this.props.jobs.items[it]);
+		const jobs = (props.account === undefined || props.jobs.isFetching) ? [] : props.account.jobs.items.map(it => props.jobs.items[it]);
 		const jobTable = canPrint ? (
 			<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false} canRefund={permissionIsVolunteer}/>) : '';
 
 		const handleSetColorPrinting = (e) => {
-			this.props.setColorPrinting(account.shortUser, e.target.checked)
+			props.setColorPrinting(account.shortUser, e.target.checked)
 		};
 
 		const handleSetExchange = (e) => {
-			this.props.setExchangeStatus(account.shortUser, e.target.checked)
+			props.setExchangeStatus(account.shortUser, e.target.checked)
 		};
 
 		return (
@@ -156,7 +156,6 @@ class Account extends React.Component {
 				</div>
 			</div>
 		);
-	}
 }
 
 export default Account;
