@@ -7,8 +7,10 @@ import Autosuggest from 'react-autosuggest';
 import Paper from "@material-ui/core/Paper";
 
 
-function renderSuggestion(s, { query, isHighlighted }) {
-	return <MenuItem selected={isHighlighted} component={"div"}>{s.displayName}</MenuItem>
+function renderSuggestion(s, {isHighlighted}) {
+	return <MenuItem selected={isHighlighted} component={"div"}>
+		<div>{s.displayName}</div>
+	</MenuItem>
 }
 
 function HeaderSearchBar(props) {
@@ -17,6 +19,7 @@ function HeaderSearchBar(props) {
 
 	const [searchTarget, setSearchTarget] = useState("");
 	const [reqID, setReqID] = useState(null);
+
 
 	function handleSubmit(event) {
 		event.preventDefault();
@@ -48,11 +51,22 @@ function HeaderSearchBar(props) {
 					getSuggestionValue={s => s.shortUser}
 					renderSuggestion={renderSuggestion}
 					inputProps={{
+						id: "header-user-search",
 						placeholder: "Search for users...",
 						value: searchTarget,
 						onChange: (event, {newValue}) => {
 							setSearchTarget(newValue)
 						},
+					}}
+					theme={{
+						suggestionsList: {
+							margin: 0,
+							padding: 0,
+							listStyleType: 'none',
+						},
+						suggestionsContainer:{
+							width: '95%',
+						}
 					}}
 					renderSuggestionsContainer={options => (
 						<Paper {...options.containerProps} square>
