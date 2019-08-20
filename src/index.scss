@@ -228,7 +228,7 @@ main header .header-left i.material-icons {
 	left: 0.5rem;
 	font-size: 1.3rem;
 }
-input#header-user-search {
+#header-user-search {
 	border: 1px solid white;
 	height: 2.2rem;
 	line-height: 2.2rem;
@@ -243,7 +243,7 @@ input#header-user-search {
 
 	transition: border-color 0.2s ease-in-out, width 0.3s ease-in-out;
 }
-input#header-user-search:focus, input#header-user-search:active {
+#header-user-search:focus, #header-user-search:active {
 	border-color: $accent-color-light;
 	outline: none;
 	width: 95%;
