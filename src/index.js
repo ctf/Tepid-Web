@@ -10,7 +10,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'
 import { PersistGate } from 'redux-persist/lib/integration/react'
 
-import tepidReducer from './reducers';
+import rootReducer from './reducers';
 
 import Tepid from './components/Tepid';
 
@@ -29,7 +29,7 @@ const persistConfig = {
 	whitelist: ['auth']
 };
 
-const persistedReducer = persistReducer(persistConfig, tepidReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = createStore(
 	persistedReducer,
