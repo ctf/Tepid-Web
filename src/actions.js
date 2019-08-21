@@ -4,6 +4,10 @@ import {buildToken} from './tepid-utils';
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
 
+const authHeader = (auth) => ({
+	'Authorization': `Token ${buildToken(auth)}`
+});
+
 const standardHeaders = (auth) => ({
 	'Content-Type': 'application/json',
 	'Accept': 'application/json',
@@ -65,6 +69,27 @@ export const receiveInvalidateAuth = (success) => {
 		type: RECEIVE_INVALIDATE_AUTH,
 		success
 	});
+};
+
+export const invalidateAuth = () => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		const fetchObject = {
+			method: 'DELETE',
+			headers: authHeader(state.auth),
+		};
+
+		dispatch(requestInvalidateAuth());
+		return fetch(`${API_URL}/sessions/${state.auth.session.id}`, fetchObject)
+			.then(
+				response => response,
+				error => handleError(error),
+			).then((response) => {
+				dispatch(receiveInvalidateAuth(response.ok))
+			})
+
+	}
 };
 
 // Queues ----------------------------------------------------------------------
