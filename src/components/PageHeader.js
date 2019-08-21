@@ -87,32 +87,33 @@ const mapStateToProps = state => {
 	return {auth: state.auth}
 };
 
-function PageHeaderContent (props) {
-    const dispatch = useDispatch();
+function PageHeaderContent(props) {
+	const dispatch = useDispatch();
 
-    const menu = useMenu();
+	const menu = useMenu();
 
-    const handleSignOut = ()=>{
-        dispatch(invalidateAuth());
-    };
+	const handleSignOut = () => {
+		menu.handleClose();
+		dispatch(invalidateAuth());
+	};
 
-    return (
-        <header>
-            { (props.auth.user.role === "ctfer" || props.auth.user.role === "elder") && (
-                <HeaderSearchBar history={props.history}/>
-            )}
-            <div className="header-right">
-                <Button id="header-user-dropdown" onClick={menu.handleOpen}>
-                    {props.auth.user.displayName}
-                    <i className="material-icons">keyboard_arrow_down</i>
-                    <Menu open={menu.open} anchorEl={menu.anchorEl} onClose={menu.handleClose}>
-                        <MenuItem><NavLink to="/my-account">My Account</NavLink></MenuItem>
-                        <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
-                    </Menu>
-                </Button>
-            </div>
-        </header>
-    );
+	return (
+		<header>
+			{(props.auth.user.role === "ctfer" || props.auth.user.role === "elder") && (
+				<HeaderSearchBar history={props.history}/>
+			)}
+			<div className="header-right">
+				<Button id="header-user-dropdown" onClick={menu.handleOpen}>
+					{props.auth.user.displayName}
+					<i className="material-icons">keyboard_arrow_down</i>
+				</Button>
+				<Menu open={menu.open} anchorEl={menu.anchorEl} onClose={menu.handleClose}>
+					<MenuItem><NavLink to="/my-account">My Account</NavLink></MenuItem>
+					<MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+				</Menu>
+			</div>
+		</header>
+	);
 };
 
 const PageHeader = withRouter(connect(mapStateToProps)(PageHeaderContent));
