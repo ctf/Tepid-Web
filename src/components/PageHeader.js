@@ -1,53 +1,106 @@
 import React, {useState} from 'react';
-import {connect} from "react-redux"
-import {NavLink, Redirect, withRouter} from 'react-router-dom';
+import {connect, useDispatch, useSelector} from "react-redux"
+import {NavLink, withRouter} from 'react-router-dom';
+import {fetchAutoSuggest} from "../actions";
+import MenuItem from "@material-ui/core/MenuItem";
+import Autosuggest from 'react-autosuggest';
+import Paper from "@material-ui/core/Paper";
 
 
-function HeaderSearchBar(props){
+function renderSuggestion(s, {isHighlighted}) {
+	return <MenuItem selected={isHighlighted} component={"div"}>
+		<div>{s.displayName}</div>
+	</MenuItem>
+}
 
-    const [searchTarget, setSearchTarget] = useState("");
+function HeaderSearchBar(props) {
+	const dispatch = useDispatch();
+	const suggestions = useSelector(state => state.ui.autosuggest);
 
-    function handleSubmit(event){
-        event.preventDefault();
-        props.history.push('/accounts/'+searchTarget)
-    }
+	const [searchTarget, setSearchTarget] = useState("");
+	const [reqID, setReqID] = useState(null);
 
-    function handleChange(event) {
-        setSearchTarget(event.target.value);
-    }
 
-    return (
-        <div className="header-left">
-            <form onSubmit={handleSubmit}>
-            <i className="material-icons">search</i>
-            <input type="text" name="user-search" id="header-user-search" placeholder="Search for users..." value ={searchTarget} onChange={handleChange}/>
-            </form>
-        </div>
-    )
+	function handleSubmit(event) {
+		event.preventDefault();
+		props.history.push('/accounts/' + searchTarget)
+	}
+
+	async function handleChange({value}) {
+		if (reqID !== null) {
+			clearTimeout(reqID)
+		}
+
+		setReqID(
+			setTimeout(() => {
+				dispatch(fetchAutoSuggest(value))
+			}, 1000)
+		);
+	}
+
+	return (
+		<div className="header-left">
+			<form onSubmit={handleSubmit}>
+				<i className="material-icons">search</i>
+
+				<Autosuggest
+					value={searchTarget}
+					onSuggestionsFetchRequested={handleChange}
+					onSuggestionsClearRequested={() => null}
+					suggestions={suggestions}
+					getSuggestionValue={s => s.shortUser}
+					renderSuggestion={renderSuggestion}
+					inputProps={{
+						id: "header-user-search",
+						placeholder: "Search for users...",
+						value: searchTarget,
+						onChange: (event, {newValue}) => {
+							setSearchTarget(newValue)
+						},
+					}}
+					theme={{
+						suggestionsList: {
+							margin: 0,
+							padding: 0,
+							listStyleType: 'none',
+						},
+						suggestionsContainer:{
+							width: '95%',
+						}
+					}}
+					renderSuggestionsContainer={options => (
+						<Paper {...options.containerProps} square>
+							{options.children}
+						</Paper>
+					)}
+				/>
+			</form>
+		</div>
+	)
 }
 
 const mapStateToProps = state => {
-    return {auth: state.auth}
+	return {auth: state.auth}
 };
 
-const PageHeaderContent = (props)=> {
-    return (
-        <header>
-            { (props.auth.user.role === "ctfer" || props.auth.user.role === "elder") && (
-                <HeaderSearchBar history={props.history}/>
-            )}
-            <div className="header-right">
-                <div id="header-user-dropdown">
-                    {props.auth.user.displayName}
-                    <i className="material-icons">keyboard_arrow_down</i>
-                    <ul>
-                        <li><NavLink to="/my-account">My Account</NavLink></li>
-                        <li>Sign Out</li>
-                    </ul>
-                </div>
-            </div>
-        </header>
-    );
+const PageHeaderContent = (props) => {
+	return (
+		<header>
+			{(props.auth.user.role === "ctfer" || props.auth.user.role === "elder") && (
+				<HeaderSearchBar history={props.history}/>
+			)}
+			<div className="header-right">
+				<div id="header-user-dropdown">
+					{props.auth.user.displayName}
+					<i className="material-icons">keyboard_arrow_down</i>
+					<ul>
+						<li><NavLink to="/my-account">My Account</NavLink></li>
+						<li>Sign Out</li>
+					</ul>
+				</div>
+			</div>
+		</header>
+	);
 };
 
 const PageHeader = withRouter(connect(mapStateToProps)(PageHeaderContent));
