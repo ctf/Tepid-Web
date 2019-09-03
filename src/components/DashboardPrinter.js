@@ -122,7 +122,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 
 	return (
 		<div className="col dash-printer no-side-padding no-bottom-padding">
-			<QueueIcon destinations={Object.values(destinations)}/>
+			<QueueIcon destinations={Object.values(queueDestinations)}/>
 			<h2>{queue.name}</h2>
 			<div className="printer-status">{queueDestinationClickers}</div>
 			<table className="dash-printer-queue">
