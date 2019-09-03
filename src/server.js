@@ -7,13 +7,13 @@ import { renderToString } from 'react-dom/server';
 import {StaticRouter} from 'react-router-dom';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import tepidReducer from './reducers';
+import rootReducer from './reducers';
 
 import Tepid from './components/Tepid';
 
 
 function handleRender(req, res) {
-	const store = createStore(tepidReducer);
+	const store = createStore(rootReducer);
 	const context = {};
 
 	const html = renderToString(

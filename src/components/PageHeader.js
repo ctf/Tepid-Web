@@ -1,8 +1,12 @@
 import React, {useState} from 'react';
 import {connect, useDispatch, useSelector} from "react-redux"
-import {NavLink, withRouter} from 'react-router-dom';
-import {fetchAutoSuggest} from "../actions";
+import {NavLink, Redirect, withRouter} from 'react-router-dom';
+import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import {invalidateAuth} from "../actions";
+import Button from "@material-ui/core/Button";
+import useMenu from "../hooks/useMenu";
+import {fetchAutoSuggest} from "../actions";
 import Autosuggest from 'react-autosuggest';
 import Paper from "@material-ui/core/Paper";
 
@@ -83,21 +87,30 @@ const mapStateToProps = state => {
 	return {auth: state.auth}
 };
 
-const PageHeaderContent = (props) => {
+function PageHeaderContent(props) {
+	const dispatch = useDispatch();
+
+	const menu = useMenu();
+
+	const handleSignOut = () => {
+		menu.handleClose();
+		dispatch(invalidateAuth());
+	};
+
 	return (
 		<header>
 			{(props.auth.user.role === "ctfer" || props.auth.user.role === "elder") && (
 				<HeaderSearchBar history={props.history}/>
 			)}
 			<div className="header-right">
-				<div id="header-user-dropdown">
+				<Button id="header-user-dropdown" onClick={menu.handleOpen}>
 					{props.auth.user.displayName}
 					<i className="material-icons">keyboard_arrow_down</i>
-					<ul>
-						<li><NavLink to="/my-account">My Account</NavLink></li>
-						<li>Sign Out</li>
-					</ul>
-				</div>
+				</Button>
+				<Menu open={menu.open} anchorEl={menu.anchorEl} onClose={menu.handleClose}>
+					<MenuItem><NavLink to="/my-account">My Account</NavLink></MenuItem>
+					<MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+				</Menu>
 			</div>
 		</header>
 	);

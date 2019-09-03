@@ -22,7 +22,6 @@ const destinations = function (state = initialDestinationsState, action) {
 				lastUpdated: action.receivedAt
 			});
 		case CONFIRM_DESTINATION_TICKET:
-			console.log(state.items);
 			return Object.assign({}, state, {
 				items: {
 					...state.items,

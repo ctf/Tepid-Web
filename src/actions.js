@@ -4,6 +4,10 @@ import {buildToken} from './tepid-utils';
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
 
+const authHeader = (auth) => ({
+	'Authorization': `Token ${buildToken(auth)}`
+});
+
 const standardHeaders = (auth) => ({
 	'Content-Type': 'application/json',
 	'Accept': 'application/json',
@@ -31,13 +35,6 @@ export const receiveAuth = (json) => ({
 	receivedAt: Date.now()
 });
 
-export const INVALIDATE_AUTH = 'INVALIDATE_AUTH';
-export const invalidateAuth = () => {
-	return ({
-		type: INVALIDATE_AUTH
-	});
-};
-
 export const attemptAuth = function (credentials) {
 	return dispatch => {
 		// TODO: Check validity / handle errors
@@ -57,6 +54,42 @@ export const attemptAuth = function (credentials) {
 			.then(response => response.json())
 			.then(json => dispatch(receiveAuth(json)));
 	};
+};
+
+export const REQUEST_INVALIDATE_AUTH = 'REQUEST_INVALIDATE_AUTH';
+export const requestInvalidateAuth = () => {
+	return ({
+		type: REQUEST_INVALIDATE_AUTH
+	});
+};
+
+export const RECEIVE_INVALIDATE_AUTH = 'RECEIVE_INVALIDATE_AUTH';
+export const receiveInvalidateAuth = (success) => {
+	return ({
+		type: RECEIVE_INVALIDATE_AUTH,
+		success
+	});
+};
+
+export const invalidateAuth = () => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		const fetchObject = {
+			method: 'DELETE',
+			headers: authHeader(state.auth),
+		};
+
+		dispatch(requestInvalidateAuth());
+		return fetch(`${API_URL}/sessions/${state.auth.session.id}`, fetchObject)
+			.then(
+				response => response,
+				error => handleError(error),
+			).then((response) => {
+				dispatch(receiveInvalidateAuth(response.ok))
+			})
+
+	}
 };
 
 // Queues ----------------------------------------------------------------------

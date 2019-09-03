@@ -1,4 +1,4 @@
-import {INVALIDATE_AUTH, RECEIVE_AUTH, REQUEST_AUTH} from '../actions';
+import {RECEIVE_AUTH, REQUEST_AUTH} from '../actions';
 
 const initialAuthState = {
 	isFetching: false,
@@ -33,10 +33,6 @@ const auth = function (state = initialAuthState, action) {
 					expiration: action.session.expiration
 				},
 				lastUpdated: action.receivedAt
-			});
-		case INVALIDATE_AUTH:
-			return Object.assign({}, state, {
-				didInvalidate: true
 			});
 		default:
 			return state;
