@@ -23,7 +23,7 @@ class Tepid extends React.Component {
 				<CTFerRoute path="/queues" component={QueuesPage} />
 				<ElderRoute path="/destinations" component={DestinationsPage} />
 				<CTFerRoute path="/statistics" component={StatisticsPage} />
-				<CTFerRoute path="/logs" component={LogsPage} />
+				<ElderRoute path="/logs" component={LogsPage} />
 				<CTFerRoute path="/constitution" component={ConstitutionPage} />
 			</div>
 		);
