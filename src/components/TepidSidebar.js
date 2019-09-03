@@ -14,7 +14,7 @@ class TepidSidebar extends React.Component {
 					<ul>
 						<li>
 							<NavLink exact to="/" activeClassName="active">
-								<i className="material-icons">show_chart</i>Dashboard
+								<i className="material-icons">show_chart</i> Dashboard
 							</NavLink>
 						</li>
 
