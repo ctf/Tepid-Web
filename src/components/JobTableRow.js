@@ -6,13 +6,15 @@ import {MoreMenu} from "./Buttons/MoreButton";
 import MenuItem from "@material-ui/core/MenuItem";
 import {TableRow} from "@material-ui/core";
 import TableCell from "@material-ui/core/TableCell";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import * as actions from "../actions";
 
 function JobTableRow({showUser, canRefund, job}) {
 
 	const dispatch = useDispatch();
 	const doSetJobRefunded = (job, refunded) => dispatch(actions.doSetJobRefunded(job, refunded));
+
+	const destination = useSelector(state => state.destinations.items[job.destination]);
 
 	const handleRefund = () => {
 		doSetJobRefunded(job, !job.refunded)
@@ -31,7 +33,7 @@ function JobTableRow({showUser, canRefund, job}) {
 			) : ''}
 			<TableCell>{`${job.pages} ${colorPages === 0 ? '' : ` (${colorPages} color)`}`}</TableCell>
 			<TableCell>{jobStatus(job)}</TableCell>
-			<TableCell>{job.originalHost}</TableCell>
+			<TableCell>{(destination && destination.name) || ""}</TableCell>
 			<TableCell>{job.name}</TableCell>
 			<TableCell>
 				<MoreMenu>

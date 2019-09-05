@@ -576,6 +576,7 @@ export const fetchAccountAndRelatedDataIfNeeded = shortUser => (dispatch, getSta
 				Promise.all([
 					dispatch(fetchAccountQuotaIfNeeded(shortUser)),
 					dispatch(fetchAccountJobsIfNeeded(shortUser)),
+					dispatch(fetchDestinationsIfNeeded()),
 				])
 			}
 		)

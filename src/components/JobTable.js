@@ -46,7 +46,7 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 						}
 						<TableCell style={{width: '10%'}}>Pages</TableCell>
 						<TableCell style={{width: '20%'}}>Status</TableCell>
-						<TableCell style={{width: '15%'}}>Host</TableCell>
+						<TableCell style={{width: '15%'}}>Destination</TableCell>
 						<TableCell style={{}}>Name</TableCell>
 						<TableCell style={{width: '6%'}}>&nbsp;</TableCell>
 					</TableRow>
