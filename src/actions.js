@@ -640,7 +640,7 @@ export const doSetPreferredSalutation = (shortUser, salutation) => {
 		const fetchObject = {
 			method: 'PUT',
 			headers: standardHeaders(state.auth),
-			body: JSON.stringify(salutation)
+			body: salutation
 		};
 		return fetch(`${API_URL}/users/${shortUser}/nick`, fetchObject)
 			.then(
