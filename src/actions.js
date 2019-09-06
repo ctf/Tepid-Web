@@ -634,7 +634,7 @@ export const doSetExchangeStatus = (shortUser, exchange) => {
 	}
 };
 
-export const doSetPreferredSalutation = (shortUser, salutation) => {
+export const doSetNick = (shortUser, salutation) => {
 	return (dispatch, getState) => {
 		const state = getState();
 		const fetchObject = {

@@ -1,8 +1,9 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import JobTable from './JobTable';
 import Switch from "@material-ui/core/Switch";
 import {FormControlLabel} from "@material-ui/core";
+import {DebounceInput} from "react-debounce-input";
 
 function NoUserCard() {
 	return (
@@ -55,11 +56,26 @@ function QuotaBar({quota, maxQuota}) {
 	)
 }
 
-function SalutationSetter() {
+function NickSetter({initialValue, onChange}) {
+	const [nick, setNick] = useState(initialValue);
+	useEffect(()=>{
+		setNick(initialValue)
+	},[initialValue]);
+
+	const handleChange = (e) => {
+		setNick(e.target.value);
+		onChange(e);
+	};
+
 	return (
 		<>
 			<strong>Preferred Salutation:</strong> <br/>
-			<input type="text" value="David" style={{marginBottom: '0.6rem'}}/> <br/>
+			<DebounceInput
+				type="text"
+				debounceTimeout={200}
+				value={nick}
+				onChange={handleChange}
+				style={{marginBottom: '0.6rem'}}/> <br/>
 		</>
 	)
 }
@@ -135,6 +151,10 @@ function Account(props) {
 		props.setExchangeStatus(account.shortUser, e.target.checked)
 	};
 
+	const handleSetNick = (e) => {
+		props.setNick(account.shortUser, e.target.value);
+	};
+
 	return (
 		<div>
 			<div className="card no-padding">
@@ -158,7 +178,8 @@ function Account(props) {
 								User <strong>has {paidFund ? '' : 'not '}</strong>paid into the 21st Century Fund
 							</div>
 							<div className="col">
-								<SalutationSetter/>
+								<NickSetter initialValue={account.nick}
+												  onChange={handleSetNick}/>
 								<strong>Jobs Expire After:</strong> 1 Week <br/>
 								<ToggleColorSwitch value={account.colorPrinting}
 												   onChange={handleSetColorPrinting}/>

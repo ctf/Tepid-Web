@@ -1,7 +1,12 @@
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import {doSetColorPrinting, doSetExchangeStatus, fetchAccountAndRelatedDataIfNeeded} from '../actions';
+import {
+	doSetColorPrinting,
+	doSetExchangeStatus,
+	doSetNick,
+	fetchAccountAndRelatedDataIfNeeded
+} from '../actions';
 
 import Account from '../components/Account';
 
@@ -25,6 +30,9 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 	},
 	setExchangeStatus: (shortUser, exchange)=>{
 		dispatch(doSetExchangeStatus(shortUser, exchange))
+	},
+	setNick: (shortUser, salutation)=>{
+		dispatch(doSetNick(shortUser, salutation))
 	}
 });
 
