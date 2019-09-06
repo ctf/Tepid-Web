@@ -40,18 +40,27 @@ function ToggleExchangeSwitch({value, onChange, ...rest}) {
 
 function QuotaBar({quota, maxQuota}) {
 	return (
-	<div>
-		<div className="flex-row-container">
-			<div className="quota-label">Quota</div>
-			<div className={'quota-bar' + (quota === null ? ' loading' : '')}>
-				<div className="quota-inner-bar"
-					 style={{width: `${quota / maxQuota * 100}%`}}>
-					<strong>{quota}</strong> pages remaining
+		<div>
+			<div className="flex-row-container">
+				<div className="quota-label">Quota</div>
+				<div className={'quota-bar' + (quota === null ? ' loading' : '')}>
+					<div className="quota-inner-bar"
+						 style={{width: `${quota / maxQuota * 100}%`}}>
+						<strong>{quota}</strong> pages remaining
+					</div>
 				</div>
 			</div>
+			<hr/>
 		</div>
-		<hr/>
-	</div>
+	)
+}
+
+function SalutationSetter() {
+	return (
+		<>
+			<strong>Preferred Salutation:</strong> <br/>
+			<input type="text" value="David" style={{marginBottom: '0.6rem'}}/> <br/>
+		</>
 	)
 }
 
@@ -149,8 +158,7 @@ function Account(props) {
 								User <strong>has {paidFund ? '' : 'not '}</strong>paid into the 21st Century Fund
 							</div>
 							<div className="col">
-								<strong>Preferred Salutation:</strong> <br/>
-								<input type="text" value="David" style={{marginBottom: '0.6rem'}}/> <br/>
+								<SalutationSetter/>
 								<strong>Jobs Expire After:</strong> 1 Week <br/>
 								<ToggleColorSwitch value={account.colorPrinting}
 												   onChange={handleSetColorPrinting}/>
