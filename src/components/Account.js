@@ -56,7 +56,7 @@ function QuotaBar({quota, maxQuota}) {
 	)
 }
 
-function NickSetter({initialValue, onChange}) {
+function NickSetter({initialValue, placeHolder, onChange}) {
 	const [nick, setNick] = useState(initialValue);
 	useEffect(()=>{
 		setNick(initialValue)
@@ -73,6 +73,7 @@ function NickSetter({initialValue, onChange}) {
 			<DebounceInput
 				type="text"
 				debounceTimeout={200}
+				placeHolder={placeHolder}
 				value={nick}
 				onChange={handleChange}
 				style={{marginBottom: '0.6rem'}}/> <br/>
@@ -179,6 +180,7 @@ function Account(props) {
 							</div>
 							<div className="col">
 								<NickSetter initialValue={account.nick}
+											placeHolder={account.salutation}
 												  onChange={handleSetNick}/>
 								<strong>Jobs Expire After:</strong> 1 Week <br/>
 								<ToggleColorSwitch value={account.colorPrinting}
