@@ -38,6 +38,23 @@ function ToggleExchangeSwitch({value, onChange, ...rest}) {
 	)
 }
 
+function QuotaBar({quota, maxQuota}) {
+	return (
+	<div>
+		<div className="flex-row-container">
+			<div className="quota-label">Quota</div>
+			<div className={'quota-bar' + (quota === null ? ' loading' : '')}>
+				<div className="quota-inner-bar"
+					 style={{width: `${quota / maxQuota * 100}%`}}>
+					<strong>{quota}</strong> pages remaining
+				</div>
+			</div>
+		</div>
+		<hr/>
+	</div>
+	)
+}
+
 function Account(props) {
 
 	useEffect(() => {
@@ -121,20 +138,7 @@ function Account(props) {
 							<div className="fac-dept">{facultyOrDepartment}</div>
 						</div>
 					</div>
-					{canPrint ? (
-						<div>
-							<div className="flex-row-container">
-								<div className="quota-label">Quota</div>
-								<div className={'quota-bar' + (quota === null ? ' loading' : '')}>
-									<div className="quota-inner-bar"
-										 style={{width: `${quota / maxQuota * 100}%`}}>
-										<strong>{quota}</strong> pages remaining
-									</div>
-								</div>
-							</div>
-							<hr/>
-						</div>
-					) : ''}
+					{canPrint ? <QuotaBar quota={quota} maxQuota={maxQuota}/> : ''}
 					<div className="user-profile-details">
 						<div className="row">
 							<div className="col">
