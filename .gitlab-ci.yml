@@ -1,0 +1,14 @@
+stages:
+  - build
+  
+build:
+  only:
+    - master
+  stage: build
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - build
+    expire_in: 1 day
