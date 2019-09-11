@@ -634,6 +634,24 @@ export const doSetExchangeStatus = (shortUser, exchange) => {
 	}
 };
 
+export const doSetNick = (shortUser, salutation) => {
+	return (dispatch, getState) => {
+		const state = getState();
+		const fetchObject = {
+			method: 'PUT',
+			headers: standardHeaders(state.auth),
+			body: salutation
+		};
+		return fetch(`${API_URL}/users/${shortUser}/nick`, fetchObject)
+			.then(
+				response => response.json(),
+				error => handleError(error)
+			).then(() => {
+				dispatch(fetchAccount(state.auth, shortUser))
+			})
+	}
+};
+
 // Account Actions -------------------------------------------------------------
 
 export const RECEIVE_USER_AUTOSUGGEST = 'RECEIVE_USER_AUTOSUGGEST';

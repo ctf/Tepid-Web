@@ -1,8 +1,9 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import JobTable from './JobTable';
 import Switch from "@material-ui/core/Switch";
 import {FormControlLabel} from "@material-ui/core";
+import {DebounceInput} from "react-debounce-input";
 
 function NoUserCard() {
 	return (
@@ -35,6 +36,48 @@ function ToggleExchangeSwitch({value, onChange, ...rest}) {
 			<FormControlLabel control={<Switch checked={value} onChange={onChange}/>} label={'Exchange Student'}
 							  labelPlacement="end" {...rest}/>
 		</div>
+	)
+}
+
+function QuotaBar({quota, maxQuota}) {
+	return (
+		<div>
+			<div className="flex-row-container">
+				<div className="quota-label">Quota</div>
+				<div className={'quota-bar' + (quota === null ? ' loading' : '')}>
+					<div className="quota-inner-bar"
+						 style={{width: `${quota / maxQuota * 100}%`}}>
+						<strong>{quota}</strong> pages remaining
+					</div>
+				</div>
+			</div>
+			<hr/>
+		</div>
+	)
+}
+
+function NickSetter({initialValue, placeHolder, onChange}) {
+	const [nick, setNick] = useState(initialValue);
+	useEffect(()=>{
+		setNick(initialValue)
+	},[initialValue]);
+
+	const handleChange = (e) => {
+		setNick(e.target.value);
+		onChange(e);
+	};
+
+	return (
+		<>
+			<strong>Preferred Salutation:</strong> <br/>
+			<DebounceInput
+				type="text"
+				debounceTimeout={200}
+				placeHolder={placeHolder}
+				value={nick}
+				onChange={handleChange}
+				style={{marginBottom: '0.6rem'}}/> <br/>
+		</>
 	)
 }
 
@@ -109,6 +152,10 @@ function Account(props) {
 		props.setExchangeStatus(account.shortUser, e.target.checked)
 	};
 
+	const handleSetNick = (e) => {
+		props.setNick(account.shortUser, e.target.value);
+	};
+
 	return (
 		<div>
 			<div className="card no-padding">
@@ -121,20 +168,7 @@ function Account(props) {
 							<div className="fac-dept">{facultyOrDepartment}</div>
 						</div>
 					</div>
-					{canPrint ? (
-						<div>
-							<div className="flex-row-container">
-								<div className="quota-label">Quota</div>
-								<div className={'quota-bar' + (quota === null ? ' loading' : '')}>
-									<div className="quota-inner-bar"
-										 style={{width: `${quota / maxQuota * 100}%`}}>
-										<strong>{quota}</strong> pages remaining
-									</div>
-								</div>
-							</div>
-							<hr/>
-						</div>
-					) : ''}
+					{canPrint ? <QuotaBar quota={quota} maxQuota={maxQuota}/> : ''}
 					<div className="user-profile-details">
 						<div className="row">
 							<div className="col">
@@ -145,8 +179,9 @@ function Account(props) {
 								User <strong>has {paidFund ? '' : 'not '}</strong>paid into the 21st Century Fund
 							</div>
 							<div className="col">
-								<strong>Preferred Salutation:</strong> <br/>
-								<input type="text" value="David" style={{marginBottom: '0.6rem'}}/> <br/>
+								<NickSetter initialValue={account.nick}
+											placeHolder={account.salutation}
+												  onChange={handleSetNick}/>
 								<strong>Jobs Expire After:</strong> 1 Week <br/>
 								<ToggleColorSwitch value={account.colorPrinting}
 												   onChange={handleSetColorPrinting}/>
