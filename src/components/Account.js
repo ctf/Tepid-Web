@@ -88,7 +88,7 @@ function Account(props) {
 	}, [props.shortUser]);
 
 
-	if (!props.account || !props.account.data.type) {
+	if (!props.account || !props.account.data._id) {
 		return (
 			NoUserCard()
 		)
