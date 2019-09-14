@@ -10,6 +10,8 @@ before_script:
 build:
   only:
     - master
+  tags:
+    - docker
   stage: build
   variables:
     REACT_APP_WEB_URL_PRODUCTION: "https://testpid.science.mcgill.ca:8443/tepid"
