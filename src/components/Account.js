@@ -4,6 +4,12 @@ import JobTable from './JobTable';
 import Switch from "@material-ui/core/Switch";
 import {FormControlLabel} from "@material-ui/core";
 import {DebounceInput} from "react-debounce-input";
+import useModal from "../hooks/useModal";
+import Dialog from "@material-ui/core/es/Dialog/Dialog";
+import DialogTitle from "@material-ui/core/es/DialogTitle/DialogTitle";
+import DialogContent from "@material-ui/core/es/DialogContent/DialogContent";
+import DialogActions from "@material-ui/core/es/DialogActions/DialogActions";
+import Button from "@material-ui/core/es/Button/Button";
 
 function NoUserCard() {
 	return (
@@ -21,11 +27,29 @@ function NoUserCard() {
 	)
 }
 
-function ToggleColorSwitch({value, onChange, ...rest}) {
+function ToggleColorSwitch({value, setColourPrinting, ...rest}) {
+	const confirmModal = useModal();
+
+	const handleClick = () =>{
+		setColourPrinting(!value);
+		confirmModal.handleClose();
+    };
+
 	return (
 		<div>
-			<FormControlLabel control={<Switch checked={value} onChange={onChange}/>} label={"Colour Printing"}
+			<FormControlLabel control={<Switch checked={value} onChange={confirmModal.handleOpen}/>} label={"Colour Printing"}
 							  labelPlacement="end" {...rest}/>
+			<Dialog
+				open={confirmModal.open}
+				onClose={confirmModal.handleClose}>
+				<DialogTitle>Confirm Color Printing Activation</DialogTitle>
+				<DialogContent>
+					For every page of color that is printed, 3 pages of your quota is used up. If you accidentally print in color, you will not be refunded for the pages you printed.
+				</DialogContent>
+				<DialogActions>
+					<Button variant={"outlined"} onClick={handleClick}>Confirm</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	)
 }
@@ -144,8 +168,8 @@ function Account(props) {
 	const jobTable = canPrint ? (
 		<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false} canRefund={permissionIsVolunteer}/>) : '';
 
-	const handleSetColorPrinting = (e) => {
-		props.setColorPrinting(account.shortUser, e.target.checked)
+	const handleSetColorPrinting = (colorEnabled) => {
+		props.setColorPrinting(account.shortUser, colorEnabled)
 	};
 
 	const handleSetExchange = (e) => {
@@ -184,7 +208,7 @@ function Account(props) {
 												  onChange={handleSetNick}/>
 								<strong>Jobs Expire After:</strong> 1 Week <br/>
 								<ToggleColorSwitch value={account.colorPrinting}
-												   onChange={handleSetColorPrinting}/>
+                                                   setColourPrinting={handleSetColorPrinting}/>
 								<ToggleExchangeSwitch value={isExchangeStudent} onChange={handleSetExchange}
 													  disabled={!permissionCanSetExchange}/>
 							</div>
