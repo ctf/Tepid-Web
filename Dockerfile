@@ -8,7 +8,7 @@ RUN	npm install -g npm
 RUN	npm install -g
 
 #### BUILD ####
-
+ARG	REACT_APP_WEB_URL_PRODUCTION=$REACT_APP_WEB_URL_PRODUCTION
 RUN	npm run build
 
 #### DEPLOY ####
