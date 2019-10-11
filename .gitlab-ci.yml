@@ -17,7 +17,7 @@ build:
   variables:
     REACT_APP_WEB_URL_PRODUCTION: "https://testpid.science.mcgill.ca:8443/tepid"
   script:
-    - sudo -g docker docker build -t $CONTAINER_TEST_IMAGE .
+    - cat Dockerfile | envsubst | sudo -g docker docker build -t $CONTAINER_TEST_IMAGE .
     - sudo -g docker docker push $CONTAINER_TEST_IMAGE
 
 deploy testing:
