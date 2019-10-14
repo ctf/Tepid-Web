@@ -16,6 +16,21 @@ const initialAccountsState = {
 	lastUpdated: null
 };
 
+const initialQuotaState = {
+	amount: null,
+	max: null,
+	isFetching: false,
+	didInvalidate: false,
+	lastUpdated: -1
+};
+
+const initialJobsState = {
+	items: [],
+	isFetching: false,
+	didInvalidate: false,
+	lastUpdated: -1
+};
+
 const accounts = function (state = initialAccountsState, action) {
 	switch (action.type) {
 		case REQUEST_ACCOUNT:
@@ -32,19 +47,8 @@ const accounts = function (state = initialAccountsState, action) {
 						isFetching: false,
 						didInvalidate: false,
 						data: action.account,
-						quota: {
-							amount: null,
-							max: null,
-							isFetching: false,
-							didInvalidate: false,
-							lastUpdated: -1
-						},
-						jobs: {
-							items: [],
-							isFetching: false,
-							didInvalidate: false,
-							lastUpdated: -1
-						},
+						quota: state.items[action.shortUser] ? state.items[action.shortUser].quota : initialQuotaState,
+						jobs: state.items[action.shortUser] ? state.items[action.shortUser].jobs : initialJobsState,
 						lastUpdated: action.receivedAt
 					}
 				}
