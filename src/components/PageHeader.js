@@ -1,20 +1,21 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {connect, useDispatch, useSelector} from "react-redux"
-import {NavLink, Redirect, withRouter} from 'react-router-dom';
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
+import {NavLink, withRouter} from 'react-router-dom';
+import {Menu, AutoComplete} from 'antd';
 import {invalidateAuth} from "../actions";
-import Button from "@material-ui/core/Button";
 import useMenu from "../hooks/useMenu";
 import {fetchAutoSuggest} from "../actions";
-import Autosuggest from 'react-autosuggest';
-import Paper from "@material-ui/core/Paper";
+import useDebounce from "../hooks/useDebounce";
+import SubMenu from "antd/es/menu/SubMenu";
 
+const {Option} = AutoComplete;
 
-function renderSuggestion(s, {isHighlighted}) {
-	return <MenuItem selected={isHighlighted} component={"div"}>
-		<div>{s.displayName}</div>
-	</MenuItem>
+function renderSuggestion(s) {
+	return (
+		<Option key={s.shortUser} text={s.displayName}>
+			{s.displayName}
+		</Option>
+	)
 }
 
 function HeaderSearchBar(props) {
@@ -22,24 +23,26 @@ function HeaderSearchBar(props) {
 	const suggestions = useSelector(state => state.ui.autosuggest);
 
 	const [searchTarget, setSearchTarget] = useState("");
-	const [reqID, setReqID] = useState(null);
 
-
-	function handleSubmit(event) {
-		event.preventDefault();
-		props.history.push('/accounts/' + searchTarget)
+	function handleSelect(value) {
+		props.history.push('/accounts/' + value)
 	}
 
-	async function handleChange({value}) {
-		if (reqID !== null) {
-			clearTimeout(reqID)
-		}
+	function handleSubmit(e) {
+		e.preventDefault();
+		handleSelect(searchTarget);
+	}
 
-		setReqID(
-			setTimeout(() => {
-				dispatch(fetchAutoSuggest(value))
-			}, 1000)
-		);
+	const debouncedTarget = useDebounce(searchTarget, 500);
+	useEffect(
+		() => {
+			dispatch(fetchAutoSuggest(searchTarget));
+
+		}, [debouncedTarget]
+	);
+
+	function handleChange(value) {
+		setSearchTarget(value)
 	}
 
 	return (
@@ -47,36 +50,12 @@ function HeaderSearchBar(props) {
 			<form onSubmit={handleSubmit}>
 				<i className="material-icons">search</i>
 
-				<Autosuggest
-					value={searchTarget}
-					onSuggestionsFetchRequested={handleChange}
-					onSuggestionsClearRequested={() => null}
-					suggestions={suggestions}
-					getSuggestionValue={s => s.shortUser}
-					renderSuggestion={renderSuggestion}
-					inputProps={{
-						id: "header-user-search",
-						placeholder: "Search for users...",
-						value: searchTarget,
-						onChange: (event, {newValue}) => {
-							setSearchTarget(newValue)
-						},
-					}}
-					theme={{
-						suggestionsList: {
-							margin: 0,
-							padding: 0,
-							listStyleType: 'none',
-						},
-						suggestionsContainer:{
-							width: '95%',
-						}
-					}}
-					renderSuggestionsContainer={options => (
-						<Paper {...options.containerProps} square>
-							{options.children}
-						</Paper>
-					)}
+				<AutoComplete
+					onSearch={handleChange}
+					dataSource={suggestions.map(renderSuggestion)}
+					onSelect={handleSelect}
+					placeholder={"Search for users..."}
+					optionLabelProp="text"
 				/>
 			</form>
 		</div>
@@ -98,23 +77,27 @@ function PageHeaderContent(props) {
 	};
 
 	return (
-		<header>
+		<header style={{}}>
 			{(props.auth.user.role === "ctfer" || props.auth.user.role === "elder") && (
 				<HeaderSearchBar history={props.history}/>
 			)}
-			<div className="header-right">
-				<Button id="header-user-dropdown" onClick={menu.handleOpen}>
-					{props.auth.user.displayName}
-					<i className="material-icons">keyboard_arrow_down</i>
-				</Button>
-				<Menu open={menu.open} anchorEl={menu.anchorEl} onClose={menu.handleClose}>
-					<MenuItem><NavLink to="/my-account">My Account</NavLink></MenuItem>
-					<MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
-				</Menu>
-			</div>
+
+			<Menu mode={"inline"} style={{maxWidth: "40vw", width: "20%", minWidth: "200px"}}>
+				<SubMenu
+					key="account"
+					title={
+						<>
+							{props.auth.user.displayName}
+						</>
+					}
+				>
+					<Menu.Item><NavLink to="/my-account">My Account</NavLink></Menu.Item>
+					<Menu.Item onClick={handleSignOut}>Sign Out</Menu.Item>
+				</SubMenu>
+			</Menu>
 		</header>
 	);
-};
+}
 
 const PageHeader = withRouter(connect(mapStateToProps)(PageHeaderContent));
 
