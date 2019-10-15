@@ -1,15 +1,9 @@
 import React, {useEffect, useState} from 'react';
 
 import JobTable from './JobTable';
-import Switch from "@material-ui/core/Switch";
-import {FormControlLabel} from "@material-ui/core";
 import {DebounceInput} from "react-debounce-input";
 import useModal from "../hooks/useModal";
-import Dialog from "@material-ui/core/es/Dialog/Dialog";
-import DialogTitle from "@material-ui/core/es/DialogTitle/DialogTitle";
-import DialogContent from "@material-ui/core/es/DialogContent/DialogContent";
-import DialogActions from "@material-ui/core/es/DialogActions/DialogActions";
-import Button from "@material-ui/core/es/Button/Button";
+import {Button, Form, Modal, Switch} from "antd";
 
 function NoUserCard() {
 	return (
@@ -45,30 +39,25 @@ function ToggleColorSwitch({value, setColourPrinting, ...rest}) {
     };
 
 	return (
-		<div>
-			<FormControlLabel control={<Switch checked={value} onChange={confirmModalAppear}/>} label={"Colour Printing"}
-							  labelPlacement="end" {...rest}/>
-			<Dialog
-				open={confirmModal.open}
-				onClose={confirmModal.handleClose}>
-				<DialogTitle>Confirm Color Printing Activation</DialogTitle>
-				<DialogContent>
-					For every page of color that is printed, 3 pages of your quota is used up. If you accidentally print in color, you will not be refunded for the pages you printed.
-				</DialogContent>
-				<DialogActions>
-					<Button variant={"outlined"} onClick={handleClick}>Confirm</Button>
-				</DialogActions>
-			</Dialog>
-		</div>
+<>
+		<Modal title={'Confirm Color Printing Activation'} visible={confirmModal.open}
+			   footer={[
+				   <Button variant={"outlined"} onClick={handleClick}>Confirm</Button>]}>
+			For every page of color that is printed, 3 pages of your quota is used up. If you accidentally print in color, you will not be refunded for the pages you printed.
+		</Modal>
+
+		<Form.Item label={"Colour Printing"} {...rest} layout="inline">
+			<Switch checked={value} onChange={confirmModalAppear}/>
+		</Form.Item>
+	</>
 	)
 }
 
 function ToggleExchangeSwitch({value, onChange, ...rest}) {
 	return (
-		<div>
-			<FormControlLabel control={<Switch checked={value} onChange={onChange}/>} label={'Exchange Student'}
-							  labelPlacement="end" {...rest}/>
-		</div>
+		<Form.Item label={"Exchange Student"} {...rest}>
+			<Switch checked={value} onChange={onChange}/>
+		</Form.Item>
 	)
 }
 
@@ -91,9 +80,9 @@ function QuotaBar({quota, maxQuota}) {
 
 function NickSetter({initialValue, placeHolder, onChange}) {
 	const [nick, setNick] = useState(initialValue);
-	useEffect(()=>{
+	useEffect(() => {
 		setNick(initialValue)
-	},[initialValue]);
+	}, [initialValue]);
 
 	const handleChange = (e) => {
 		setNick(e.target.value);
@@ -181,8 +170,8 @@ function Account(props) {
 		props.setColorPrinting(account.shortUser, colorEnabled)
 	};
 
-	const handleSetExchange = (e) => {
-		props.setExchangeStatus(account.shortUser, e.target.checked)
+	const handleSetExchange = (value) => {
+		props.setExchangeStatus(account.shortUser, value)
 	};
 
 	const handleSetNick = (e) => {
@@ -212,14 +201,16 @@ function Account(props) {
 								User <strong>has {paidFund ? '' : 'not '}</strong>paid into the 21st Century Fund
 							</div>
 							<div className="col">
-								<NickSetter initialValue={account.nick}
-											placeHolder={account.salutation}
-												  onChange={handleSetNick}/>
-								<strong>Jobs Expire After:</strong> 1 Week <br/>
-								<ToggleColorSwitch value={account.colorPrinting}
-                                                   setColourPrinting={handleSetColorPrinting}/>
-								<ToggleExchangeSwitch value={isExchangeStudent} onChange={handleSetExchange}
-													  disabled={!permissionCanSetExchange}/>
+								<Form layout={"inline"}>
+									<NickSetter initialValue={account.nick}
+												placeHolder={account.salutation}
+												onChange={handleSetNick}/>
+									<strong>Jobs Expire After:</strong> 1 Week <br/>
+									<ToggleColorSwitch value={account.colorPrinting}
+													   setColourPrinting={handleSetColorPrinting}/>
+									<ToggleExchangeSwitch value={isExchangeStudent} onChange={handleSetExchange}
+														  disabled={!permissionCanSetExchange}/>
+								</Form>
 							</div>
 						</div>
 					</div>
