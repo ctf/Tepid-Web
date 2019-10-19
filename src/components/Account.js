@@ -30,6 +30,15 @@ function NoUserCard() {
 function ToggleColorSwitch({value, setColourPrinting, ...rest}) {
 	const confirmModal = useModal();
 
+	const confirmModalAppear = () =>{
+		if (!value){
+            confirmModal.handleOpen();
+		}
+		else{
+			setColourPrinting(!value);
+		}
+    };
+
 	const handleClick = () =>{
 		setColourPrinting(!value);
 		confirmModal.handleClose();
@@ -37,7 +46,7 @@ function ToggleColorSwitch({value, setColourPrinting, ...rest}) {
 
 	return (
 		<div>
-			<FormControlLabel control={<Switch checked={value} onChange={confirmModal.handleOpen}/>} label={"Colour Printing"}
+			<FormControlLabel control={<Switch checked={value} onChange={confirmModalAppear}/>} label={"Colour Printing"}
 							  labelPlacement="end" {...rest}/>
 			<Dialog
 				open={confirmModal.open}
