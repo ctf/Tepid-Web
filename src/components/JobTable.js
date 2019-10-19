@@ -5,7 +5,7 @@ import {jobStatus} from "../tepid-utils";
 import {useDispatch, useSelector} from "react-redux";
 import * as actions from "../actions";
 import {MoreMenu} from "./Buttons/MoreButton";
-import MenuItem from "@material-ui/core/MenuItem";
+import {Menu} from "antd";
 
 function JobTable({loading, showUser, canRefund, jobs}) {
 
@@ -49,7 +49,7 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 		{
 			title: '',
 			key: 'MoreMenu',
-			render: job => <MoreMenu>{canRefund && <MenuItem onClick={makeHandleRefund(job)}>Refund</MenuItem>}<MenuItem>Reprint</MenuItem></MoreMenu>
+			render: job => <MoreMenu>{canRefund && <Menu.Item onClick={makeHandleRefund(job)}>Refund</Menu.Item>}<Menu.Item>Reprint</Menu.Item></MoreMenu>
 		}
 	];
 
