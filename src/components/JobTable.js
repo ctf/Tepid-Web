@@ -21,11 +21,11 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 			key: 'Started',
 			render: job => <>{job.started === -1 ? '' : new Date(job.started).toLocaleString('en-CA')}</>
 		},
-		{
+		...	(showUser?[{
 			title: 'User',
 			key: 'User',
 			render: job => <Link to={`/accounts/${job.userIdentification}`}> {job.userIdentification}</Link>
-		},
+		}]: []),
 		{
 			title: 'Pages',
 			key: 'Pages',
