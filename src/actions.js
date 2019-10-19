@@ -240,7 +240,7 @@ const doManageDestinationTicket = (destination, up, reason) => {
 		};
 
 		dispatch(manageDestinationTicket(destination, ticket));
-		return fetch(`${API_URL}/destinations/${destination._id}`, fetchObject)
+		return fetch(`${API_URL}/destinations/${encodeURIComponent(destination._id)}`, fetchObject)
 			.then(
 				response => response.text(),
 				error => handleError(error),
