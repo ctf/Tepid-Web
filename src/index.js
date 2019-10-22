@@ -14,6 +14,7 @@ import rootReducer from './reducers';
 
 import Tepid from './components/Tepid';
 
+import 'antd/dist/antd.css';
 import './index.css';
 
 // -----------------------------------------------------------------------------
