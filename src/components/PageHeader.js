@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {connect, useDispatch, useSelector} from "react-redux"
 import {NavLink, withRouter} from 'react-router-dom';
-import {Menu, AutoComplete} from 'antd';
-import {invalidateAuth} from "../actions";
+import {AutoComplete, Menu} from 'antd';
+import {fetchAutoSuggest, invalidateAuth} from "../actions";
 import useMenu from "../hooks/useMenu";
-import {fetchAutoSuggest} from "../actions";
 import useDebounce from "../hooks/useDebounce";
 import SubMenu from "antd/es/menu/SubMenu";
 

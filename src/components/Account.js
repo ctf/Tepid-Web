@@ -24,32 +24,32 @@ function NoUserCard() {
 function ToggleColorSwitch({value, setColourPrinting, ...rest}) {
 	const confirmModal = useModal();
 
-	const confirmModalAppear = () =>{
-		if (!value){
-            confirmModal.handleOpen();
-		}
-		else{
+	const confirmModalAppear = () => {
+		if (!value) {
+			confirmModal.handleOpen();
+		} else {
 			setColourPrinting(!value);
 		}
-    };
+	};
 
-	const handleClick = () =>{
+	const handleClick = () => {
 		setColourPrinting(!value);
 		confirmModal.handleClose();
-    };
+	};
 
 	return (
-<>
-		<Modal title={'Confirm Color Printing Activation'} visible={confirmModal.open}
-			   footer={[
-				   <Button variant={"outlined"} onClick={handleClick}>Confirm</Button>]}>
-			For every page of color that is printed, 3 pages of your quota is used up. If you accidentally print in color, you will not be refunded for the pages you printed.
-		</Modal>
+		<>
+			<Modal title={'Confirm Color Printing Activation'} visible={confirmModal.open}
+				   footer={[
+					   <Button variant={"outlined"} onClick={handleClick}>Confirm</Button>]}>
+				For every page of color that is printed, 3 pages of your quota is used up. If you accidentally print in
+				color, you will not be refunded for the pages you printed.
+			</Modal>
 
-		<Form.Item label={"Colour Printing"} {...rest} layout="inline">
-			<Switch checked={value} onChange={confirmModalAppear}/>
-		</Form.Item>
-	</>
+			<Form.Item label={"Colour Printing"} {...rest} layout="inline">
+				<Switch checked={value} onChange={confirmModalAppear}/>
+			</Form.Item>
+		</>
 	)
 }
 

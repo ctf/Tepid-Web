@@ -1,11 +1,10 @@
 import React from 'react';
-import {Table} from "antd";
+import {Menu, Table} from "antd";
 import {Link} from "react-router-dom";
 import {jobStatus} from "../tepid-utils";
 import {useDispatch, useSelector} from "react-redux";
 import * as actions from "../actions";
 import {MoreMenu} from "./Buttons/MoreButton";
-import {Menu} from "antd";
 
 function JobTable({loading, showUser, canRefund, jobs}) {
 
@@ -21,11 +20,11 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 			key: 'Started',
 			render: job => <>{job.started === -1 ? '' : new Date(job.started).toLocaleString('en-CA')}</>
 		},
-		...	(showUser?[{
+		...(showUser ? [{
 			title: 'User',
 			key: 'User',
 			render: job => <Link to={`/accounts/${job.userIdentification}`}> {job.userIdentification}</Link>
-		}]: []),
+		}] : []),
 		{
 			title: 'Pages',
 			key: 'Pages',
@@ -39,7 +38,10 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 		{
 			title: 'Destination',
 			key: 'Destination',
-			render: job => { const destination = getDestination(job); return <>{(destination && destination.name) || ""}</>}
+			render: job => {
+				const destination = getDestination(job);
+				return <>{(destination && destination.name) || ""}</>
+			}
 		},
 		{
 			title: 'Name',
@@ -49,13 +51,14 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 		{
 			title: '',
 			key: 'MoreMenu',
-			render: job => <MoreMenu>{canRefund && <Menu.Item onClick={makeHandleRefund(job)}>Refund</Menu.Item>}<Menu.Item>Reprint</Menu.Item></MoreMenu>
+			render: job => <MoreMenu>{canRefund &&
+			<Menu.Item onClick={makeHandleRefund(job)}>Refund</Menu.Item>}<Menu.Item>Reprint</Menu.Item></MoreMenu>
 		}
 	];
 
 	return (
 		<div>
-				<Table columns={columns} dataSource={jobs} loading={loading}/>
+			<Table columns={columns} dataSource={jobs} loading={loading}/>
 		</div>
 	);
 }
