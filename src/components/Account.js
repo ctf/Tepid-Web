@@ -118,7 +118,7 @@ function Account(props) {
 	const account = props.account.data;
 
 	const quota = props.account.quota.amount;
-	const maxQuota = 4000; // TODO: Fetch from somewhere
+	const maxQuota = props.account.quota.max;
 
 	const role = account.role;
 	const canPrint = role === "user" || role === "ctfer" || role === "elder";
