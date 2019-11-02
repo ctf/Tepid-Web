@@ -75,7 +75,8 @@ const accounts = function (state = initialAccountsState, action) {
 						...state.items[action.shortUser],
 						quota: {
 							...state.items[action.shortUser].quota,
-							amount: action.quota,
+							amount: action.quota.quota,
+							max: action.quota.maxQuota,
 							isFetching: false,
 							didInvalidate: false,
 							lastUpdated: action.receivedAt
