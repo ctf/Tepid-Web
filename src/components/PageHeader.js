@@ -35,7 +35,7 @@ function HeaderSearchBar(props) {
 	const debouncedTarget = useDebounce(searchTarget, 500);
 	useEffect(
 		() => {
-			dispatch(fetchAutoSuggest(searchTarget));
+			if (searchTarget !== null && searchTarget !== "") dispatch(fetchAutoSuggest(searchTarget));
 
 		}, [debouncedTarget]
 	);
@@ -51,7 +51,7 @@ function HeaderSearchBar(props) {
 
 				<AutoComplete
 					onSearch={handleChange}
-					dataSource={suggestions.map(renderSuggestion)}
+					dataSource={suggestions ? suggestions.map(renderSuggestion) : []}
 					onSelect={handleSelect}
 					placeholder={"Search for users..."}
 					optionLabelProp="text"

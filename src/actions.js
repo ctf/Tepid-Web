@@ -583,7 +583,7 @@ export const fetchAccountAndRelatedDataIfNeeded = shortUser => (dispatch, getSta
 };
 
 function handleError(error) {
-	console.log(error)
+	console.log("!!!!!!!!" + error)
 }
 
 export const doSetColorPrinting = (shortUser, enabled) => {
@@ -669,8 +669,9 @@ export const fetchAutoSuggest = (like, limit = 10) => {
 		};
 		return fetch(`${API_URL}/users/autosuggest/${like}?limit=${limit}`, fetchObject)
 			.then(
-				response => response.json(),
-				error => handleError(error)
+				response => {
+					return (response.ok ? response.json() : handleError(response))
+				}
 			).then((json)=>{
 				dispatch(receiveUserAutosuggest(json))
 			}
