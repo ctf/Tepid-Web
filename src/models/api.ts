@@ -653,13 +653,13 @@ export interface Session {
      * @type {string}
      * @memberof Session
      */
-    getId?: string;
+    _id?: string;
     /**
      * 
      * @type {string}
      * @memberof Session
      */
-    getRev?: string;
+    _rev?: string;
     /**
      * 
      * @type {string}

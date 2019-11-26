@@ -6,16 +6,25 @@ import {
 	REQUEST_QUEUE_JOBS
 } from '../actions';
 import {dbObjToIds} from "./helpers";
+import {PrintJob, PrintQueue} from "../models";
 
-const initialQueuesState = {
+export interface QueuesState {
+	isFetching: boolean,
+	didInvalidate: boolean,
+	items: PrintQueue[],
+	jobsByQueue: Map<string, PrintJob>,
+	lastUpdated: Date | null,
+}
+
+const initialQueuesState: QueuesState = {
 	isFetching: false,
 	didInvalidate: false,
 	items: [],
-	jobsByQueue: {},
+	jobsByQueue: new Map(),
 	lastUpdated: null
 };
 
-const queues = function (state = initialQueuesState, action) {
+const queues = function (state = initialQueuesState, action: any) {
 	switch (action.type) {
 		case REQUEST_QUEUES:
 			return Object.assign({}, state, {

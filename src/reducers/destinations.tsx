@@ -1,9 +1,17 @@
 import {CONFIRM_DESTINATION_TICKET, RECEIVE_DESTINATIONS, REQUEST_DESTINATIONS} from '../actions';
+import {Destination} from "../models";
 
-const initialDestinationsState = {
+export interface DestinationsState {
+	isFetching: boolean,
+	didInvalidate: boolean,
+	items: Map<string, Destination>,
+	lastUpdated: Date | null,
+}
+
+const initialDestinationsState : DestinationsState = {
 	isFetching: false,
 	didInvalidate: false,
-	items: {},
+	items: new Map<string, Destination>(),
 	lastUpdated: null
 };
 

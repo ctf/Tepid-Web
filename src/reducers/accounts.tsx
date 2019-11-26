@@ -9,26 +9,57 @@ import {
 	RECEIVE_ACCOUNT_JOBS
 } from '../actions';
 import {dbObjToIds} from "./helpers";
+import {PrintJob, User} from "../models";
 
-const initialAccountsState = {
+interface UserContainer {
+	isFetching: boolean,
+	didInvalidate: boolean,
+	data: User,
+	quota: QuotaState,
+	jobs: JobsState,
+	lastUpdated: Date | null,
+}
+
+export interface AccountsState {
+	isFetching: boolean,
+	items: Map<string, UserContainer>,
+	lastUpdated: Date | null,
+}
+
+const initialAccountsState: AccountsState = {
 	isFetching: false,
-	items: {},
+	items: new Map<string, UserContainer>(),
 	lastUpdated: null
 };
 
-const initialQuotaState = {
+export interface QuotaState {
+	amount: number | null,
+	max: number | null,
+	isFetching: boolean,
+	didInvalidate: boolean,
+	lastUpdated: Date | null,
+}
+
+const initialQuotaState : QuotaState = {
 	amount: null,
 	max: null,
 	isFetching: false,
 	didInvalidate: false,
-	lastUpdated: -1
+	lastUpdated: null
 };
 
-const initialJobsState = {
+export interface JobsState {
+	items: PrintJob[],
+	isFetching: boolean,
+	didInvalidate: boolean,
+	lastUpdated: Date | null,
+}
+
+const initialJobsState: JobsState = {
 	items: [],
 	isFetching: false,
 	didInvalidate: false,
-	lastUpdated: -1
+	lastUpdated: null
 };
 
 const accounts = function (state = initialAccountsState, action) {

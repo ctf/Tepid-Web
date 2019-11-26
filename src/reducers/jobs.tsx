@@ -8,11 +8,20 @@ import {
 } from "../actions";
 
 import {dbObjToSpreadable} from "./helpers";
+import {PrintJob} from "../models";
 
-const initialJobsState = {
+export interface JobsState {
+	isFetching: boolean,
+	didInvalidate: boolean,
+	items: Map<string, PrintJob>,
+	allItems: PrintJob[],
+	lastUpdated: Date | null,
+}
+
+const initialJobsState: JobsState = {
 	isFetching: false,
 	didInvalidate: false,
-	items: {},
+	items: new Map<string, PrintJob>(),
 	allItems: [],
 	lastUpdated: null
 };
