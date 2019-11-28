@@ -1,4 +1,6 @@
 import {
+	ActionTypesAccountJobs,
+	ActionTypesJobActions, ActionTypesQueueJobs,
 	ADD_JOB,
 	RECEIVE_ACCOUNT_JOBS,
 	RECEIVE_JOB_REFUNDED,
@@ -34,7 +36,7 @@ const updatePrintJobs = function (state = initialJobsState, actionItems) {
 	})
 };
 
-const jobs = function (state = initialJobsState, action) {
+const jobs = function (state = initialJobsState, action: ActionTypesJobActions | ActionTypesQueueJobs | ActionTypesAccountJobs) {
 	switch (action.type) {
 		case ADD_JOB:
 			return Object.assign({}, state, {

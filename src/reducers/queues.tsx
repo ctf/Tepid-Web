@@ -3,7 +3,7 @@ import {
 	RECEIVE_QUEUES,
 
 	RECEIVE_QUEUE_JOBS,
-	REQUEST_QUEUE_JOBS
+	REQUEST_QUEUE_JOBS, ActionTypesQueues, ActionTypesQueueJobs
 } from '../actions';
 import {dbObjToIds} from "./helpers";
 import {PrintJob, PrintQueue} from "../models";
@@ -24,7 +24,7 @@ const initialQueuesState: QueuesState = {
 	lastUpdated: null
 };
 
-const queues = function (state = initialQueuesState, action: any) {
+const queues = function (state = initialQueuesState, action: ActionTypesQueues | ActionTypesQueueJobs) {
 	switch (action.type) {
 		case REQUEST_QUEUES:
 			return Object.assign({}, state, {
@@ -36,7 +36,7 @@ const queues = function (state = initialQueuesState, action: any) {
 				isFetching: false,
 				didInvalidate: false,
 				items: action.queues,
-				jobsByQueue: Object.assign({}, ...action.queues.map(queue => ({
+				jobsByQueue: Object.assign({}, ...action.queues.map(queue => queue.name && ({
 					[queue.name]: {
 						isFetching: false,
 						didInvalidate: false,

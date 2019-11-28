@@ -1,4 +1,4 @@
-import {RECEIVE_AUTH, REQUEST_AUTH} from '../actions';
+import {ActionTypesAuth, ActionTypesInvalidateAuth, RECEIVE_AUTH, REQUEST_AUTH} from '../actions';
 import {Session, User} from "../models";
 
 export interface AuthState {
@@ -27,7 +27,7 @@ const initialAuthState : AuthState = {
 	lastUpdated: null
 };
 
-const auth = function (state = initialAuthState, action) {
+const auth = function (state = initialAuthState, action: ActionTypesAuth | ActionTypesInvalidateAuth) {
 	switch (action.type) {
 		case REQUEST_AUTH:
 			return Object.assign({}, state, {

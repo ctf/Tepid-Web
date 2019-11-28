@@ -6,7 +6,7 @@ import {
 	RECEIVE_ACCOUNT_QUOTA,
 
 	REQUEST_ACCOUNT_JOBS,
-	RECEIVE_ACCOUNT_JOBS
+	RECEIVE_ACCOUNT_JOBS, ActionTypesAccounts, ActionTypesAccountJobs
 } from '../actions';
 import {dbObjToIds} from "./helpers";
 import {PrintJob, User} from "../models";
@@ -62,7 +62,7 @@ const initialJobsState: JobsState = {
 	lastUpdated: null
 };
 
-const accounts = function (state = initialAccountsState, action) {
+const accounts = function (state = initialAccountsState, action: ActionTypesAccounts | ActionTypesAccountJobs) {
 	switch (action.type) {
 		case REQUEST_ACCOUNT:
 			return Object.assign({}, state, {

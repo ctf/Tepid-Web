@@ -1,4 +1,9 @@
-import {CONFIRM_DESTINATION_TICKET, RECEIVE_DESTINATIONS, REQUEST_DESTINATIONS} from '../actions';
+import {
+	ActionTypesDestinations, ActionTypesTickets,
+	CONFIRM_DESTINATION_TICKET,
+	RECEIVE_DESTINATIONS,
+	REQUEST_DESTINATIONS
+} from '../actions';
 import {Destination} from "../models";
 
 export interface DestinationsState {
@@ -8,14 +13,14 @@ export interface DestinationsState {
 	lastUpdated: Date | null,
 }
 
-const initialDestinationsState : DestinationsState = {
+const initialDestinationsState: DestinationsState = {
 	isFetching: false,
 	didInvalidate: false,
 	items: new Map<string, Destination>(),
 	lastUpdated: null
 };
 
-const destinations = function (state = initialDestinationsState, action) {
+const destinations = function (state = initialDestinationsState, action: ActionTypesDestinations | ActionTypesTickets) {
 	switch (action.type) {
 		case REQUEST_DESTINATIONS:
 			return Object.assign({}, state, {
@@ -30,16 +35,20 @@ const destinations = function (state = initialDestinationsState, action) {
 				lastUpdated: action.receivedAt
 			});
 		case CONFIRM_DESTINATION_TICKET:
-			return Object.assign({}, state, {
-				items: {
-					...state.items,
-					[action.destination.name]:{
-						...state.items[action.destination.name],
-						ticket:action.ticket,
-						up:action.up,
+			if (action.destination.name) {
+				return Object.assign({}, state, {
+					items: {
+						...state.items,
+						[action.destination.name]: {
+							...state.items[action.destination.name],
+							ticket: action.ticket,
+							up: action.up,
+						}
 					}
-				}
-			});
+				})
+			} else {
+				return state
+			}
 		default:
 			return state;
 	}
