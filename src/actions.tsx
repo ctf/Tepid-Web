@@ -1,6 +1,7 @@
 import fetch from 'cross-fetch';
 
 import {buildToken} from './tepid-utils';
+import {Destination, PrintJob, PrintQueue, QuotaData, User} from "./models";
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
 
@@ -15,15 +16,34 @@ const standardHeaders = (auth) => ({
 });
 
 // Auth ------------------------------------------------------------------------
+export type ActionTypesAuth = ARequestAuth | AReceiveAuth
 
 export const REQUEST_AUTH = 'REQUEST_AUTH';
-export const requestAuth = (credentials) => ({
+interface ARequestAuth {
+	type: typeof REQUEST_AUTH,
+	credentials: {
+		username: string,
+		password: string,
+	}
+}
+export const requestAuth = (credentials): ARequestAuth => ({
 	type: REQUEST_AUTH,
 	credentials
 });
 
 export const RECEIVE_AUTH = 'RECEIVE_AUTH';
-export const receiveAuth = (json) => ({
+interface AReceiveAuth {
+	type: typeof RECEIVE_AUTH,
+	user: string,
+	role: string,
+	session: {
+		id: string,
+		expiration: Date | null,
+	},
+	valid: boolean,
+	receivedAt: Date,
+}
+export const receiveAuth = (json): AReceiveAuth => ({
 	type: RECEIVE_AUTH,
 	user: json.user,
 	role: json.role,
@@ -32,7 +52,7 @@ export const receiveAuth = (json) => ({
 		expiration: json.expiration
 	},
 	valid: json.valid,
-	receivedAt: Date.now()
+	receivedAt: new Date()
 });
 
 export const attemptAuth = function (credentials) {
@@ -56,15 +76,23 @@ export const attemptAuth = function (credentials) {
 	};
 };
 
+export type ActionTypesInvalidateAuth = ARequestInvalidateAuth | AReceiveInvalidateAuth;
 export const REQUEST_INVALIDATE_AUTH = 'REQUEST_INVALIDATE_AUTH';
-export const requestInvalidateAuth = () => {
+interface ARequestInvalidateAuth {
+	type: typeof REQUEST_INVALIDATE_AUTH,
+}
+export const requestInvalidateAuth = (): ARequestInvalidateAuth => {
 	return ({
 		type: REQUEST_INVALIDATE_AUTH
 	});
 };
 
 export const RECEIVE_INVALIDATE_AUTH = 'RECEIVE_INVALIDATE_AUTH';
-export const receiveInvalidateAuth = (success) => {
+interface AReceiveInvalidateAuth {
+	type: typeof RECEIVE_INVALIDATE_AUTH,
+	success: boolean,
+}
+export const receiveInvalidateAuth = (success): AReceiveInvalidateAuth => {
 	return ({
 		type: RECEIVE_INVALIDATE_AUTH,
 		success
@@ -86,28 +114,39 @@ export const invalidateAuth = () => {
 				response => response,
 				error => handleError(error),
 			).then((response) => {
-				dispatch(receiveInvalidateAuth(response.ok))
+				dispatch(receiveInvalidateAuth(response["ok"]))
 			})
 
 	}
 };
 
 // Queues ----------------------------------------------------------------------
+export type ActionTypesQueues = ARequestQueues | AReceiveQueues | AInvalidateQueues
 
 export const REQUEST_QUEUES = 'REQUEST_QUEUES';
-export const requestQueues = () => ({
+interface ARequestQueues {
+	type: typeof REQUEST_QUEUES
+}
+export const requestQueues = (): ARequestQueues => ({
 	type: REQUEST_QUEUES
 });
 
-
 export const RECEIVE_QUEUES = 'RECEIVE_QUEUES';
-export const receiveQueues = json => ({
+interface AReceiveQueues {
+	type: typeof RECEIVE_QUEUES,
+	queues: PrintQueue[],
+	receivedAt: Date,
+}
+export const receiveQueues = (json): AReceiveQueues => ({
 	type: RECEIVE_QUEUES,
 	queues: json,
-	receivedAt: Date.now()
+	receivedAt: new Date()
 });
 
 export const INVALIDATE_QUEUES = 'INVALIDATE_QUEUES';
+interface AInvalidateQueues {
+	type: typeof INVALIDATE_QUEUES
+}
 export const invalidateQueues = () => ({
 	type: INVALIDATE_QUEUES
 });
@@ -141,17 +180,26 @@ export const fetchQueuesIfNeeded = () => (dispatch, getState) => {
 };
 
 // Destinations ----------------------------------------------------------------
+export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations
 
 export const REQUEST_DESTINATIONS = 'REQUEST_DESTINATIONS';
-export const requestDestinations = () => ({
+interface ARequestDestinations {
+	type: typeof REQUEST_DESTINATIONS
+}
+export const requestDestinations = (): ARequestDestinations => ({
 	type: REQUEST_DESTINATIONS
 });
 
 export const RECEIVE_DESTINATIONS = 'RECEIVE_DESTINATIONS';
-export const receiveDestinations = json => ({
+interface AReceiveDestinations {
+	type: typeof RECEIVE_DESTINATIONS,
+	receivedAt: Date,
+	destinations: Map<string, Destination>,
+}
+export const receiveDestinations = (json): AReceiveDestinations => ({
 	type: RECEIVE_DESTINATIONS,
 	destinations: json,
-	receivedAt: Date.now()
+	receivedAt: new Date()
 });
 
 const fetchDestinations = auth => dispatch => {
@@ -202,8 +250,19 @@ export const fetchDestinationsIfNeeded = () => (dispatch, getState) => {
 };
 
 // Tickets ---------------------------------------------------------------------
+export type ActionTypesTickets = AManageDestinationTicket | AConfirmDestinationTicket
+
+export interface Ticket {
+	reason: string,
+	up: boolean,
+}
 
 export const MANAGE_DESTINATION_TICKET = 'MANAGE_DESTINATION_TICKET';
+interface AManageDestinationTicket {
+	type: typeof MANAGE_DESTINATION_TICKET,
+	ticket: Ticket,
+	destination: Destination,
+}
 export const manageDestinationTicket = (destination, ticket) => ({
 	type: MANAGE_DESTINATION_TICKET,
 	ticket,
@@ -211,6 +270,12 @@ export const manageDestinationTicket = (destination, ticket) => ({
 });
 
 export const CONFIRM_DESTINATION_TICKET = 'CONFIRM_DESTINATION_TICKET';
+interface AConfirmDestinationTicket {
+	type: typeof CONFIRM_DESTINATION_TICKET,
+	ticket: Ticket,
+	up: boolean,
+	destination: Destination,
+}
 export const confirmDestinationTicket = (destination, ticket, up) => ({
 	type: CONFIRM_DESTINATION_TICKET,
 	ticket,
@@ -264,19 +329,30 @@ export const resolveDestinationTicket = (destination) => {
 // see also Job Actions
 
 // -- Queue Jobs ---------------------------------------------------------------
+export type ActionTypesQueueJobs = ARequestQueueJobs | AReceiveQueueJobs
 
 export const REQUEST_QUEUE_JOBS = 'REQUEST_QUEUE_JOBS';
-export const requestQueueJobs = queue => ({
+interface ARequestQueueJobs {
+	type: typeof REQUEST_QUEUE_JOBS,
+	queue: string,
+}
+export const requestQueueJobs = (queue): ARequestQueueJobs => ({
 	type: REQUEST_QUEUE_JOBS,
 	queue
 });
 
 export const RECEIVE_QUEUE_JOBS = 'RECEIVE_QUEUE_JOBS';
+interface AReceiveQueueJobs {
+	type: typeof RECEIVE_QUEUE_JOBS,
+	queue: string,
+	jobs: PrintJob[],
+	receivedAt: Date,
+}
 export const receiveQueueJobs = (queue, json) => ({
 	type: RECEIVE_QUEUE_JOBS,
 	queue,
 	jobs: json,
-	receivedAt: Date.now()
+	receivedAt: new Date(),
 });
 
 const fetchQueueJobs = (auth, queueName, limit = -1) => dispatch => {
@@ -339,21 +415,36 @@ export const fetchAllQueueJobsIfNeeded = () => (dispatch, getState) => {
 };
 
 // -- Job Actions --------------------------------------------------------------
+export type ActionTypesJobActions = AAddJob | ARequestJobRefunded | AReceiveJobRefunded
 
 export const ADD_JOB = 'ADD_JOB';
+interface AAddJob {
+	type: typeof ADD_JOB,
+	job: PrintJob,
+}
 export const addJob = job => ({
 	type: ADD_JOB,
 	job
 });
 
 export const REQUEST_JOB_REFUNDED = 'REQUEST_JOB_REFUNDED';
-export const requestJobRefunded = (jobId, refunded = true) => ({
+interface ARequestJobRefunded {
+	type: typeof REQUEST_JOB_REFUNDED,
+	jobId: string,
+	refunded: boolean
+}
+export const requestJobRefunded = (jobId, refunded = true): ARequestJobRefunded => ({
 	type: REQUEST_JOB_REFUNDED,
 	jobId,
 	refunded,
 });
 
 export const RECEIVE_JOB_REFUNDED = 'RECEIVE_JOB_REFUNDED';
+interface AReceiveJobRefunded {
+	type: typeof RECEIVE_JOB_REFUNDED,
+	jobId: string,
+	ok: boolean,
+}
 export const receiveJobRefunded = (jobId, ok = false) => ({
 	type: RECEIVE_JOB_REFUNDED,
 	jobId,
@@ -384,19 +475,30 @@ export const doSetJobRefunded = (job, refunded) => {
 };
 
 // Accounts --------------------------------------------------------------------
+export type ActionTypesAccounts = ARequestAccount | AReceiveAccount | ARequestAccountQuota | AReceiveAccountQuota;
 
 export const REQUEST_ACCOUNT = 'REQUEST_ACCOUNT';
-export const requestAccount = shortUser => ({
+interface ARequestAccount {
+	type: typeof REQUEST_ACCOUNT,
+	shortUser: string,
+}
+export const requestAccount = (shortUser): ARequestAccount => ({
 	type: REQUEST_ACCOUNT,
 	shortUser
 });
 
 export const RECEIVE_ACCOUNT = 'RECEIVE_ACCOUNT';
-export const receiveAccount = (shortUser, json) => ({
+interface AReceiveAccount {
+	type: typeof RECEIVE_ACCOUNT,
+	shortUser: string,
+	account: User,
+	receivedAt: Date,
+}
+export const receiveAccount = (shortUser, json): AReceiveAccount => ({
 	type: RECEIVE_ACCOUNT,
 	shortUser,
 	account: json,
-	receivedAt: Date.now()
+	receivedAt: new Date()
 });
 
 const fetchAccount = (auth, shortUser) => dispatch => {
@@ -445,17 +547,27 @@ export const fetchAccountIfNeeded = shortUser => (dispatch, getState) => {
 };
 
 export const REQUEST_ACCOUNT_QUOTA = 'REQUEST_ACCOUNT_QUOTA';
+interface ARequestAccountQuota {
+	type: typeof REQUEST_ACCOUNT_QUOTA,
+	shortUser: string
+}
 export const requestAccountQuota = shortUser => ({
 	type: REQUEST_ACCOUNT_QUOTA,
 	shortUser
 });
 
 export const RECEIVE_ACCOUNT_QUOTA = 'RECEIVE_ACCOUNT_QUOTA';
+interface AReceiveAccountQuota {
+	type: typeof RECEIVE_ACCOUNT_QUOTA,
+	shortUser: string,
+	quota: QuotaData,
+	receivedAt: Date,
+}
 export const receiveAccountQuota = (shortUser, quota) => ({
 	type: RECEIVE_ACCOUNT_QUOTA,
 	shortUser,
 	quota,
-	receivedAt: Date.now()
+	receivedAt: new Date()
 });
 
 const fetchAccountQuota = (auth, shortUser) => dispatch => {
@@ -507,18 +619,30 @@ export const fetchAccountQuotaIfNeeded = shortUser => (dispatch, getState) => {
 	}
 };
 
+export type ActionTypesAccountJobs = ARequestAccountJobs | AReceiveAccountJobs;
+
 export const REQUEST_ACCOUNT_JOBS = 'REQUEST_ACCOUNT_JOBS';
+interface ARequestAccountJobs {
+	type: typeof REQUEST_ACCOUNT_JOBS,
+	shortUser: string,
+}
 export const requestAccountJobs = shortUser => ({
 	type: REQUEST_ACCOUNT_JOBS,
 	shortUser
 });
 
 export const RECEIVE_ACCOUNT_JOBS = 'RECEIVE_ACCOUNT_JOBS';
+interface AReceiveAccountJobs {
+	type: typeof RECEIVE_ACCOUNT_JOBS,
+	shortUser: string,
+	jobs: PrintJob[],
+	receivedAt: Date,
+}
 export const receiveAccountJobs = (shortUser, jobs) => ({
 	type: RECEIVE_ACCOUNT_JOBS,
 	shortUser,
 	jobs,
-	receivedAt: Date.now()
+	receivedAt: new Date()
 });
 
 const fetchAccountJobs = (auth, shortUser) => dispatch => {
@@ -653,9 +777,14 @@ export const doSetNick = (shortUser, salutation) => {
 };
 
 // Account Actions -------------------------------------------------------------
+export type ActionTypesUi = AReceiveUserAutosuggest;
 
 export const RECEIVE_USER_AUTOSUGGEST = 'RECEIVE_USER_AUTOSUGGEST';
-export const receiveUserAutosuggest = (autosuggest) => ({
+interface AReceiveUserAutosuggest {
+	type: typeof RECEIVE_USER_AUTOSUGGEST,
+	autosuggest: string,
+}
+export const receiveUserAutosuggest = (autosuggest): AReceiveUserAutosuggest => ({
 	type: RECEIVE_USER_AUTOSUGGEST,
 	autosuggest,
 });
