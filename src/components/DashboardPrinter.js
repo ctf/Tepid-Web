@@ -114,7 +114,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 
 	return (
 		<div className="col dash-printer no-side-padding no-bottom-padding">
-			<QueueIcon destinations={Object.values(queueDestinations)}/>
+			<QueueIcon destinations={queueDestinations}/>
 			<h2>{queue.name}</h2>
 			<div className="printer-status">{queueDestinationClickers}</div>
 			<table className="dash-printer-queue">
@@ -133,14 +133,14 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 }
 
 const mapStateToProps = (state, ownProps) => {
-	const loading = state.queues.jobsByQueue[ownProps.queue.name].isFetching || state.destinations.isFetching;
-	const unloaded = state.queues.jobsByQueue[ownProps.queue.name].items.length === 0;
+	const loading = state.queues.jobsByQueue[ownProps.queue._id].isFetching || state.destinations.isFetching;
+	const unloaded = state.queues.jobsByQueue[ownProps.queue._id].items.length === 0;
 
 	const loadingDestinations = Object.keys(state.destinations.items).length === 0;
 
 	return {
 		queue: ownProps.queue,
-		queueJobs: state.queues.jobsByQueue[ownProps.queue.name].items,
+		queueJobs: state.queues.jobsByQueue[ownProps.queue._id].items,
 		destinations: state.destinations.items,
 		loading: unloaded || loading || loadingDestinations,
 		loadingDestinations: loadingDestinations,
@@ -152,7 +152,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
 	return {
 		fetchNeededData: () => {
-			dispatch(fetchDestinationsIfNeeded()).then(() => dispatch(fetchQueueJobsIfNeeded(ownProps.queue.name)));
+			dispatch(fetchDestinationsIfNeeded()).then(() => dispatch(fetchQueueJobsIfNeeded(ownProps.queue._id)));
 		}
 	};
 };

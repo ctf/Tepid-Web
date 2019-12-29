@@ -172,7 +172,6 @@ const shouldFetchQueues = state => {
 
 export const fetchQueuesIfNeeded = () => (dispatch, getState) => {
 	if (shouldFetchQueues(getState())) {
-		console.log('fetching qs', getState());
 		return dispatch(fetchQueues());
 	} else {
 		return Promise.resolve();
@@ -382,13 +381,12 @@ const fetchQueueJobs = (auth, queueName, limit = -1) => dispatch => {
 		.then(json => dispatch(receiveQueueJobs(queueName, json)));
 };
 
-const shouldFetchQueueJobs = (state, queueName) => {
+const shouldFetchQueueJobs = (state, queueId) => {
 	if (Object.keys(state.queues.jobsByQueue).length === 0) {
 		// Have to fetch Queues first
 		return false;
 	}
-
-	const queueJobs = state.queues.jobsByQueue[queueName];
+	const queueJobs = state.queues.jobsByQueue[queueId];
 	if (queueJobs.isFetching) {
 		return false;
 	} else if (queueJobs.items.length === 0) {
@@ -398,20 +396,21 @@ const shouldFetchQueueJobs = (state, queueName) => {
 	}
 };
 
-export const fetchQueueJobsIfNeeded = (queueName) => (dispatch, getState) => {
+export const fetchQueueJobsIfNeeded = (queueId) => (dispatch, getState) => {
 	return dispatch(fetchQueuesIfNeeded()).then(() => {
 		const state = getState();
-		if (shouldFetchQueueJobs(state, queueName)) {
-			return dispatch(fetchQueueJobs(state.auth, queueName));
+		if (shouldFetchQueueJobs(state, queueId)) {
+			return dispatch(fetchQueueJobs(state.auth, queueId));
 		} else {
 			return Promise.resolve();
 		}
 	});
 };
 
+
 export const fetchAllQueueJobsIfNeeded = () => (dispatch, getState) => {
 	const state = getState();
-	return Promise.all(state.queues.items.map(queue => dispatch(fetchQueueJobsIfNeeded(queue.name))));
+	return Promise.all(Object.values(state.queues.items).map((queue: PrintQueue) => dispatch(fetchQueueJobsIfNeeded(queue._id))));
 };
 
 // -- Job Actions --------------------------------------------------------------

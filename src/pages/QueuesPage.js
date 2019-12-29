@@ -16,10 +16,12 @@ class QueuesPage extends React.Component {
 	}
 
 	render() {
-		const navItems = this.props.queues.map(queue => ({
-			'text': queue.name,
-			'link': `${this.props.match.url}/${queue.name}`
+		const navItems = Object.values(this.props.queues).map(queue => ({
+			'text': queue._id,
+			'link': `${this.props.match.url}/${queue._id}`
 		}));
+
+		console.log(this.props.queues)
 
 		return (
 			<div>
@@ -34,9 +36,9 @@ class QueuesPage extends React.Component {
 							</h2>
 							<Switch>
 								<CTFerRoute path={`${this.props.match.url}/:queueName`} component={QueueContainer} />
-								{this.props.loading
+								{this.props.loading || Object.entries(this.props.queues).length === 0
 									? ''
-									: (<Redirect to={`${this.props.match.url}/${this.props.queues[0].name}`} />)}
+									: (<Redirect to={`${this.props.match.url}/${Object.values(this.props.queues)[0]._id}`} />)}
 							</Switch>
 						</div>
 					</section>
