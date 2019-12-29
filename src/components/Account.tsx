@@ -121,7 +121,7 @@ function Account(props) {
 	const maxQuota = props.account.quota.max;
 
 	const role = account.role;
-	const canPrint = role === "user" || role === "ctfer" || role === "elder";
+	const canPrint = maxQuota > 0;
 	const isVolunteer = role === "ctfer" || role === "elder";
 	const paidFund = account.groups.reduce((acc, it) => acc || it.name === '000-21st Century Fund', false);
 	const isExchangeStudent = canPrint && !paidFund;
