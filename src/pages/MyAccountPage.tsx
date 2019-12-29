@@ -7,21 +7,19 @@ import PageHeader from '../components/PageHeader';
 
 import AccountContainer from '../containers/AccountContainer';
 
-class MyAccountPage extends React.Component {
+function MyAccountPage ({auth}) {
 	// TODO: Use cached values whenever possible?
-	render() {
 		return (
 			<div>
 				<TepidSidebar />
 				<main>
 					<PageHeader />
 					<section id="page-content">
-						<AccountContainer shortUser={this.props.auth.user.shortUser} />
+						<AccountContainer shortUser={auth.user.shortUser} />
 					</section>
 				</main>
 			</div>
 		);
-	}
 }
 
 const mapStateToProps = (state, ownProps) => {

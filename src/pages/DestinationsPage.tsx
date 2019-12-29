@@ -1,34 +1,31 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 import TepidSidebar from '../components/TepidSidebar';
 import PageHeader from '../components/PageHeader';
 
-import { fetchDestinationsIfNeeded } from '../actions';
+import {fetchDestinationsIfNeeded} from '../actions';
 
-class DestinationsPage extends React.Component {
-	componentWillMount() {
-		this.props.fetchNeededData();
-	}
-
-	render() {
-		return (
-			<div>
-				<TepidSidebar />
-				<main>
-					<PageHeader />
-					<section id="page-content">
-						<div className="card no-padding">
-							<h2>Destinations</h2>
-							{/*<CTFerRoute path={`${this.props.match.url}/:destName`}*/}
-										{/*component={DestinationContainer} />*/}
-						</div>
-					</section>
-				</main>
-			</div>
-		);
-	}
+function DestinationsPage({fetchNeededData}) {
+	useEffect(() => {
+		fetchNeededData();
+	}, []);
+	return (
+		<div>
+			<TepidSidebar/>
+			<main>
+				<PageHeader/>
+				<section id="page-content">
+					<div className="card no-padding">
+						<h2>Destinations</h2>
+						{/*<CTFerRoute path={`${this.props.match.url}/:destName`}*/}
+						{/*component={DestinationContainer} />*/}
+					</div>
+				</section>
+			</main>
+		</div>
+	);
 }
 
 const mapStateToProps = (state, ownProps) => {
