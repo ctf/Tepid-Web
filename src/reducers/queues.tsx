@@ -11,15 +11,15 @@ import {PrintJob, PrintQueue} from "../models";
 export interface QueuesState {
 	isFetching: boolean,
 	didInvalidate: boolean,
-	items: PrintQueue[],
-	jobsByQueue: Map<string, PrintJob>,
+	items: Map<string, PrintQueue>,
+	jobsByQueue: Map<string, PrintJob[]>,
 	lastUpdated: Date | null,
 }
 
 const initialQueuesState: QueuesState = {
 	isFetching: false,
-	didInvalidate: false,
-	items: [],
+	didInvalidate: true,
+	items: new Map<string, PrintQueue>(),
 	jobsByQueue: new Map(),
 	lastUpdated: null
 };
@@ -36,8 +36,8 @@ const queues = function (state = initialQueuesState, action: ActionTypesQueues |
 				isFetching: false,
 				didInvalidate: false,
 				items: action.queues,
-				jobsByQueue: Object.assign({}, ...action.queues.map(queue => queue.name && ({
-					[queue.name]: {
+				jobsByQueue: Object.assign({}, ...Object.keys(action.queues).map(queue => queue && ({
+					[queue]: {
 						isFetching: false,
 						didInvalidate: false,
 						items: []
@@ -63,7 +63,7 @@ const queues = function (state = initialQueuesState, action: ActionTypesQueues |
 						...state.jobsByQueue[action.queue],
 						isFetching: false,
 						didInvalidate: false,
-						items: dbObjToIds(action.jobs),
+						items: action.jobs? dbObjToIds(action.jobs) : [],
 						lastUpdated: action.receivedAt
 					}
 				}

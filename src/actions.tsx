@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch';
 
 import {buildToken} from './tepid-utils';
-import {Destination, PrintJob, PrintQueue, QuotaData, User} from "./models";
+import {Destination, PrintJob, PrintQueue, PutResponse, QuotaData, User} from "./models";
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
 
@@ -134,7 +134,7 @@ export const requestQueues = (): ARequestQueues => ({
 export const RECEIVE_QUEUES = 'RECEIVE_QUEUES';
 interface AReceiveQueues {
 	type: typeof RECEIVE_QUEUES,
-	queues: PrintQueue[],
+	queues: Map<string, PrintQueue>,
 	receivedAt: Date,
 }
 export const receiveQueues = (json): AReceiveQueues => ({
@@ -163,7 +163,7 @@ const shouldFetchQueues = state => {
 	const queues = state.queues;
 	if (queues.isFetching) {
 		return false;
-	} else if (queues.items.length === 0) {
+	} else if (Object.keys(queues.items).length === 0) {
 		return true;
 	} else {
 		return queues.didInvalidate;
