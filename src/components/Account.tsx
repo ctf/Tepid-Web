@@ -21,7 +21,7 @@ function NoUserCard() {
 	)
 }
 
-function ToggleColorSwitch({value, setColourPrinting, ...rest}) {
+function ToggleColorSwitch({value, setColourPrinting}) {
 	const confirmModal = useModal();
 
 	const confirmModalAppear = () => {
@@ -41,22 +41,22 @@ function ToggleColorSwitch({value, setColourPrinting, ...rest}) {
 		<>
 			<Modal title={'Confirm Color Printing Activation'} visible={confirmModal.open}
 				   footer={[
-					   <Button variant={"outlined"} onClick={handleClick}>Confirm</Button>]}>
+					   <Button type={"primary"} onClick={handleClick}>Confirm</Button>]}>
 				For every page of color that is printed, 3 pages of your quota is used up. If you accidentally print in
 				color, you will not be refunded for the pages you printed.
 			</Modal>
 
-			<Form.Item label={"Colour Printing"} {...rest} layout="inline">
+			<Form.Item label={"Colour Printing"}>
 				<Switch checked={value} onChange={confirmModalAppear}/>
 			</Form.Item>
 		</>
 	)
 }
 
-function ToggleExchangeSwitch({value, onChange, ...rest}) {
+function ToggleExchangeSwitch({value, onChange, disabled}) {
 	return (
-		<Form.Item label={"Exchange Student"} {...rest}>
-			<Switch checked={value} onChange={onChange}/>
+		<Form.Item label={"Exchange Student"}>
+			<Switch checked={value} onChange={onChange} disabled={disabled}/>
 		</Form.Item>
 	)
 }
@@ -147,7 +147,7 @@ function Account(props) {
 		? (account.salutation ? account.salutation : account.displayName)
 		: account.displayName;
 
-	const badgeables = [];
+	const badgeables: string[] = [];
 	if (isVolunteer) {
 		badgeables.push('CTF Volunteer')
 	}
