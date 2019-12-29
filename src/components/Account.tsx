@@ -103,49 +103,49 @@ function NickSetter({initialValue, placeHolder, onChange}) {
 	)
 }
 
-function Account(props) {
+function Account({shortUser, account, jobs, auth, fetchNeededData, setColorPrinting, setExchangeStatus, setNick}) {
 
 	useEffect(() => {
-		props.fetchNeededData(props.shortUser);
-	}, [props.shortUser]);
+		fetchNeededData(shortUser);
+	}, [shortUser]);
 
 
-	if (!props.account || !props.account.data._id) {
+	if (!account || !account.data._id) {
 		return (
 			NoUserCard()
 		)
 	}
-	const account = props.account.data;
+	const accountData = account.data;
 
-	const quota = props.account.quota.amount;
-	const maxQuota = props.account.quota.max;
+	const quota = account.quota.amount;
+	const maxQuota = account.quota.max;
 
-	const role = account.role;
+	const role = accountData.role;
 	const canPrint = maxQuota > 0;
 	const isVolunteer = role === "ctfer" || role === "elder";
-	const paidFund = account.groups.reduce((acc, it) => acc || it.name === '000-21st Century Fund', false);
+	const paidFund = accountData.groups.reduce((acc, it) => acc || it.name === '000-21st Century Fund', false);
 	const isExchangeStudent = canPrint && !paidFund;
 
-	const permissionIsVolunteer = props.auth.role === "ctfer" || props.auth.role === "elder";
-	const permissionCanSetExchange = props.auth.role === "ctfer" || props.auth.role === "elder";
+	const permissionIsVolunteer = auth.role === "ctfer" || auth.role === "elder";
+	const permissionCanSetExchange = auth.role === "ctfer" || auth.role === "elder";
 
-	const self = Object.keys(props.auth.user).includes('shortUser')
-		? account.shortUser === props.auth.user.shortUser
+	const self = Object.keys(auth.user).includes('shortUser')
+		? accountData.shortUser === auth.user.shortUser
 		: false;
 
 	const facultyOrDepartment = (() => {
-		if (!account.staff && account.faculty) {
-			return account.faculty;
-		} else if (account.staff && account.department) {
-			return account.department;
+		if (!accountData.staff && accountData.faculty) {
+			return accountData.faculty;
+		} else if (accountData.staff && accountData.department) {
+			return accountData.department;
 		} else {
 			return ''
 		}
 	})();
 
 	const salutation = self
-		? (account.salutation ? account.salutation : account.displayName)
-		: account.displayName;
+		? (accountData.salutation ? accountData.salutation : accountData.displayName)
+		: accountData.displayName;
 
 	const badgeables: string[] = [];
 	if (isVolunteer) {
@@ -154,28 +154,28 @@ function Account(props) {
 	if (isExchangeStudent) {
 		badgeables.push('Exchange')
 	}
-	if (account.shortUser === props.auth.user.shortUser) {
+	if (accountData.shortUser === auth.user.shortUser) {
 		badgeables.push('You!')
 	}
 
-	const badges = props.account === undefined
+	const badges = account === undefined
 		? ''
 		: badgeables.map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
-	const jobs = (props.account === undefined || props.jobs.isFetching) ? [] : props.account.jobs.items.map(it => props.jobs.items[it]);
+	const jobsElements = (account === undefined || jobs.isFetching) ? [] : account.jobs.items.map(it => jobs.items[it]);
 	const jobTable = canPrint ? (
-		<JobTable loading={jobs.length === 0} jobs={jobs} showUser={false} canRefund={permissionIsVolunteer}/>) : '';
+		<JobTable loading={jobsElements.length === 0} jobs={jobsElements} showUser={false} canRefund={permissionIsVolunteer}/>) : '';
 
 	const handleSetColorPrinting = (colorEnabled) => {
-		props.setColorPrinting(account.shortUser, colorEnabled)
+		setColorPrinting(accountData.shortUser, colorEnabled)
 	};
 
 	const handleSetExchange = (value) => {
-		props.setExchangeStatus(account.shortUser, value)
+		setExchangeStatus(accountData.shortUser, value)
 	};
 
 	const handleSetNick = (e) => {
-		props.setNick(account.shortUser, e.target.value);
+		setNick(accountData.shortUser, e.target.value);
 	};
 
 	return (
@@ -194,19 +194,19 @@ function Account(props) {
 					<div className="user-profile-details">
 						<div className="row">
 							<div className="col">
-								<strong>Short Username:</strong> {account.shortUser} <br/>
-								<strong>Long Username:</strong> {account.longUser} <br/>
+								<strong>Short Username:</strong> {accountData.shortUser} <br/>
+								<strong>Long Username:</strong> {accountData.longUser} <br/>
 								<strong>Current Status:</strong> Active <br/>
 								<strong>Student Since:</strong> May 2015 <br/>
 								User <strong>has {paidFund ? '' : 'not '}</strong>paid into the 21st Century Fund
 							</div>
 							<div className="col">
 								<Form layout={"inline"}>
-									<NickSetter initialValue={account.nick}
-												placeHolder={account.salutation}
+									<NickSetter initialValue={accountData.nick}
+												placeHolder={accountData.salutation}
 												onChange={handleSetNick}/>
 									<strong>Jobs Expire After:</strong> 1 Week <br/>
-									<ToggleColorSwitch value={account.colorPrinting}
+									<ToggleColorSwitch value={accountData.colorPrinting}
 													   setColourPrinting={handleSetColorPrinting}/>
 									<ToggleExchangeSwitch value={isExchangeStudent} onChange={handleSetExchange}
 														  disabled={!permissionCanSetExchange}/>

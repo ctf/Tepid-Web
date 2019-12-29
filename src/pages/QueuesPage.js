@@ -21,8 +21,6 @@ class QueuesPage extends React.Component {
 			'link': `${this.props.match.url}/${queue._id}`
 		}));
 
-		console.log(this.props.queues)
-
 		return (
 			<div>
 				<TepidSidebar />
