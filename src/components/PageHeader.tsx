@@ -11,7 +11,7 @@ const {Option} = AutoComplete;
 
 function renderSuggestion(s) {
 	return (
-		<Option key={s.shortUser} text={s.displayName}>
+		<Option key={s.shortUser}>
 			{s.displayName}
 		</Option>
 	)

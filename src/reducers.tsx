@@ -10,12 +10,12 @@ import {RECEIVE_INVALIDATE_AUTH, REQUEST_INVALIDATE_AUTH} from "./actions";
 import storage from 'redux-persist/lib/storage'
 
 const tepidReducer = combineReducers({
-	auth,
-	queues,
-	destinations,
-	jobs,
-	accounts,
-	ui,
+	auth: auth,
+	queues: queues,
+	destinations: destinations,
+	jobs: jobs,
+	accounts: accounts,
+	ui: ui,
 });
 
 const rootReducer = (state, action) => {
@@ -28,3 +28,4 @@ const rootReducer = (state, action) => {
 };
 
 export default rootReducer;
+export type RootState = ReturnType<typeof rootReducer>

@@ -3,19 +3,28 @@ import {
 	RECEIVE_QUEUES,
 
 	RECEIVE_QUEUE_JOBS,
-	REQUEST_QUEUE_JOBS
+	REQUEST_QUEUE_JOBS, ActionTypesQueues, ActionTypesQueueJobs
 } from '../actions';
 import {dbObjToIds} from "./helpers";
+import {PrintJob, PrintQueue} from "../models";
 
-const initialQueuesState = {
+export interface QueuesState {
+	isFetching: boolean,
+	didInvalidate: boolean,
+	items: Map<string, PrintQueue>,
+	jobsByQueue: Map<string, PrintJob[]>,
+	lastUpdated: Date | null,
+}
+
+const initialQueuesState: QueuesState = {
 	isFetching: false,
-	didInvalidate: false,
-	items: [],
-	jobsByQueue: {},
+	didInvalidate: true,
+	items: new Map<string, PrintQueue>(),
+	jobsByQueue: new Map(),
 	lastUpdated: null
 };
 
-const queues = function (state = initialQueuesState, action) {
+const queues = function (state = initialQueuesState, action: ActionTypesQueues | ActionTypesQueueJobs) {
 	switch (action.type) {
 		case REQUEST_QUEUES:
 			return Object.assign({}, state, {
@@ -27,8 +36,8 @@ const queues = function (state = initialQueuesState, action) {
 				isFetching: false,
 				didInvalidate: false,
 				items: action.queues,
-				jobsByQueue: Object.assign({}, ...action.queues.map(queue => ({
-					[queue.name]: {
+				jobsByQueue: Object.assign({}, ...Object.keys(action.queues).map(queue => queue && ({
+					[queue]: {
 						isFetching: false,
 						didInvalidate: false,
 						items: []
@@ -54,7 +63,7 @@ const queues = function (state = initialQueuesState, action) {
 						...state.jobsByQueue[action.queue],
 						isFetching: false,
 						didInvalidate: false,
-						items: dbObjToIds(action.jobs),
+						items: action.jobs? dbObjToIds(action.jobs) : [],
 						lastUpdated: action.receivedAt
 					}
 				}

@@ -12,13 +12,14 @@ import {jobHasFailed, jobStatus} from '../tepid-utils';
 import useModal from "../hooks/useModal";
 import {useFormField} from "../hooks/useFormField";
 import styled from 'styled-components'
-import {Button, Form, Input, Modal} from "antd";
+import {Button, Card, Form, Input, Modal} from "antd";
+import TextArea from "antd/es/input/TextArea";
 
 
 function AddTicketDialog({destination, ticket, modal}) {
 	const dispatch = useDispatch();
 
-	const text = useFormField((ticket && ticket.reason) || '');
+	const text = useFormField<string>((ticket && ticket.reason) || '');
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -31,14 +32,14 @@ function AddTicketDialog({destination, ticket, modal}) {
 	return (
 		<Modal title={`Add ticket for destination ${destination.name}`} visible={modal.open}
 			   footer={[
-				   ...(ticket ? [<Button variant={"outlined"} onClick={handleResolve}> Resolve</Button>] : []),
-				   <Button variant={"outlined"} type={'submit'} onClick={handleSubmit}>Submit</Button>
+				   ...(ticket ? [<Button type={"primary"} onClick={handleResolve}> Resolve</Button>] : []),
+				   <Button type={'danger'} onClick={handleSubmit}>Submit</Button>
 			   ]}
 			   onCancel={modal.handleClose}
 		>
 			<Form>
 				<Form.Item label={'Ticket'}>
-					<Input rows={4} variant={'outlined'} {...text}/>
+					<Input {...text}/>
 				</Form.Item>
 			</Form>
 		</Modal>
@@ -88,7 +89,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 		fetchNeededData()
 	});
 
-	if (loadingDestinations) return (<div className="col"></div>);
+	if (loadingDestinations) return (<div className="col"><Card loading={loadingDestinations}></Card></div>);
 
 	const queueDestinations = queue.destinations
 		.map(dest => destinations[dest])
@@ -99,7 +100,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 	const jobsToShow = queueJobs.slice(0, 25).map(it => jobs.items[it]);
 	const queueJobsElement = loadingQueueJobs
 		? (<tr style={{borderBottom: 'none'}}>
-			<td colSpan="4" style={{textAlign: 'center'}}>Loading...</td>
+			<td colSpan={4} style={{textAlign: 'center'}}>Loading...</td>
 		</tr>)
 		: jobsToShow.map(job => (
 			<tr key={job._id} className={jobHasFailed(job) ? 'failed' : ''}>
@@ -114,7 +115,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 
 	return (
 		<div className="col dash-printer no-side-padding no-bottom-padding">
-			<QueueIcon destinations={Object.values(queueDestinations)}/>
+			<QueueIcon destinations={queueDestinations}/>
 			<h2>{queue.name}</h2>
 			<div className="printer-status">{queueDestinationClickers}</div>
 			<table className="dash-printer-queue">
@@ -133,14 +134,14 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 }
 
 const mapStateToProps = (state, ownProps) => {
-	const loading = state.queues.jobsByQueue[ownProps.queue.name].isFetching || state.destinations.isFetching;
-	const unloaded = state.queues.jobsByQueue[ownProps.queue.name].items.length === 0;
+	const loading = state.queues.jobsByQueue[ownProps.queue._id].isFetching || state.destinations.isFetching;
+	const unloaded = state.queues.jobsByQueue[ownProps.queue._id].items.length === 0;
 
 	const loadingDestinations = Object.keys(state.destinations.items).length === 0;
 
 	return {
 		queue: ownProps.queue,
-		queueJobs: state.queues.jobsByQueue[ownProps.queue.name].items,
+		queueJobs: state.queues.jobsByQueue[ownProps.queue._id].items,
 		destinations: state.destinations.items,
 		loading: unloaded || loading || loadingDestinations,
 		loadingDestinations: loadingDestinations,
@@ -152,7 +153,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
 	return {
 		fetchNeededData: () => {
-			dispatch(fetchDestinationsIfNeeded()).then(() => dispatch(fetchQueueJobsIfNeeded(ownProps.queue.name)));
+			dispatch(fetchDestinationsIfNeeded()).then(() => dispatch(fetchQueueJobsIfNeeded(ownProps.queue._id)));
 		}
 	};
 };

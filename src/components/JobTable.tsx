@@ -5,6 +5,7 @@ import {jobStatus} from "../tepid-utils";
 import {useDispatch, useSelector} from "react-redux";
 import * as actions from "../actions";
 import {MoreMenu} from "./Buttons/MoreButton";
+import {PrintJob} from "../models";
 
 function JobTable({loading, showUser, canRefund, jobs}) {
 
@@ -58,7 +59,7 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 
 	return (
 		<div>
-			<Table columns={columns} dataSource={jobs} loading={loading}/>
+			<Table columns={columns} dataSource={jobs} loading={loading} rowKey={(record:PrintJob, _)=>record._id || ""}/>
 		</div>
 	);
 }

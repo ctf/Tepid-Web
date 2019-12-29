@@ -14,7 +14,7 @@ function DashboardPage({queues, fetchNeededData}) {
 		fetchNeededData()
 	});
 
-	const dashboardPrinters = queues.map(queue => (<DashboardPrinter key={queue.name} queue={queue}/>));
+	const dashboardPrinters = Object.entries(queues).map(([k, v]) => (<DashboardPrinter key={k} queue={v}/>));
 
 	return (
 		<div>

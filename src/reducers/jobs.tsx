@@ -1,4 +1,6 @@
 import {
+	ActionTypesAccountJobs,
+	ActionTypesJobActions, ActionTypesQueueJobs,
 	ADD_JOB,
 	RECEIVE_ACCOUNT_JOBS,
 	RECEIVE_JOB_REFUNDED,
@@ -8,11 +10,20 @@ import {
 } from "../actions";
 
 import {dbObjToSpreadable} from "./helpers";
+import {PrintJob} from "../models";
 
-const initialJobsState = {
+export interface JobsState {
+	isFetching: boolean,
+	didInvalidate: boolean,
+	items: Map<string, PrintJob>,
+	allItems: PrintJob[],
+	lastUpdated: Date | null,
+}
+
+const initialJobsState: JobsState = {
 	isFetching: false,
 	didInvalidate: false,
-	items: {},
+	items: new Map<string, PrintJob>(),
 	allItems: [],
 	lastUpdated: null
 };
@@ -25,7 +36,7 @@ const updatePrintJobs = function (state = initialJobsState, actionItems) {
 	})
 };
 
-const jobs = function (state = initialJobsState, action) {
+const jobs = function (state = initialJobsState, action: ActionTypesJobActions | ActionTypesQueueJobs | ActionTypesAccountJobs) {
 	switch (action.type) {
 		case ADD_JOB:
 			return Object.assign({}, state, {

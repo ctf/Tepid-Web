@@ -8,20 +8,18 @@ import {CTFerRoute} from '../components/auth_routes';
 
 import AccountContainer from '../containers/AccountContainer';
 
-class AccountPage extends React.Component {
-	render() {
-		return (
-			<div>
-				<TepidSidebar />
-				<main>
-					<PageHeader />
-					<section id="page-content">
-						<CTFerRoute path={`${this.props.match.url}/:shortUser`} component={AccountContainer} />
-					</section>
-				</main>
-			</div>
-		);
-	}
+function AccountPage({match}) {
+	return (
+		<div>
+			<TepidSidebar/>
+			<main>
+				<PageHeader/>
+				<section id="page-content">
+					<CTFerRoute path={`${match.url}/:shortUser`} component={AccountContainer}/>
+				</section>
+			</main>
+		</div>
+	);
 }
 
 const mapStateToProps = (state, ownProps) => {
