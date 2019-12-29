@@ -413,6 +413,12 @@ export interface PrintJob {
      */
     getId?: string;
     /**
+     *
+     * @type {string}
+     * @memberof PrintJob
+     */
+    _id?: string;
+    /**
      * 
      * @type {string}
      * @memberof PrintJob
@@ -546,6 +552,12 @@ export interface PrintQueue {
      * @memberof PrintQueue
      */
     getId?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof PrintQueue
+     */
+    _id?: string;
     /**
      * 
      * @type {string}
