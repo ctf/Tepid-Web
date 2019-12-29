@@ -12,7 +12,7 @@ import {jobHasFailed, jobStatus} from '../tepid-utils';
 import useModal from "../hooks/useModal";
 import {useFormField} from "../hooks/useFormField";
 import styled from 'styled-components'
-import {Button, Form, Input, Modal} from "antd";
+import {Button, Card, Form, Input, Modal} from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 
@@ -89,7 +89,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 		fetchNeededData()
 	});
 
-	if (loadingDestinations) return (<div className="col"></div>);
+	if (loadingDestinations) return (<div className="col"><Card loading={loadingDestinations}></Card></div>);
 
 	const queueDestinations = queue.destinations
 		.map(dest => destinations[dest])
