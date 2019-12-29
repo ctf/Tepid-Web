@@ -363,7 +363,7 @@ const fetchQueueJobs = (auth, queueName, limit = -1) => dispatch => {
 	};
 
 	// noinspection JSUnresolvedFunction
-	return fetch(`${API_URL}/queues/${queueName}`, fetchObject)
+	return fetch(`${API_URL}/queues/${queueName}/jobs`, fetchObject)
 		.then(response => {
 			if (response.status === 401) {
 				dispatch(invalidateAuth()); // To be used for redirection
