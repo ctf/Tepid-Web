@@ -19,7 +19,7 @@ import TextArea from "antd/es/input/TextArea";
 function AddTicketDialog({destination, ticket, modal}) {
 	const dispatch = useDispatch();
 
-	const text = useFormField((ticket && ticket.reason) || '');
+	const text = useFormField<string>((ticket && ticket.reason) || '');
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -39,7 +39,7 @@ function AddTicketDialog({destination, ticket, modal}) {
 		>
 			<Form>
 				<Form.Item label={'Ticket'}>
-					<TextArea rows={4} {...text}/>
+					<Input {...text}/>
 				</Form.Item>
 			</Form>
 		</Modal>
