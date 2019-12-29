@@ -282,13 +282,6 @@ export const confirmDestinationTicket = (destination, ticket, up) => ({
 	destination,
 });
 
-const parseTicketUpdateToStatus = (response) => {
-	const match = response.match(/.* marked as (.*)/)[1];
-	if (match === 'up') return true;
-	if (match === 'down') return false;
-	return null;
-};
-
 const doManageDestinationTicket = (destination, up, reason) => {
 	return (dispatch, getState) => {
 		const state = getState();
@@ -304,14 +297,18 @@ const doManageDestinationTicket = (destination, up, reason) => {
 		};
 
 		dispatch(manageDestinationTicket(destination, ticket));
-		return fetch(`${API_URL}/destinations/${encodeURIComponent(destination._id)}`, fetchObject)
+		return fetch(`${API_URL}/destinations/${encodeURIComponent(destination._id)}/ticket`, fetchObject)
 			.then(
-				response => response.text(),
-				error => handleError(error),
-			).then((body) => {
-				const status = parseTicketUpdateToStatus(body);
-				if (status !== null) {
-					dispatch(confirmDestinationTicket(destination, ticket, status))
+				response => {
+					if (response.ok) {
+						return response.json()
+					} else {
+						handleError(null)
+					}
+				},
+			).then((body: PutResponse) => {
+				if (body.ok) {
+					dispatch(confirmDestinationTicket(destination, ticket, ticket.up))
 				}
 			})
 	}
