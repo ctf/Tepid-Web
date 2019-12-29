@@ -13,6 +13,7 @@ import useModal from "../hooks/useModal";
 import {useFormField} from "../hooks/useFormField";
 import styled from 'styled-components'
 import {Button, Form, Input, Modal} from "antd";
+import TextArea from "antd/es/input/TextArea";
 
 
 function AddTicketDialog({destination, ticket, modal}) {
@@ -31,14 +32,14 @@ function AddTicketDialog({destination, ticket, modal}) {
 	return (
 		<Modal title={`Add ticket for destination ${destination.name}`} visible={modal.open}
 			   footer={[
-				   ...(ticket ? [<Button variant={"outlined"} onClick={handleResolve}> Resolve</Button>] : []),
-				   <Button variant={"outlined"} type={'submit'} onClick={handleSubmit}>Submit</Button>
+				   ...(ticket ? [<Button type={"primary"} onClick={handleResolve}> Resolve</Button>] : []),
+				   <Button type={'danger'} onClick={handleSubmit}>Submit</Button>
 			   ]}
 			   onCancel={modal.handleClose}
 		>
 			<Form>
 				<Form.Item label={'Ticket'}>
-					<Input rows={4} variant={'outlined'} {...text}/>
+					<TextArea rows={4} {...text}/>
 				</Form.Item>
 			</Form>
 		</Modal>
@@ -99,7 +100,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 	const jobsToShow = queueJobs.slice(0, 25).map(it => jobs.items[it]);
 	const queueJobsElement = loadingQueueJobs
 		? (<tr style={{borderBottom: 'none'}}>
-			<td colSpan="4" style={{textAlign: 'center'}}>Loading...</td>
+			<td colSpan={4} style={{textAlign: 'center'}}>Loading...</td>
 		</tr>)
 		: jobsToShow.map(job => (
 			<tr key={job._id} className={jobHasFailed(job) ? 'failed' : ''}>
