@@ -134,7 +134,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 }
 
 const mapStateToProps = (state, ownProps) => {
-	const loading = state.queues.jobsByQueue[ownProps.queue._id].isFetching || state.destinations.isFetching;
+	const loading = state.queues.jobsByQueue[ownProps.queue._id] === undefined || state.queues.jobsByQueue[ownProps.queue._id].isFetching || state.destinations.isFetching;
 	const unloaded = state.queues.jobsByQueue[ownProps.queue._id].items.length === 0;
 
 	const loadingDestinations = Object.keys(state.destinations.items).length === 0;
