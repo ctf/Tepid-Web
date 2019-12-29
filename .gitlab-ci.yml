@@ -9,10 +9,8 @@ before_script:
   - sudo -g docker docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
 build:
-  only:
-    - master
   tags:
-    - docker
+    - docker-build
   stage: build
   variables:
     REACT_APP_WEB_URL_PRODUCTION: "https://testpid.science.mcgill.ca:8443/tepid"
@@ -24,6 +22,7 @@ deploy testing:
   stage: deploy
   tags:
     - docker
+    - deploy
   only:
     - dev
     - master
