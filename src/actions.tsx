@@ -459,7 +459,7 @@ export const doSetJobRefunded = (job, refunded) => {
 		dispatch(requestJobRefunded(job._id, refunded));
 
 
-		return fetch(`${API_URL}/jobs/job/${job._id}/refunded`, fetchObject)
+		return fetch(`${API_URL}/jobs/${job._id}/refunded`, fetchObject)
 			.then(
 				response => response.json(),
 				error => handleError(error)
@@ -653,7 +653,7 @@ const fetchAccountJobs = (auth, shortUser) => dispatch => {
 	};
 
 	// noinspection JSUnresolvedFunction
-	return fetch(`${API_URL}/jobs/${shortUser}`, fetchObject)
+	return fetch(`${API_URL}/users/${shortUser}/jobs`, fetchObject)
 		.then(response => {
 			if (response.status === 401) {
 				dispatch(invalidateAuth()); // To be used for redirection
