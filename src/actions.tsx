@@ -470,6 +470,31 @@ export const doSetJobRefunded = (job, refunded) => {
 	}
 };
 
+export const REQUEST_JOB_REPRINT = 'REQUEST_JOB_REPRINT';
+
+interface ARequestJobReprint {
+	type: typeof REQUEST_JOB_REPRINT,
+	jobId: string
+}
+
+export const requestJobReprint = (jobId) => ({
+	type: REQUEST_JOB_REPRINT,
+	jobId,
+});
+
+export const RECEIVE_JOB_REPRINT = 'RECEIVE_JOB_REPRINT';
+
+interface AReceiveJobReprint {
+	type: typeof RECEIVE_JOB_REPRINT,
+	jobId: string,
+	ok: boolean
+}
+
+export const receiveJobReprint = (jobId, ok) => ({
+	type: RECEIVE_JOB_REPRINT,
+	jobId,
+	ok
+});
 // Accounts --------------------------------------------------------------------
 export type ActionTypesAccounts = ARequestAccount | AReceiveAccount | ARequestAccountQuota | AReceiveAccountQuota;
 
