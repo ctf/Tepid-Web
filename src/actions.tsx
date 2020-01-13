@@ -178,6 +178,30 @@ export const fetchQueuesIfNeeded = () => (dispatch, getState) => {
 	}
 };
 
+export const REQUEST_PUT_QUEUE = 'REQUEST_PUT_QUEUE';
+
+interface ARequestPutQueue {
+	type: typeof REQUEST_PUT_QUEUE,
+	queue: PrintQueue
+}
+
+export const requestPutQueue = (queue: PrintQueue): ARequestPutQueue => ({
+	type: REQUEST_PUT_QUEUE,
+	queue
+});
+
+export const RECEIVE_PUT_QUEUE = 'RECEIVE_PUT_QUEUE';
+
+interface AReceivePutQueue {
+	type: typeof RECEIVE_PUT_QUEUE,
+	putResponse: PutResponse
+}
+
+export const receivePutQueue = (putResponse: PutResponse): AReceivePutQueue => ({
+	type: RECEIVE_PUT_QUEUE,
+	putResponse
+});
+
 // Destinations ----------------------------------------------------------------
 export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations
 
