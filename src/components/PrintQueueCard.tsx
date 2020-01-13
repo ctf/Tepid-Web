@@ -1,10 +1,11 @@
 import React, {useCallback, useState} from "react";
-import {Button, Card, Form, Modal} from "antd";
+import {Button, Card, Col, Form, Modal, Row} from "antd";
 import {useDispatch} from "react-redux";
 import * as actions from "../actions";
 import {FullDestination, PrintQueue} from "../models";
 import {FormComponentProps} from 'antd/lib/form/Form';
 import FormBuilder from 'antd-form-builder'
+import {QueueIcon} from "./QueueIcon";
 
 interface i extends FormComponentProps {
 	printQueue: PrintQueue,
@@ -48,36 +49,45 @@ function PQ({form, printQueue, destinations}: i) {
 			{key: 'name', label: 'Name', required: true, initialValue: q.name},
 			{key: 'loadBalancer', label: 'Loadbalancer', required: true, initialValue: q.loadBalancer},
 			{key: 'defaultOn', label: 'Default for', initialValue: q.defaultOn},
-			{key: 'destinations', label: 'Destinations', widget: 'checkbox-group', options: Object.keys(destinations), initialValue: q.destinations}
+			{
+				key: 'destinations',
+				label: 'Destinations',
+				widget: 'checkbox-group',
+				options: Object.keys(destinations),
+				initialValue: q.destinations
+			}
 		]
 	};
 
 	return (
-		<Card>
-			<Form layout="horizontal" onSubmit={handleSubmit}>
-				<h1 style={{height: '40px', fontSize: '16px', marginTop: '50px', color: '#888'}}>
-					{printQueue.name}
-					{viewMode && (
-						<Button type="link" onClick={() => setViewMode(false)} style={{float: 'right'}}>
-							Edit
-						</Button>
-					)}
-				</h1>
-				<FormBuilder form={form} meta={meta} viewMode={viewMode}/>
-				{!viewMode && (
-					<Form.Item className="form-footer" wrapperCol={{span: 16, offset: 4}}>
-						<Button htmlType="submit" type="primary" disabled={pending}>
-							{pending ? 'Updating...' : 'Update'}
-						</Button>
-						<Button onClick={() => {
-							form.resetFields();
-							setViewMode(true)
-						}} style={{marginLeft: '15px'}}>
-							Cancel
-						</Button>
-					</Form.Item>
-				)}
-			</Form>
+		<Card title={printQueue.name} extra={viewMode && (
+			<Button type="link" onClick={() => setViewMode(false)} style={{float: 'right'}}>
+				Edit
+			</Button>
+		)}>
+			<Row>
+				<Col span={8}>
+					<QueueIcon destinations={q.destinations?.map(dest => destinations[dest]).filter(x => x !== undefined) || []}/>
+				</Col>
+				<Col >
+					<Form layout="horizontal" onSubmit={handleSubmit}>
+						<FormBuilder form={form} meta={meta} viewMode={viewMode}/>
+						{!viewMode && (
+							<Form.Item className="form-footer" wrapperCol={{span: 16, offset: 4}}>
+								<Button htmlType="submit" type="primary" disabled={pending}>
+									{pending ? 'Updating...' : 'Update'}
+								</Button>
+								<Button onClick={() => {
+									form.resetFields();
+									setViewMode(true)
+								}} style={{marginLeft: '15px'}}>
+									Cancel
+								</Button>
+							</Form.Item>
+						)}
+					</Form>
+				</Col>
+			</Row>
 		</Card>
 	)
 }
