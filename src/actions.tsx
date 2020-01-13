@@ -15,6 +15,8 @@ const standardHeaders = (auth) => ({
 	'Authorization': `Token ${buildToken(auth)}`
 });
 
+enum ModifyAction { POST = 'POST', PUT = 'PUT', DELETE = 'DELETE' }
+
 // Auth ------------------------------------------------------------------------
 export type ActionTypesAuth = ARequestAuth | AReceiveAuth
 
@@ -235,7 +237,7 @@ export const putQueue = (queue: PrintQueue) => {
 };
 
 // Destinations ----------------------------------------------------------------
-export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations | ARequestPutDestination | AReceivePutDestination
+export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations | ARequestModifyDestination | AReceiveModifyDestination
 
 export const REQUEST_DESTINATIONS = 'REQUEST_DESTINATIONS';
 interface ARequestDestinations {
@@ -304,28 +306,32 @@ export const fetchDestinationsIfNeeded = () => (dispatch, getState) => {
 	}
 };
 
-export const REQUEST_PUT_DESTINATION = 'REQUEST_PUT_DESTINATION';
+export const REQUEST_MODIFY_DESTINATION = 'REQUEST_MODIFY_DESTINATION';
 
-interface ARequestPutDestination {
-	type: typeof REQUEST_PUT_DESTINATION,
-	destination: FullDestination
+interface ARequestModifyDestination {
+	type: typeof REQUEST_MODIFY_DESTINATION,
+	action: ModifyAction,
+	destination: FullDestination,
 }
 
-export const requestPutDestination = (destination: FullDestination): ARequestPutDestination => ({
-	type: REQUEST_PUT_DESTINATION,
-	destination
+export const requestModifyDestination = (action: ModifyAction, destination: FullDestination): ARequestModifyDestination => ({
+	type: REQUEST_MODIFY_DESTINATION,
+	action,
+	destination,
 });
 
-export const RECEIVE_PUT_DESTINATION = 'RECEIVE_PUT_DESTINATION';
+export const RECEIVE_MODIFY_DESTINATION = 'RECEIVE_MODIFY_DESTINATION';
 
-interface AReceivePutDestination {
-	type: typeof RECEIVE_PUT_DESTINATION,
+interface AReceiveModifyDestination {
+	type: typeof RECEIVE_MODIFY_DESTINATION,
+	action: ModifyAction,
 	putResponse: PutResponse,
 	newDestination: FullDestination
 }
 
-export const receivePutDestination = (putResponse: PutResponse, newDestination: FullDestination): AReceivePutDestination => ({
-	type: RECEIVE_PUT_DESTINATION,
+export const receiveModifyDestination = (action: ModifyAction, putResponse: PutResponse, newDestination: FullDestination): AReceiveModifyDestination => ({
+	type: RECEIVE_MODIFY_DESTINATION,
+	action,
 	putResponse,
 	newDestination
 });
@@ -354,7 +360,7 @@ export const putDestination = (destination: FullDestination) => {
 				},
 			).then((body:PutResponse) => {
 				if (body.ok) {
-					dispatch(receivePutDestination(body, destination))
+					dispatch(receiveModifyDestination(ModifyAction.PUT, body,destination))
 				}
 			})
 	}
