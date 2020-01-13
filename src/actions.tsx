@@ -329,6 +329,37 @@ export const receivePutDestination = (putResponse: PutResponse, newDestination: 
 	putResponse,
 	newDestination
 });
+
+export const putDestination = (destination: FullDestination) => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		if (destination._id === undefined) throw "no _id";
+
+		const fetchObject = {
+			method: 'PUT',
+			headers: standardHeaders(state.auth),
+			body: JSON.stringify(destination)
+		};
+
+		dispatch(requestPutDestination(destination));
+		return fetch(`${API_URL}/destinations/${encodeURIComponent(destination._id)}`, fetchObject)
+			.then(
+				response => {
+					if (response.ok) {
+						return response.json()
+					} else {
+						handleError(response)
+					}
+				},
+			).then((body:PutResponse) => {
+				if (body.ok) {
+					dispatch(receivePutDestination(body, destination))
+				}
+			})
+	}
+};
+
 // Tickets ---------------------------------------------------------------------
 export type ActionTypesTickets = AManageDestinationTicket | AConfirmDestinationTicket
 
