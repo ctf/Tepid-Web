@@ -1,9 +1,12 @@
 import {
-	REQUEST_QUEUES,
-	RECEIVE_QUEUES,
-
+	ActionTypesQueueJobs,
+	ActionTypesQueues,
+	RECEIVE_PUT_QUEUE,
 	RECEIVE_QUEUE_JOBS,
-	REQUEST_QUEUE_JOBS, ActionTypesQueues, ActionTypesQueueJobs
+	RECEIVE_QUEUES,
+	REQUEST_PUT_QUEUE,
+	REQUEST_QUEUE_JOBS,
+	REQUEST_QUEUES
 } from '../actions';
 import {dbObjToIds} from "./helpers";
 import {PrintJob, PrintQueue} from "../models";
@@ -68,6 +71,20 @@ const queues = function (state = initialQueuesState, action: ActionTypesQueues |
 					}
 				}
 			});
+		case REQUEST_PUT_QUEUE:
+			return state;
+		case RECEIVE_PUT_QUEUE: {
+			if (action.putResponse.ok && action.putResponse.id !== undefined) {
+				return Object.assign({}, state, {
+					items: {
+						...state.items,
+						[action.putResponse.id]: action.newQueue
+					}
+				})
+			} else {
+				return state
+			}
+		}
 		default:
 			return state;
 	}

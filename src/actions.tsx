@@ -121,7 +121,7 @@ export const invalidateAuth = () => {
 };
 
 // Queues ----------------------------------------------------------------------
-export type ActionTypesQueues = ARequestQueues | AReceiveQueues | AInvalidateQueues
+export type ActionTypesQueues = ARequestQueues | AReceiveQueues | AInvalidateQueues | ARequestPutQueue | AReceivePutQueue
 
 export const REQUEST_QUEUES = 'REQUEST_QUEUES';
 interface ARequestQueues {
