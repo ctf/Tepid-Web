@@ -340,16 +340,18 @@ export const putDestination = (destination: FullDestination) => {
 	return (dispatch, getState) => {
 		const state = getState();
 
-		if (destination._id === undefined) throw "no _id";
+		const {action, URL} = destination._id === undefined ?
+			{ action: ModifyAction.POST, URL: `${API_URL}/destinations/` }
+			: { action: ModifyAction.PUT, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
 
 		const fetchObject = {
-			method: 'PUT',
+			method: action,
 			headers: standardHeaders(state.auth),
 			body: JSON.stringify(destination)
 		};
 
-		dispatch(requestPutDestination(destination));
-		return fetch(`${API_URL}/destinations/${encodeURIComponent(destination._id)}`, fetchObject)
+		dispatch(requestModifyDestination(action, destination));
+		return fetch(URL, fetchObject)
 			.then(
 				response => {
 					if (response.ok) {
@@ -360,7 +362,7 @@ export const putDestination = (destination: FullDestination) => {
 				},
 			).then((body:PutResponse) => {
 				if (body.ok) {
-					dispatch(receiveModifyDestination(ModifyAction.PUT, body,destination))
+					dispatch(receiveModifyDestination(action, body,destination))
 				}
 			})
 	}
