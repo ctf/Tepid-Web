@@ -11,9 +11,8 @@ import {
 import {jobHasFailed, jobStatus} from '../tepid-utils';
 import useModal from "../hooks/useModal";
 import {useFormField} from "../hooks/useFormField";
-import styled from 'styled-components'
 import {Button, Card, Form, Input, Modal} from "antd";
-import TextArea from "antd/es/input/TextArea";
+import {QueueIcon} from "./QueueIcon";
 
 
 function AddTicketDialog({destination, ticket, modal}) {
@@ -59,28 +58,6 @@ function QueueDestinationClicker({dest}) {
 		</>
 	);
 
-}
-
-const PrinterUpIcon = styled.i`
-	color: #4D983E
-`;
-const PrinterDownIcon = styled.i`
-	color: #F44336;
-`;
-
-function PrinterIconHalf({up}) {
-	return up ? <PrinterUpIcon className="material-icons"> print </PrinterUpIcon> :
-		<PrinterDownIcon className="material-icons"> print </PrinterDownIcon>
-}
-
-function QueueIcon({destinations}) {
-	const hasUp = destinations.reduce((acc, it) => (acc || it.up), false);
-	const allUp = destinations.reduce((acc, it) => (acc && it.up), true);
-
-	return <div className="printer-status-display">
-		<PrinterIconHalf up={allUp}/>
-		<PrinterIconHalf up={hasUp}/>
-	</div>;
 }
 
 function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queueJobs, loadingQueueJobs, fetchNeededData}) {
