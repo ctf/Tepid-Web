@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch';
 
 import {buildToken} from './tepid-utils';
-import {Destination, PrintJob, PrintQueue, PutResponse, QuotaData, User} from "./models";
+import {Destination, FullDestination, PrintJob, PrintQueue, PutResponse, QuotaData, User} from "./models";
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
 
@@ -235,7 +235,7 @@ export const putQueue = (queue: PrintQueue) => {
 };
 
 // Destinations ----------------------------------------------------------------
-export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations
+export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations | ARequestPutDestination | AReceivePutDestination
 
 export const REQUEST_DESTINATIONS = 'REQUEST_DESTINATIONS';
 interface ARequestDestinations {
@@ -304,6 +304,31 @@ export const fetchDestinationsIfNeeded = () => (dispatch, getState) => {
 	}
 };
 
+export const REQUEST_PUT_DESTINATION = 'REQUEST_PUT_DESTINATION';
+
+interface ARequestPutDestination {
+	type: typeof REQUEST_PUT_DESTINATION,
+	destination: FullDestination
+}
+
+export const requestPutDestination = (destination: FullDestination): ARequestPutDestination => ({
+	type: REQUEST_PUT_DESTINATION,
+	destination
+});
+
+export const RECEIVE_PUT_DESTINATION = 'RECEIVE_PUT_DESTINATION';
+
+interface AReceivePutDestination {
+	type: typeof RECEIVE_PUT_DESTINATION,
+	putResponse: PutResponse,
+	newDestination: FullDestination
+}
+
+export const receivePutDestination = (putResponse: PutResponse, newDestination: FullDestination): AReceivePutDestination => ({
+	type: RECEIVE_PUT_DESTINATION,
+	putResponse,
+	newDestination
+});
 // Tickets ---------------------------------------------------------------------
 export type ActionTypesTickets = AManageDestinationTicket | AConfirmDestinationTicket
 
