@@ -12,6 +12,27 @@ interface i extends FormComponentProps {
 	destination: FullDestination
 }
 
+export const destinationsFormMeta = (d) => ({
+	columns: 2,
+	fields: [
+		{key: 'name', label: 'Name', required: true, initialValue: d.name},
+		{key: 'protocol', label: 'Protocol', required: true, initialValue: d.protocol},
+		{key: 'username', label: 'Username', initialValue: d.username},
+		{
+			key: 'password',
+			label: 'Password',
+			initialValue: d.password,
+			widget: Password,
+			viewWidget: Password,
+			viewWidgetProps: {disabled: true}
+		},
+		{key: 'path', label: 'Path', initialValue: d.path},
+		{key: 'domain', label: 'Domain', initialValue: d.domain},
+		{key: 'up', label: 'Up', disabled: true},
+		{key: 'ppm', label: 'PPM', initialValue: d.ppm, widget: InputNumber}
+	]
+});
+
 function D({form, destination}: i) {
 
 	const [d, sd] = useState(destination);
@@ -42,20 +63,7 @@ function D({form, destination}: i) {
 		[form],
 	);
 
-	const meta = {
-		columns: 2,
-		disabled: pending,
-		fields: [
-			{key: 'name', label: 'Name', required: true, initialValue: d.name},
-			{key: 'protocol', label: 'Protocol', required: true, initialValue: d.protocol},
-			{key: 'username', label: 'Username', initialValue: d.username},
-			{key: 'password', label: 'Password', initialValue: d.password, widget: Password, viewWidget: Password, viewWidgetProps:{disabled: true}},
-			{key: 'path', label: 'Path', initialValue: d.path},
-			{key: 'domain', label: 'Domain', initialValue: d.domain},
-			{key: 'up', label: 'Up', disabled: true},
-			{key: 'ppm', label: 'PPM', initialValue: d.ppm, widget: InputNumber}
-		]
-	};
+	const meta = destinationsFormMeta(d);
 
 	return (
 		<Card title={destination.name} extra={viewMode && (
@@ -64,7 +72,7 @@ function D({form, destination}: i) {
 			</Button>
 		)}>
 			<Form layout="horizontal" onSubmit={handleSubmit}>
-				<FormBuilder form={form} meta={meta} viewMode={viewMode}/>
+				<FormBuilder form={form} meta={{...meta, disabled: pending}} viewMode={viewMode}/>
 				{!viewMode && (
 					<Form.Item className="form-footer" wrapperCol={{span: 16, offset: 4}}>
 						<Button htmlType="submit" type="primary" disabled={pending}>
