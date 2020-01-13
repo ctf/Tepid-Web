@@ -2,15 +2,16 @@ import React, {useCallback, useState} from "react";
 import {Button, Card, Form, Modal} from "antd";
 import {useDispatch} from "react-redux";
 import * as actions from "../actions";
-import {PrintQueue} from "../models";
+import {FullDestination, PrintQueue} from "../models";
 import {FormComponentProps} from 'antd/lib/form/Form';
 import FormBuilder from 'antd-form-builder'
 
 interface i extends FormComponentProps {
-	printQueue: PrintQueue
+	printQueue: PrintQueue,
+	destinations: FullDestination[]
 }
 
-function PQ({form, printQueue}: i) {
+function PQ({form, printQueue, destinations}: i) {
 
 	const [q, sq] = useState(printQueue);
 
@@ -45,7 +46,9 @@ function PQ({form, printQueue}: i) {
 		disabled: pending,
 		fields: [
 			{key: 'name', label: 'Name', required: true, initialValue: q.name},
-			{key: 'loadBalancer', label: 'Loadbalancer', required: true, initialValue: q.loadBalancer}
+			{key: 'loadBalancer', label: 'Loadbalancer', required: true, initialValue: q.loadBalancer},
+			{key: 'defaultOn', label: 'Default for', initialValue: q.defaultOn},
+			{key: 'destinations', label: 'Destinations', widget: 'checkbox-group', options: Object.keys(destinations), initialValue: q.destinations}
 		]
 	};
 
