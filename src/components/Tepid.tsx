@@ -12,6 +12,7 @@ import ConstitutionPage from '../pages/ConstitutionPage';
 import StatisticsPage from '../pages/StatisticsPage';
 import DashboardPage from '../pages/DashboardPage';
 import AccountPage from '../pages/AccountPage';
+import ConfigDestinationsPage from "../pages/ConfigDestinationsPage";
 
 class Tepid extends React.Component {
 	render() {
@@ -23,6 +24,7 @@ class Tepid extends React.Component {
 				<UserRoute path="/my-account" component={MyAccountPage} />
 				<CTFerRoute path="/queues" component={QueuesPage} />
 				<ElderRoute path="/config-queues" component={ConfigQueuesPage} />
+				<ElderRoute path="/config-destinations" component={ConfigDestinationsPage} />
 				<ElderRoute path="/destinations" component={DestinationsPage} />
 				<CTFerRoute path="/statistics" component={StatisticsPage} />
 				<ElderRoute path="/logs" component={LogsPage} />
