@@ -194,13 +194,45 @@ export const RECEIVE_PUT_QUEUE = 'RECEIVE_PUT_QUEUE';
 
 interface AReceivePutQueue {
 	type: typeof RECEIVE_PUT_QUEUE,
-	putResponse: PutResponse
+	putResponse: PutResponse,
+	newQueue: PrintQueue
 }
 
-export const receivePutQueue = (putResponse: PutResponse): AReceivePutQueue => ({
+export const receivePutQueue = (putResponse: PutResponse, newQueue: PrintQueue): AReceivePutQueue => ({
 	type: RECEIVE_PUT_QUEUE,
-	putResponse
+	putResponse,
+	newQueue
 });
+
+export const putQueue = (queue: PrintQueue) => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		if (queue._id === undefined) throw "no _id"
+
+		const fetchObject = {
+			method: 'PUT',
+			headers: standardHeaders(state.auth),
+			body: JSON.stringify(queue)
+		};
+
+		dispatch(requestPutQueue(queue));
+		return fetch(`${API_URL}/queues/${encodeURIComponent(queue._id)}`, fetchObject)
+			.then(
+				response => {
+					if (response.ok) {
+						return response.json()
+					} else {
+						handleError(response)
+					}
+				},
+			).then((body:PutResponse) => {
+				if (body.ok) {
+					dispatch(receivePutQueue(body, queue))
+				}
+			})
+	}
+};
 
 // Destinations ----------------------------------------------------------------
 export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations
