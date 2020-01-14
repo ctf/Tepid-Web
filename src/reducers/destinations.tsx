@@ -1,8 +1,12 @@
 import {
-	ActionTypesDestinations, ActionTypesTickets,
+	ActionTypesDestinations,
+	ActionTypesTickets,
 	CONFIRM_DESTINATION_TICKET,
-	RECEIVE_DESTINATIONS, RECEIVE_MODIFY_DESTINATION, RECEIVE_PUT_QUEUE,
-	REQUEST_DESTINATIONS, REQUEST_MODIFY_DESTINATION, REQUEST_PUT_QUEUE
+	ModifyAction,
+	RECEIVE_DESTINATIONS,
+	RECEIVE_MODIFY_DESTINATION,
+	REQUEST_DESTINATIONS,
+	REQUEST_MODIFY_DESTINATION
 } from '../actions';
 import {Destination} from "../models";
 
@@ -53,12 +57,23 @@ const destinations = function (state = initialDestinationsState, action: ActionT
 			return state;
 		case RECEIVE_MODIFY_DESTINATION: {
 			if (action.putResponse.ok && action.putResponse.id !== undefined) {
-				return Object.assign({}, state, {
-					items: {
-						...state.items,
-						[action.putResponse.id]: action.newDestination
-					}
-				})
+				if (action.action === ModifyAction.DELETE) {
+
+					const byId = {...state.items};
+					delete byId[action.putResponse.id];
+					return Object.assign({}, state, {
+						items: {
+							...byId
+						}
+					})
+				} else {
+					return Object.assign({}, state, {
+						items: {
+							...state.items,
+							[action.putResponse.id]: action.newDestination
+						}
+					})
+				}
 			} else {
 				return state
 			}
