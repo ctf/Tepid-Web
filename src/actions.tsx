@@ -123,7 +123,7 @@ export const invalidateAuth = () => {
 };
 
 // Queues ----------------------------------------------------------------------
-export type ActionTypesQueues = ARequestQueues | AReceiveQueues | AInvalidateQueues | ARequestPutQueue | AReceivePutQueue
+export type ActionTypesQueues = ARequestQueues | AReceiveQueues | AInvalidateQueues | ARequestModifyQueue | AReceiveModifyQueue
 
 export const REQUEST_QUEUES = 'REQUEST_QUEUES';
 interface ARequestQueues {
@@ -180,59 +180,92 @@ export const fetchQueuesIfNeeded = () => (dispatch, getState) => {
 	}
 };
 
-export const REQUEST_PUT_QUEUE = 'REQUEST_PUT_QUEUE';
+export const REQUEST_MODIFY_QUEUE = 'REQUEST_MODIFY_QUEUE';
 
-interface ARequestPutQueue {
-	type: typeof REQUEST_PUT_QUEUE,
-	queue: PrintQueue
+interface ARequestModifyQueue {
+	type: typeof REQUEST_MODIFY_QUEUE,
+	action: ModifyAction,
+	queue: PrintQueue,
 }
 
-export const requestPutQueue = (queue: PrintQueue): ARequestPutQueue => ({
-	type: REQUEST_PUT_QUEUE,
-	queue
+export const requestModifyQueue = (action: ModifyAction, queue: PrintQueue): ARequestModifyQueue => ({
+	type: REQUEST_MODIFY_QUEUE,
+	action,
+	queue,
 });
 
-export const RECEIVE_PUT_QUEUE = 'RECEIVE_PUT_QUEUE';
+export const RECEIVE_MODIFY_QUEUE = 'RECEIVE_MODIFY_QUEUE';
 
-interface AReceivePutQueue {
-	type: typeof RECEIVE_PUT_QUEUE,
+interface AReceiveModifyQueue {
+	type: typeof RECEIVE_MODIFY_QUEUE,
+	action: ModifyAction,
 	putResponse: PutResponse,
-	newQueue: PrintQueue
+	newQueue: PrintQueue,
 }
 
-export const receivePutQueue = (putResponse: PutResponse, newQueue: PrintQueue): AReceivePutQueue => ({
-	type: RECEIVE_PUT_QUEUE,
+export const receiveModifyQueue = (action: ModifyAction, putResponse: PutResponse, newQueue: PrintQueue): AReceiveModifyQueue => ({
+	type: RECEIVE_MODIFY_QUEUE,
+	action,
 	putResponse,
 	newQueue
 });
+
+const dispatchModifyQueue = (dispatch, action, queue, URL, fetchObject) => {
+	dispatch(requestModifyQueue(action, queue));
+	return fetch(URL, fetchObject)
+		.then(
+			response => {
+				if (response.ok) {
+					if (action === ModifyAction.DELETE) {
+						return {ok: true, id: queue._id}
+					}
+					return response.json()
+				} else {
+					handleError(response)
+				}
+			},
+		).then((body: PutResponse) => {
+			if (body.ok) {
+				if (action === ModifyAction.POST){
+					queue._id = body.id
+				}
+				dispatch(receiveModifyQueue(action, body, queue))
+			}
+		})
+};
 
 export const putQueue = (queue: PrintQueue) => {
 	return (dispatch, getState) => {
 		const state = getState();
 
-		if (queue._id === undefined) throw "no _id"
+		const {action, URL} = queue._id === undefined ?
+			{action: ModifyAction.POST, URL: `${API_URL}/queues/`}
+			: {action: ModifyAction.PUT, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
 
 		const fetchObject = {
-			method: 'PUT',
+			method: action,
 			headers: standardHeaders(state.auth),
 			body: JSON.stringify(queue)
 		};
 
-		dispatch(requestPutQueue(queue));
-		return fetch(`${API_URL}/queues/${encodeURIComponent(queue._id)}`, fetchObject)
-			.then(
-				response => {
-					if (response.ok) {
-						return response.json()
-					} else {
-						handleError(response)
-					}
-				},
-			).then((body:PutResponse) => {
-				if (body.ok) {
-					dispatch(receivePutQueue(body, queue))
-				}
-			})
+		return dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
+	}
+};
+
+export const deleteQueue = (queue: PrintQueue) => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		if (queue._id === undefined) throw "no _id";
+		const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
+
+		const fetchObject = {
+			method: 'DELETE',
+			headers: standardHeaders(state.auth),
+			body: JSON.stringify(queue)
+		};
+
+		return dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
 	}
 };
 
