@@ -8,7 +8,7 @@ import FormBuilder from 'antd-form-builder'
 import Password from "antd/es/input/Password";
 
 
-interface i extends FormComponentProps {
+interface ConfigDestinationArgs extends FormComponentProps {
 	destination: FullDestination
 }
 
@@ -33,7 +33,7 @@ export const destinationsFormMeta = (d) => ({
 	]
 });
 
-function D({form, destination}: i) {
+function InnerConfigDestination({form, destination}: ConfigDestinationArgs) {
 
 	const [d, sd] = useState(destination);
 
@@ -114,4 +114,4 @@ function D({form, destination}: i) {
 	)
 }
 
-export default Form.create()(D)
+export default Form.create()(InnerConfigDestination)

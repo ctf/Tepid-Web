@@ -7,12 +7,12 @@ import {FormComponentProps} from 'antd/lib/form/Form';
 import FormBuilder from 'antd-form-builder'
 import {QueueIcon} from "./QueueIcon";
 
-interface i extends FormComponentProps {
+interface ConfigPrintQueueArgs extends FormComponentProps {
 	printQueue: PrintQueue,
 	destinations: FullDestination[]
 }
 
-function PQ({form, printQueue, destinations}: i) {
+function InnerConfigPrintQueue({form, printQueue, destinations}: ConfigPrintQueueArgs) {
 
 	const [q, sq] = useState(printQueue);
 
@@ -118,4 +118,4 @@ function PQ({form, printQueue, destinations}: i) {
 	)
 }
 
-export default Form.create()(PQ)
+export default Form.create()(InnerConfigPrintQueue)

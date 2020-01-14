@@ -1,15 +1,14 @@
 import React, {useState} from "react";
 import {Button, Card} from "antd";
 import {RootState} from "../reducers";
-import {useDispatch, useSelector} from "react-redux";
+import {connect, useDispatch, useSelector} from "react-redux";
 import {withRouter} from 'react-router-dom';
 import PrintQueueCard from "../components/PrintQueueCard";
 import * as actions from "../actions";
-import {FullDestination, PrintQueue} from "../models";
-import { connect } from 'react-redux';
+import {PrintQueue} from "../models";
 
 
-function _ConfigQueuesContainer({}) {
+const ConfigQueuesContainer =  withRouter(connect()(function ({}) {
 
 	const dispatch = useDispatch();
 	dispatch(actions.fetchQueuesIfNeeded());
@@ -40,12 +39,6 @@ function _ConfigQueuesContainer({}) {
 
 		</Card>
 	)
-}
-
-const mapStateToProps = (state, ownProps) => ({
-	auth: state.auth,
-});
-
-const ConfigQueuesContainer =  withRouter(connect(mapStateToProps)(_ConfigQueuesContainer));
+}));
 
 export default ConfigQueuesContainer

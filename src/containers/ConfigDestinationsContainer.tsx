@@ -7,7 +7,7 @@ import * as actions from "../actions";
 import {FullDestination} from "../models";
 import DestinationCard from "../components/DestinationCard";
 
-function _D({}) {
+const ConfigDestinationsContainer = withRouter(connect()(function ({}) {
 	const dispatch = useDispatch();
 	dispatch(actions.fetchDestinationsIfNeeded());
 
@@ -33,8 +33,6 @@ function _D({}) {
 			})}
 		</Card>
 	)
-}
-
-const ConfigDestinationsContainer = withRouter(connect()(_D));
+}));
 
 export default ConfigDestinationsContainer
