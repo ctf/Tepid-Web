@@ -1,10 +1,11 @@
 import {
 	ActionTypesQueueJobs,
 	ActionTypesQueues,
-	RECEIVE_PUT_QUEUE,
+	ModifyAction,
+	RECEIVE_MODIFY_QUEUE,
 	RECEIVE_QUEUE_JOBS,
 	RECEIVE_QUEUES,
-	REQUEST_PUT_QUEUE,
+	REQUEST_MODIFY_QUEUE,
 	REQUEST_QUEUE_JOBS,
 	REQUEST_QUEUES
 } from '../actions';
@@ -66,21 +67,31 @@ const queues = function (state = initialQueuesState, action: ActionTypesQueues |
 						...state.jobsByQueue[action.queue],
 						isFetching: false,
 						didInvalidate: false,
-						items: action.jobs? dbObjToIds(action.jobs) : [],
+						items: action.jobs ? dbObjToIds(action.jobs) : [],
 						lastUpdated: action.receivedAt
 					}
 				}
 			});
-		case REQUEST_PUT_QUEUE:
+		case REQUEST_MODIFY_QUEUE:
 			return state;
-		case RECEIVE_PUT_QUEUE: {
+		case RECEIVE_MODIFY_QUEUE: {
 			if (action.putResponse.ok && action.putResponse.id !== undefined) {
-				return Object.assign({}, state, {
-					items: {
-						...state.items,
-						[action.putResponse.id]: action.newQueue
-					}
-				})
+				if (action.action === ModifyAction.DELETE) {
+					const byId = {...state.items};
+					delete byId[action.putResponse.id];
+					return Object.assign({}, state, {
+						items: {
+							...byId
+						}
+					})
+				} else {
+					return Object.assign({}, state, {
+						items: {
+							...state.items,
+							[action.putResponse.id]: action.newQueue
+						}
+					})
+				}
 			} else {
 				return state
 			}

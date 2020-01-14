@@ -58,7 +58,6 @@ const destinations = function (state = initialDestinationsState, action: ActionT
 		case RECEIVE_MODIFY_DESTINATION: {
 			if (action.putResponse.ok && action.putResponse.id !== undefined) {
 				if (action.action === ModifyAction.DELETE) {
-
 					const byId = {...state.items};
 					delete byId[action.putResponse.id];
 					return Object.assign({}, state, {
