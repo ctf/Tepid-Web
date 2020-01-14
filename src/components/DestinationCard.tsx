@@ -81,8 +81,25 @@ function D({form, destination}: i) {
 						<Button onClick={() => {
 							form.resetFields();
 							setViewMode(true)
-						}} style={{marginLeft: '15px'}}>
+						}}>
 							Cancel
+						</Button>
+						<Button
+							type="danger"
+							onClick={() => {
+								setViewMode(true)
+								dispatch(actions.deleteDestination(d))
+								setTimeout(() => {
+									setPending(false);
+									// setPersonalInfo(values);
+									setViewMode(true);
+									Modal.success({
+										title: 'Success',
+										content: 'Deleted.',
+									})
+								}, 1500)
+							}}>
+							Delete
 						</Button>
 					</Form.Item>
 				)}
