@@ -18,7 +18,7 @@ function PQ({form, printQueue, destinations}: i) {
 
 	const dispatch = useDispatch();
 
-	const [viewMode, setViewMode] = useState(true)
+	const [viewMode, setViewMode] = useState(true);
 	const [pending, setPending] = useState(false);
 	const handleSubmit = useCallback(
 		evt => {
@@ -82,6 +82,23 @@ function PQ({form, printQueue, destinations}: i) {
 									setViewMode(true)
 								}} style={{marginLeft: '15px'}}>
 									Cancel
+								</Button>
+								<Button
+									type="danger"
+									onClick={() => {
+										setViewMode(true);
+										dispatch(actions.deleteQueue(q));
+										setTimeout(() => {
+											setPending(false);
+											// setPersonalInfo(values);
+											setViewMode(true);
+											Modal.success({
+												title: 'Success',
+												content: 'Deleted.',
+											})
+										}, 1500)
+									}}>
+									Delete
 								</Button>
 							</Form.Item>
 						)}
