@@ -20,7 +20,7 @@ function PQ({form, printQueue, destinations}: i) {
 
 	const [viewMode, setViewMode] = useState(true);
 	const [pending, setPending] = useState(false);
-	const handleSubmit = useCallback(
+	const handleUpdate = useCallback(
 		evt => {
 			evt.preventDefault();
 			const values = form.getFieldsValue();
@@ -28,19 +28,39 @@ function PQ({form, printQueue, destinations}: i) {
 			setPending(true);
 			const n = Object.assign({}, q, values)
 			sq(n);
-			dispatch(actions.putQueue(n));
-			setTimeout(() => {
-				setPending(false);
-				// setPersonalInfo(values);
-				setViewMode(true);
-				Modal.success({
-					title: 'Success',
-					content: 'Infomation updated.',
+			dispatch(actions.putQueue(n)).then(
+				() => {
+					setPending(false);
+					// setPersonalInfo(values);
+					setViewMode(true);
+					Modal.success({
+						title: 'Success',
+						content: 'Infomation updated.',
+					})
 				})
-			}, 1500)
 		},
 		[form],
 	);
+
+	const handleDelete = useCallback(
+		evt => {
+			evt.preventDefault();
+			setPending(true);
+			setViewMode(true);
+			dispatch(actions.deleteQueue(q)).then(
+				() => {
+					setPending(false);
+					// setPersonalInfo(values);
+					setViewMode(true);
+					Modal.success({
+						title: 'Success',
+						content: 'Deleted.',
+					})
+				})
+		},
+		[form],
+	);
+
 
 	const meta = {
 		columns: 2,
@@ -67,10 +87,11 @@ function PQ({form, printQueue, destinations}: i) {
 		)}>
 			<Row>
 				<Col span={8}>
-					<QueueIcon destinations={q.destinations?.map(dest => destinations[dest]).filter(x => x !== undefined) || []}/>
+					<QueueIcon
+						destinations={q.destinations?.map(dest => destinations[dest]).filter(x => x !== undefined) || []}/>
 				</Col>
-				<Col >
-					<Form layout="horizontal" onSubmit={handleSubmit}>
+				<Col>
+					<Form layout="horizontal" onSubmit={handleUpdate}>
 						<FormBuilder form={form} meta={meta} viewMode={viewMode}/>
 						{!viewMode && (
 							<Form.Item className="form-footer" wrapperCol={{span: 16, offset: 4}}>
@@ -85,19 +106,7 @@ function PQ({form, printQueue, destinations}: i) {
 								</Button>
 								<Button
 									type="danger"
-									onClick={() => {
-										setViewMode(true);
-										dispatch(actions.deleteQueue(q));
-										setTimeout(() => {
-											setPending(false);
-											// setPersonalInfo(values);
-											setViewMode(true);
-											Modal.success({
-												title: 'Success',
-												content: 'Deleted.',
-											})
-										}, 1500)
-									}}>
+									onClick={handleDelete}>
 									Delete
 								</Button>
 							</Form.Item>

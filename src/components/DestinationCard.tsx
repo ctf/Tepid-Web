@@ -41,7 +41,7 @@ function D({form, destination}: i) {
 
 	const [viewMode, setViewMode] = useState(true);
 	const [pending, setPending] = useState(false);
-	const handleSubmit = useCallback(
+	const handleUpdate = useCallback(
 		evt => {
 			evt.preventDefault();
 			const values = form.getFieldsValue();
@@ -49,18 +49,36 @@ function D({form, destination}: i) {
 			setPending(true);
 			const n = Object.assign({}, d, values);
 			sd(n);
-			dispatch(actions.putDestination(n));
-			setTimeout(() => {
-				setPending(false);
-				// setPersonalInfo(values);
-				setViewMode(true);
-				Modal.success({
-					title: 'Success',
-					content: 'Infomation updated.',
+			dispatch(actions.putDestination(n)).then(
+				() => {
+					setPending(false);
+					// setPersonalInfo(values);
+					setViewMode(true);
+					Modal.success({
+						title: 'Success',
+						content: 'Infomation updated.',
+					})
 				})
-			}, 1500)
+
 		},
 		[form],
+	);
+
+	const handleDelete = useCallback(
+		evt => {
+			setViewMode(true)
+			dispatch(actions.deleteDestination(d)).then(
+				() => {
+					setPending(false);
+					// setPersonalInfo(values);
+					setViewMode(true);
+					Modal.success({
+						title: 'Success',
+						content: 'Deleted.',
+					})
+				})
+		},
+		[form]
 	);
 
 	const meta = destinationsFormMeta(d);
@@ -71,7 +89,7 @@ function D({form, destination}: i) {
 				Edit
 			</Button>
 		)}>
-			<Form layout="horizontal" onSubmit={handleSubmit}>
+			<Form layout="horizontal" onSubmit={handleUpdate}>
 				<FormBuilder form={form} meta={{...meta, disabled: pending}} viewMode={viewMode}/>
 				{!viewMode && (
 					<Form.Item className="form-footer" wrapperCol={{span: 16, offset: 4}}>
@@ -86,19 +104,7 @@ function D({form, destination}: i) {
 						</Button>
 						<Button
 							type="danger"
-							onClick={() => {
-								setViewMode(true)
-								dispatch(actions.deleteDestination(d))
-								setTimeout(() => {
-									setPending(false);
-									// setPersonalInfo(values);
-									setViewMode(true);
-									Modal.success({
-										title: 'Success',
-										content: 'Deleted.',
-									})
-								}, 1500)
-							}}>
+							onClick={handleDelete}>
 							Delete
 						</Button>
 					</Form.Item>
