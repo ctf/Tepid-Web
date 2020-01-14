@@ -15,7 +15,7 @@ const standardHeaders = (auth) => ({
 	'Authorization': `Token ${buildToken(auth)}`
 });
 
-enum ModifyAction { POST = 'POST', PUT = 'PUT', DELETE = 'DELETE' }
+export enum ModifyAction { POST = 'POST', PUT = 'PUT', DELETE = 'DELETE' }
 
 // Auth ------------------------------------------------------------------------
 export type ActionTypesAuth = ARequestAuth | AReceiveAuth
@@ -336,13 +336,38 @@ export const receiveModifyDestination = (action: ModifyAction, putResponse: PutR
 	newDestination
 });
 
+const dispatchModifyDestination = (dispatch, action, destination, URL, fetchObject) => {
+	dispatch(requestModifyDestination(action, destination));
+	return fetch(URL, fetchObject)
+		.then(
+			response => {
+				if (response.ok) {
+					if (action === ModifyAction.DELETE) {
+						return {ok: true, id: destination._id}
+					}
+					return response.json()
+				} else {
+					handleError(response)
+				}
+			},
+		).then((body: PutResponse) => {
+			if (body.ok) {
+				if (action === ModifyAction.POST){
+					destination._id = body.id
+				}
+				dispatch(receiveModifyDestination(action, body, destination))
+			}
+		})
+};
+
+
 export const putDestination = (destination: FullDestination) => {
 	return (dispatch, getState) => {
 		const state = getState();
 
 		const {action, URL} = destination._id === undefined ?
-			{ action: ModifyAction.POST, URL: `${API_URL}/destinations/` }
-			: { action: ModifyAction.PUT, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
+			{action: ModifyAction.POST, URL: `${API_URL}/destinations/`}
+			: {action: ModifyAction.PUT, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
 
 		const fetchObject = {
 			method: action,
@@ -350,21 +375,24 @@ export const putDestination = (destination: FullDestination) => {
 			body: JSON.stringify(destination)
 		};
 
-		dispatch(requestModifyDestination(action, destination));
-		return fetch(URL, fetchObject)
-			.then(
-				response => {
-					if (response.ok) {
-						return response.json()
-					} else {
-						handleError(response)
-					}
-				},
-			).then((body:PutResponse) => {
-				if (body.ok) {
-					dispatch(receiveModifyDestination(action, body,destination))
-				}
-			})
+		return dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
+	}
+};
+
+export const deleteDestination = (destination: FullDestination) => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		if (destination._id === undefined) throw "no _id";
+		const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
+
+		const fetchObject = {
+			method: 'DELETE',
+			headers: standardHeaders(state.auth),
+			body: JSON.stringify(destination)
+		};
+
+		return dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
 	}
 };
 
