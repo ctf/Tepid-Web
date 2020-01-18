@@ -447,7 +447,7 @@ export interface PrintJob {
      * @type {string}
      * @memberof PrintJob
      */
-    queueName?: string;
+    queueId?: string;
     /**
      * 
      * @type {string}

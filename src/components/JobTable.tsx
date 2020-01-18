@@ -14,6 +14,7 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 
 	const dispatch = useDispatch();
 	const makeHandleRefund = (job) => () => dispatch(actions.doSetJobRefunded(job, !job.refunded));
+	const makeHandleReprint = (job) => () => dispatch(actions.doJobReprint(job));
 
 	const columns = [
 		{
@@ -52,14 +53,17 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 		{
 			title: '',
 			key: 'MoreMenu',
-			render: job => <MoreMenu>{canRefund &&
-			<Menu.Item onClick={makeHandleRefund(job)}>Refund</Menu.Item>}<Menu.Item>Reprint</Menu.Item></MoreMenu>
+			render: job => <MoreMenu>
+				{canRefund && <Menu.Item onClick={makeHandleRefund(job)}>Refund</Menu.Item>}
+				<Menu.Item onClick={makeHandleReprint(job)}>Reprint</Menu.Item></MoreMenu>
+
 		}
 	];
 
 	return (
 		<div>
-			<Table columns={columns} dataSource={jobs} loading={loading} rowKey={(record:PrintJob, _)=>record._id || ""}/>
+			<Table columns={columns} dataSource={jobs} loading={loading}
+				   rowKey={(record: PrintJob, _) => record._id || ""}/>
 		</div>
 	);
 }

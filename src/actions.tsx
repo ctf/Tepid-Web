@@ -411,7 +411,7 @@ export const fetchAllQueueJobsIfNeeded = () => (dispatch, getState) => {
 };
 
 // -- Job Actions --------------------------------------------------------------
-export type ActionTypesJobActions = AAddJob | ARequestJobRefunded | AReceiveJobRefunded
+export type ActionTypesJobActions = AAddJob | ARequestJobRefunded | AReceiveJobRefunded | ARequestJobReprint | AReceiveJobReprint
 
 export const ADD_JOB = 'ADD_JOB';
 interface AAddJob {
@@ -469,6 +469,60 @@ export const doSetJobRefunded = (job, refunded) => {
 			)
 	}
 };
+
+export const REQUEST_JOB_REPRINT = 'REQUEST_JOB_REPRINT';
+
+interface ARequestJobReprint {
+	type: typeof REQUEST_JOB_REPRINT,
+	jobId: string
+}
+
+export const requestJobReprint = (jobId) => ({
+	type: REQUEST_JOB_REPRINT,
+	jobId,
+});
+
+export const RECEIVE_JOB_REPRINT = 'RECEIVE_JOB_REPRINT';
+
+interface AReceiveJobReprint {
+	type: typeof RECEIVE_JOB_REPRINT,
+	jobId: string,
+	ok: boolean
+}
+
+export const receiveJobReprint = (jobId, ok) => ({
+	type: RECEIVE_JOB_REPRINT,
+	jobId,
+	ok
+});
+
+export const doJobReprint = (job: PrintJob) => {
+	return (dispatch, getState) => {
+		const state = getState();
+		const fetchObject = {
+			method: 'POST',
+			headers: standardHeaders(state.auth),
+		};
+
+		dispatch(requestJobReprint(job._id));
+
+		return fetch(`${API_URL}/jobs/${job._id}/reprint`, fetchObject)
+			.then(
+				response => {
+					if (response.ok) {
+						return response.json()
+					} else {
+						handleError(response)
+					}
+				})
+			.then(json => {
+				dispatch(receiveJobReprint(job._id, json.ok));
+				dispatch(fetchAccountJobs(state.auth, job.userIdentification));
+				dispatch(fetchQueueJobs(state.auth, job.queueId));
+			})
+	}
+};
+
 
 // Accounts --------------------------------------------------------------------
 export type ActionTypesAccounts = ARequestAccount | AReceiveAccount | ARequestAccountQuota | AReceiveAccountQuota;
@@ -643,7 +697,6 @@ export const receiveAccountJobs = (shortUser, jobs) => ({
 
 const fetchAccountJobs = (auth, shortUser) => dispatch => {
 	dispatch(requestAccountJobs(shortUser));
-
 	const fetchObject = {
 		method: 'GET',
 		headers: {
