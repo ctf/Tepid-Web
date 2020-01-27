@@ -283,6 +283,12 @@ export interface FullDestination {
      */
     getId?: string;
     /**
+     *
+     * @type {string}
+     * @memberof FullDestination
+     */
+    _id?: string;
+    /**
      * 
      * @type {string}
      * @memberof FullDestination

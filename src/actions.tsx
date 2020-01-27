@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch';
 
 import {buildToken} from './tepid-utils';
-import {Destination, PrintJob, PrintQueue, PutResponse, QuotaData, User} from "./models";
+import {Destination, FullDestination, PrintJob, PrintQueue, PutResponse, QuotaData, User} from "./models";
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
 
@@ -14,6 +14,8 @@ const standardHeaders = (auth) => ({
 	'Accept': 'application/json',
 	'Authorization': `Token ${buildToken(auth)}`
 });
+
+export enum ModifyAction { POST = 'POST', PUT = 'PUT', DELETE = 'DELETE' }
 
 // Auth ------------------------------------------------------------------------
 export type ActionTypesAuth = ARequestAuth | AReceiveAuth
@@ -121,7 +123,7 @@ export const invalidateAuth = () => {
 };
 
 // Queues ----------------------------------------------------------------------
-export type ActionTypesQueues = ARequestQueues | AReceiveQueues | AInvalidateQueues
+export type ActionTypesQueues = ARequestQueues | AReceiveQueues | AInvalidateQueues | ARequestModifyQueue | AReceiveModifyQueue
 
 export const REQUEST_QUEUES = 'REQUEST_QUEUES';
 interface ARequestQueues {
@@ -178,8 +180,97 @@ export const fetchQueuesIfNeeded = () => (dispatch, getState) => {
 	}
 };
 
+export const REQUEST_MODIFY_QUEUE = 'REQUEST_MODIFY_QUEUE';
+
+interface ARequestModifyQueue {
+	type: typeof REQUEST_MODIFY_QUEUE,
+	action: ModifyAction,
+	queue: PrintQueue,
+}
+
+export const requestModifyQueue = (action: ModifyAction, queue: PrintQueue): ARequestModifyQueue => ({
+	type: REQUEST_MODIFY_QUEUE,
+	action,
+	queue,
+});
+
+export const RECEIVE_MODIFY_QUEUE = 'RECEIVE_MODIFY_QUEUE';
+
+interface AReceiveModifyQueue {
+	type: typeof RECEIVE_MODIFY_QUEUE,
+	action: ModifyAction,
+	putResponse: PutResponse,
+	newQueue: PrintQueue,
+}
+
+export const receiveModifyQueue = (action: ModifyAction, putResponse: PutResponse, newQueue: PrintQueue): AReceiveModifyQueue => ({
+	type: RECEIVE_MODIFY_QUEUE,
+	action,
+	putResponse,
+	newQueue
+});
+
+const dispatchModifyQueue = (dispatch, action, queue, URL, fetchObject) => {
+	dispatch(requestModifyQueue(action, queue));
+	return fetch(URL, fetchObject)
+		.then(
+			response => {
+				if (response.ok) {
+					if (action === ModifyAction.DELETE) {
+						return {ok: true, id: queue._id}
+					}
+					return response.json()
+				} else {
+					handleError(response)
+				}
+			},
+		).then((body: PutResponse) => {
+			if (body.ok) {
+				if (action === ModifyAction.POST){
+					queue._id = body.id
+				}
+				dispatch(receiveModifyQueue(action, body, queue))
+			}
+		})
+};
+
+export const putQueue = (queue: PrintQueue) => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		const {action, URL} = queue._id === undefined ?
+			{action: ModifyAction.POST, URL: `${API_URL}/queues/`}
+			: {action: ModifyAction.PUT, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
+
+		const fetchObject = {
+			method: action,
+			headers: standardHeaders(state.auth),
+			body: JSON.stringify(queue)
+		};
+
+		return dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
+	}
+};
+
+export const deleteQueue = (queue: PrintQueue) => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		if (queue._id === undefined) throw "no _id";
+		const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
+
+		const fetchObject = {
+			method: 'DELETE',
+			headers: standardHeaders(state.auth),
+			body: JSON.stringify(queue)
+		};
+
+		return dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
+	}
+};
+
 // Destinations ----------------------------------------------------------------
-export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations
+export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations | ARequestModifyDestination | AReceiveModifyDestination
 
 export const REQUEST_DESTINATIONS = 'REQUEST_DESTINATIONS';
 interface ARequestDestinations {
@@ -245,6 +336,96 @@ export const fetchDestinationsIfNeeded = () => (dispatch, getState) => {
 		return dispatch(fetchDestinations(state.auth));
 	} else {
 		return Promise.resolve();
+	}
+};
+
+export const REQUEST_MODIFY_DESTINATION = 'REQUEST_MODIFY_DESTINATION';
+
+interface ARequestModifyDestination {
+	type: typeof REQUEST_MODIFY_DESTINATION,
+	action: ModifyAction,
+	destination: FullDestination,
+}
+
+export const requestModifyDestination = (action: ModifyAction, destination: FullDestination): ARequestModifyDestination => ({
+	type: REQUEST_MODIFY_DESTINATION,
+	action,
+	destination,
+});
+
+export const RECEIVE_MODIFY_DESTINATION = 'RECEIVE_MODIFY_DESTINATION';
+
+interface AReceiveModifyDestination {
+	type: typeof RECEIVE_MODIFY_DESTINATION,
+	action: ModifyAction,
+	putResponse: PutResponse,
+	newDestination: FullDestination
+}
+
+export const receiveModifyDestination = (action: ModifyAction, putResponse: PutResponse, newDestination: FullDestination): AReceiveModifyDestination => ({
+	type: RECEIVE_MODIFY_DESTINATION,
+	action,
+	putResponse,
+	newDestination
+});
+
+const dispatchModifyDestination = (dispatch, action, destination, URL, fetchObject) => {
+	dispatch(requestModifyDestination(action, destination));
+	return fetch(URL, fetchObject)
+		.then(
+			response => {
+				if (response.ok) {
+					if (action === ModifyAction.DELETE) {
+						return {ok: true, id: destination._id}
+					}
+					return response.json()
+				} else {
+					handleError(response)
+				}
+			},
+		).then((body: PutResponse) => {
+			if (body.ok) {
+				if (action === ModifyAction.POST){
+					destination._id = body.id
+				}
+				dispatch(receiveModifyDestination(action, body, destination))
+			}
+		})
+};
+
+
+export const putDestination = (destination: FullDestination) => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		const {action, URL} = destination._id === undefined ?
+			{action: ModifyAction.POST, URL: `${API_URL}/destinations/`}
+			: {action: ModifyAction.PUT, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
+
+		const fetchObject = {
+			method: action,
+			headers: standardHeaders(state.auth),
+			body: JSON.stringify(destination)
+		};
+
+		return dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
+	}
+};
+
+export const deleteDestination = (destination: FullDestination) => {
+	return (dispatch, getState) => {
+		const state = getState();
+
+		if (destination._id === undefined) throw "no _id";
+		const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
+
+		const fetchObject = {
+			method: 'DELETE',
+			headers: standardHeaders(state.auth),
+			body: JSON.stringify(destination)
+		};
+
+		return dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
 	}
 };
 
