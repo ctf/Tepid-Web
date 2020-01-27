@@ -1,10 +1,10 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Card} from "antd";
 import {RootState} from "../reducers";
 import {connect, useDispatch, useSelector} from "react-redux";
 import {withRouter} from 'react-router-dom';
 import * as actions from "../actions";
-import {FullDestination} from "../models";
+import {FullDestination, PrintQueue} from "../models";
 import DestinationCard from "../components/DestinationCard";
 
 const ConfigDestinationsContainer = withRouter(connect()(function ({}) {
@@ -14,6 +14,9 @@ const ConfigDestinationsContainer = withRouter(connect()(function ({}) {
 	const destinations = useSelector((state: RootState) => state.destinations.items);
 
 	const [newDestination, setNewDestination] = useState<FullDestination | undefined>(undefined);
+	useEffect(()=>{
+		setNewDestination(undefined)
+	}, [destinations]);
 
 	return (
 		<Card loading={!(destinations && Object.keys(destinations).length > 0)}>

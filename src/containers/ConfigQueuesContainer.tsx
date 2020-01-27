@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Card} from "antd";
 import {RootState} from "../reducers";
 import {connect, useDispatch, useSelector} from "react-redux";
@@ -18,6 +18,9 @@ const ConfigQueuesContainer =  withRouter(connect()(function ({}) {
 	const destinations = useSelector((state: RootState) => state.destinations.items);
 
 	const [newQueue, setNewQueue] = useState<PrintQueue | undefined>(undefined);
+	useEffect(()=>{
+		setNewQueue(undefined)
+	}, [queues]);
 
 	return (
 		<Card loading={!(queues && Object.keys(queues).length > 0)}>
