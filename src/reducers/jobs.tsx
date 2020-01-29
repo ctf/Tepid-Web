@@ -1,6 +1,7 @@
 import {
 	ActionTypesAccountJobs,
-	ActionTypesJobActions, ActionTypesQueueJobs,
+	ActionTypesJobActions,
+	ActionTypesQueueJobs,
 	ADD_JOB,
 	RECEIVE_ACCOUNT_JOBS,
 	RECEIVE_JOB_REFUNDED,
@@ -28,57 +29,53 @@ const initialJobsState: JobsState = {
 	lastUpdated: null
 };
 
-const updatePrintJobs = function (state = initialJobsState, actionItems) {
-	return Object.assign({}, state, {
-		isFetching: false,
-		didInvalidate: false,
-		items: Object.assign({}, state.items,  dbObjToSpreadable(actionItems))
-	})
-};
+const updatePrintJobs = (state = initialJobsState, actionItems) => ({
+	...state,
+	isFetching: false,
+	didInvalidate: false,
+	items: {...state.items, ...dbObjToSpreadable(actionItems)}
+});
 
-const jobs = function (state = initialJobsState, action: ActionTypesJobActions | ActionTypesQueueJobs | ActionTypesAccountJobs) {
+const jobs = (
+	state = initialJobsState,
+	action: ActionTypesJobActions | ActionTypesQueueJobs | ActionTypesAccountJobs
+): JobsState => {
 	switch (action.type) {
 		case ADD_JOB:
-			return Object.assign({}, state, {
+			// TODO
+			return state;
+		case RECEIVE_JOB_REFUNDED:
+			if (!action.ok) return state;
+			const job = state.items[action.jobId];
+			const newRefundedStatus = action.ok ? !job.refunded : job.refunded;
 
-			});
-		case RECEIVE_JOB_REFUNDED:{
-			if (action.ok) {
-				const job = state.items[action.jobId];
-				const newRefundedStatus = action.ok ? !job.refunded : job.refunded;
-
-				return Object.assign({}, state, {
-					items: {
-						...state.items,
-						[action.jobId]: {
-							...job,
-							refunded:newRefundedStatus
-						}
+			return {
+				...state,
+				items: {
+					...state.items,
+					[action.jobId]: {
+						...job,
+						refunded:newRefundedStatus
 					}
-				});
-			} else {
-				return state
-			}
-		}
-		case REQUEST_QUEUE_JOBS:{
+				}
+			};
+
+		case REQUEST_QUEUE_JOBS:
 			return Object.assign({}, state, {
 				isFetching: true
-			})
-		}
+			});
 
-		case RECEIVE_QUEUE_JOBS:{
+		case RECEIVE_QUEUE_JOBS:
 			return updatePrintJobs(state, action.jobs);
-		}
 
-		case REQUEST_ACCOUNT_JOBS:{
-			return Object.assign({}, state, {
+		case REQUEST_ACCOUNT_JOBS:
+			return {
+				...state,
 				isFetching: true
-			})
-		}
+			};
 
-		case RECEIVE_ACCOUNT_JOBS:{
+		case RECEIVE_ACCOUNT_JOBS:
 			return updatePrintJobs(state, action.jobs);
-		}
 
 		default:
 			return state;

@@ -6,7 +6,10 @@ import {
 	RECEIVE_ACCOUNT_QUOTA,
 
 	REQUEST_ACCOUNT_JOBS,
-	RECEIVE_ACCOUNT_JOBS, ActionTypesAccounts, ActionTypesAccountJobs
+	RECEIVE_ACCOUNT_JOBS,
+
+	ActionTypesAccounts,
+	ActionTypesAccountJobs,
 } from '../actions';
 import {dbObjToIds} from "./helpers";
 import {PrintJob, User} from "../models";
@@ -62,14 +65,19 @@ const initialJobsState: JobsState = {
 	lastUpdated: null
 };
 
-const accounts = function (state = initialAccountsState, action: ActionTypesAccounts | ActionTypesAccountJobs) {
+const accounts = (
+	state = initialAccountsState,
+	action: ActionTypesAccounts | ActionTypesAccountJobs
+): AccountsState => {
 	switch (action.type) {
 		case REQUEST_ACCOUNT:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				isFetching: true
-			});
+			};
 		case RECEIVE_ACCOUNT:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				isFetching: false,
 				items: {
 					...state.items,
@@ -83,9 +91,10 @@ const accounts = function (state = initialAccountsState, action: ActionTypesAcco
 						lastUpdated: action.receivedAt
 					}
 				}
-			});
+			};
 		case REQUEST_ACCOUNT_QUOTA:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				items: {
 					...state.items,
 					[action.shortUser]: {
@@ -97,9 +106,10 @@ const accounts = function (state = initialAccountsState, action: ActionTypesAcco
 						}
 					}
 				}
-			});
+			};
 		case RECEIVE_ACCOUNT_QUOTA:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				items: {
 					...state.items,
 					[action.shortUser]: {
@@ -114,9 +124,10 @@ const accounts = function (state = initialAccountsState, action: ActionTypesAcco
 						}
 					}
 				}
-			});
+			};
 		case REQUEST_ACCOUNT_JOBS:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				items: {
 					...state.items,
 					[action.shortUser]: {
@@ -128,9 +139,10 @@ const accounts = function (state = initialAccountsState, action: ActionTypesAcco
 						}
 					}
 				}
-			});
+			};
 		case RECEIVE_ACCOUNT_JOBS:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				items: {
 					...state.items,
 					[action.shortUser]: {
@@ -144,7 +156,7 @@ const accounts = function (state = initialAccountsState, action: ActionTypesAcco
 						}
 					}
 				}
-			});
+			};
 		default:
 			return state;
 	}

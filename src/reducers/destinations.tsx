@@ -24,7 +24,10 @@ const initialDestinationsState: DestinationsState = {
 	lastUpdated: null
 };
 
-const destinations = function (state = initialDestinationsState, action: ActionTypesDestinations | ActionTypesTickets) {
+const destinations = (
+	state = initialDestinationsState,
+	action: ActionTypesDestinations | ActionTypesTickets
+): DestinationsState => {
 	switch (action.type) {
 		case REQUEST_DESTINATIONS:
 			return Object.assign({}, state, {

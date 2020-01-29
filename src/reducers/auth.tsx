@@ -1,5 +1,5 @@
 import {ActionTypesAuth, ActionTypesInvalidateAuth, RECEIVE_AUTH, REQUEST_AUTH} from '../actions';
-import {Session, User} from "../models";
+import {User} from "../models";
 
 export interface AuthState {
 	isFetching: boolean,
@@ -14,7 +14,7 @@ export interface AuthState {
 	lastUpdated: Date | null,
 }
 
-const initialAuthState : AuthState = {
+const initialAuthState: AuthState = {
 	isFetching: false,
 	didInvalidate: false,
 	isAuthenticated: false,
@@ -27,16 +27,21 @@ const initialAuthState : AuthState = {
 	lastUpdated: null
 };
 
-const auth = function (state = initialAuthState, action: ActionTypesAuth | ActionTypesInvalidateAuth) {
+const auth = (
+	state = initialAuthState,
+	action: ActionTypesAuth | ActionTypesInvalidateAuth
+): AuthState => {
 	switch (action.type) {
 		case REQUEST_AUTH:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				isFetching: true,
 				didInvalidate: false
-			});
+			};
 		case RECEIVE_AUTH:
 			// TODO: Session expiration
-			return Object.assign({}, state, {
+			return {
+				...state,
 				isFetching: false,
 				didInvalidate: false,
 				isAuthenticated: action.valid,
@@ -47,7 +52,7 @@ const auth = function (state = initialAuthState, action: ActionTypesAuth | Actio
 					expiration: action.session.expiration
 				},
 				lastUpdated: action.receivedAt
-			});
+			};
 		default:
 			return state;
 	}
