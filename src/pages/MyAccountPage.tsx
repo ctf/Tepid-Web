@@ -22,16 +22,10 @@ function MyAccountPage ({auth}) {
 		);
 }
 
-const mapStateToProps = (state, ownProps) => {
-	return {
-		auth: state.auth
-	};
-};
+const mapStateToProps = (state) => ({
+	auth: state.auth
+});
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {};
-};
-
-const MyAccountPageContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(MyAccountPage));
+const MyAccountPageContainer = withRouter(connect(mapStateToProps)(MyAccountPage));
 
 export default MyAccountPageContainer;

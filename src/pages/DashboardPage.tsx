@@ -9,7 +9,6 @@ import DashboardPrinter from '../components/DashboardPrinter';
 import {fetchDestinationsIfNeeded, fetchQueuesIfNeeded} from "../actions";
 
 function DashboardPage({queues, fetchNeededData}) {
-
 	useEffect(() => {
 		fetchNeededData()
 	});
@@ -41,13 +40,12 @@ const mapStateToProps = (state, ownProps) => {
 	};
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		fetchNeededData: () => {
-			dispatch(fetchQueuesIfNeeded()).then(() => fetchDestinationsIfNeeded());
-		}
-	};
-};
+const mapDispatchToProps = (dispatch, ownProps) => ({
+	fetchNeededData: async () => {
+		await dispatch(fetchQueuesIfNeeded());
+		await dispatch(fetchDestinationsIfNeeded());
+	}
+});
 
 const DashboardPageContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(DashboardPage));
 

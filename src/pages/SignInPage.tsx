@@ -10,11 +10,11 @@ function SignInPage(props) {
 	const [password, setPassword] = useState('');
 
 	const handleUsernameChange = (event) => {
-		setUsername(event.target.value)
+		setUsername(event.target.value);
 	};
 
 	const handlePasswordChange = (event) => {
-		setPassword(event.target.value)
+		setPassword(event.target.value);
 	};
 
 	return (
@@ -43,19 +43,13 @@ function SignInPage(props) {
 	);
 }
 
-const mapStateToProps = (state, ownProps) => {
-	return {
-		auth: state.auth
-	};
-};
+const mapStateToProps = state => ({
+	auth: state.auth
+});
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		onSignInClick: credentials => {
-			dispatch(attemptAuthAndLoadInitialData(credentials));
-		}
-	};
-};
+const mapDispatchToProps = dispatch => ({
+	onSignInClick: credentials => dispatch(attemptAuthAndLoadInitialData(credentials))
+});
 
 const SignInPageContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(SignInPage));
 

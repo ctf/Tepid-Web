@@ -2,15 +2,11 @@ import React from 'react';
 import { Route, Redirect, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-const mapStateToProps = (state, ownProps) => {
-	return {
-		auth: state.auth
-	};
-};
+const mapStateToProps = (state, ownProps) => ({
+	auth: state.auth
+});
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {};
-};
+const mapDispatchToProps = (dispatch, ownProps) => ({});
 
 const InnerElderRoute = ({ component: Component, auth, ...rest }) => (
 	<Route {...rest} render={props => (

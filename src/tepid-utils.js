@@ -27,10 +27,6 @@ export const jobStatus = job => {
 	return status;
 };
 
-export const jobIsProcessing = job => {
-	return jobStatus(job) === 'Processing...';
-};
+export const jobIsProcessing = job => jobStatus(job) === 'Processing...';
 
-export const jobHasFailed = job => {
-	return (job.failed !== null && job.failed !== -1 && job.failed !== undefined);
-};
+export const jobHasFailed = job => (job.failed !== null && job.failed !== -1 && job.failed !== undefined);
