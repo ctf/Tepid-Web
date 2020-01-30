@@ -5,13 +5,13 @@ import {DebounceInput} from "react-debounce-input";
 import useModal from "../hooks/useModal";
 import {Button, Form, Modal, Skeleton, Switch} from "antd";
 
-function UserStatusCard(content=<h2>Could not find user</h2>) {
+function UserStatusCard(content) {
 	return (
 		<div>
 			<div className="card no-padding">
 				<div className="user-profile">
 					<div className="row">
-						<div className="col no-padding no-borders">
+						<div className="col no-borders">
 							{content}
 						</div>
 					</div>
