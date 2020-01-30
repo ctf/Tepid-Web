@@ -61,8 +61,10 @@ function JobTable({loading, showUser, canRefund, jobs}) {
 	];
 
 	return (
-		<div>
-			<Table columns={columns} dataSource={jobs} loading={loading}
+		<div style={{borderTop: "1px solid rgba(0, 0, 0, 0.08)"}}>
+			<Table columns={columns}
+				   dataSource={jobs}
+				   loading={loading}
 				   rowKey={(record: PrintJob, _) => record._id || ""}/>
 		</div>
 	);
