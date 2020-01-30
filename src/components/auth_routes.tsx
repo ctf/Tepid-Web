@@ -2,11 +2,9 @@ import React from 'react';
 import { Route, Redirect, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = state => ({
 	auth: state.auth
 });
-
-const mapDispatchToProps = (dispatch, ownProps) => ({});
 
 const InnerElderRoute = ({ component: Component, auth, ...rest }) => (
 	<Route {...rest} render={props => (
@@ -21,7 +19,7 @@ const InnerElderRoute = ({ component: Component, auth, ...rest }) => (
 	)} />
 );
 
-export const ElderRoute = withRouter(connect(mapStateToProps, mapDispatchToProps)(InnerElderRoute));
+export const ElderRoute = withRouter(connect(mapStateToProps)(InnerElderRoute));
 
 const InnerCTFerRoute = ({ component: Component, auth, ...rest }) => (
 	<Route {...rest} render={props => (
@@ -36,7 +34,7 @@ const InnerCTFerRoute = ({ component: Component, auth, ...rest }) => (
 	)} />
 );
 
-export const CTFerRoute = withRouter(connect(mapStateToProps, mapDispatchToProps)(InnerCTFerRoute));
+export const CTFerRoute = withRouter(connect(mapStateToProps)(InnerCTFerRoute));
 
 const InnerUserRoute = ({ component: Component, auth, ...rest }) => (
 	<Route {...rest} render={props => (
@@ -51,7 +49,7 @@ const InnerUserRoute = ({ component: Component, auth, ...rest }) => (
 	)} />
 );
 
-export const UserRoute = withRouter(connect(mapStateToProps, mapDispatchToProps)(InnerUserRoute));
+export const UserRoute = withRouter(connect(mapStateToProps)(InnerUserRoute));
 
 const InnerGuestRoute = ({ component: Component, auth, ...rest }) => (
 	<Route {...rest} render={props => (
@@ -66,4 +64,4 @@ const InnerGuestRoute = ({ component: Component, auth, ...rest }) => (
 	)} />
 );
 
-export const GuestRoute = withRouter(connect(mapStateToProps, mapDispatchToProps)(InnerGuestRoute));
+export const GuestRoute = withRouter(connect(mapStateToProps)(InnerGuestRoute));
