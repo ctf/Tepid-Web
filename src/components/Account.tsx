@@ -132,7 +132,7 @@ function Account({shortUser, account, accountsFetching, jobs, auth, fetchNeededD
 	}
 
 	if (!account || !account.data._id) {
-		return UserStatusCard();
+		return UserStatusCard(<h2>Could not find user</h2>);
 	}
 	const accountData = account.data;
 
