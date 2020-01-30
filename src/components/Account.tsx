@@ -185,9 +185,10 @@ function Account({shortUser, account, accountsFetching, jobs, auth, fetchNeededD
 		? ''
 		: badgeables.map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
-	const jobsElements = (!account || jobs.isFetching) ? [] : account.jobs.items.map(it => jobs.items[it]);
+	const jobsLoading = !account || accountsFetching || jobs.isFetching;
+	const jobsElements = jobsLoading ? [] : account.jobs.items.map(it => jobs.items[it]);
 	const jobTable = canPrint ? (
-		<JobTable loading={jobsElements.length === 0}
+		<JobTable loading={jobsLoading}
 				  jobs={jobsElements}
 				  showUser={false}
 				  canRefund={permissionIsVolunteer} />) : '';
