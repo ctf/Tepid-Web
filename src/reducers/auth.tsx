@@ -1,4 +1,4 @@
-import {ActionTypesAuth, ActionTypesInvalidateAuth, RECEIVE_AUTH, REQUEST_AUTH} from '../actions';
+import {ActionTypesAuth, ActionTypesInvalidateAuth, ERROR_AUTH, RECEIVE_AUTH, REQUEST_AUTH} from '../actions';
 import {User} from "../models";
 
 export interface AuthState {
@@ -52,6 +52,11 @@ const auth = (
 					expiration: action.session.expiration
 				},
 				lastUpdated: action.receivedAt
+			};
+		case ERROR_AUTH:
+			return {
+				...state,
+				isFetching: false
 			};
 		default:
 			return state;

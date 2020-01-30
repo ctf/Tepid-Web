@@ -1,5 +1,7 @@
 import fetch from 'cross-fetch';
 
+import {message} from "antd";
+
 import {buildToken} from './tepid-utils';
 import {Destination, FullDestination, PrintJob, PrintQueue, PutResponse, QuotaData, User} from "./models";
 
@@ -15,18 +17,10 @@ const standardHeaders = (auth) => ({
 	'Authorization': `Token ${buildToken(auth)}`
 });
 
-export enum ModifyAction { POST = 'POST', PUT = 'PUT', DELETE = 'DELETE' };
-
-const networkActionTypes = (a) => ({
-	REQUEST: `${a}.REQUEST`,
-	RECEIVE: `${a}.RECEIVE`,
-	ERROR: `${a}.ERROR`,
-});
+export enum ModifyAction { POST = 'POST', PUT = 'PUT', DELETE = 'DELETE' }
 
 // Auth ------------------------------------------------------------------------
-export type ActionTypesAuth = ARequestAuth | AReceiveAuth;
-
-export const FETCH_AUTH = networkActionTypes("AUTH");
+export type ActionTypesAuth = ARequestAuth | AReceiveAuth | AnErrorAuth;
 
 export const REQUEST_AUTH = 'REQUEST_AUTH';
 interface ARequestAuth {
@@ -65,6 +59,14 @@ export const receiveAuth = (json): AReceiveAuth => ({
 	receivedAt: new Date()
 });
 
+export const ERROR_AUTH = 'ERROR_AUTH';
+interface AnErrorAuth {
+	type: typeof ERROR_AUTH
+}
+export const errorAuth = () => ({
+	type: ERROR_AUTH
+});
+
 export const attemptAuth = credentials => async dispatch => {
 	// TODO: Check validity / handle errors
 	await dispatch(requestAuth(credentials));
@@ -80,8 +82,14 @@ export const attemptAuth = credentials => async dispatch => {
 
 	// noinspection JSUnresolvedFunction
 	const response = await fetch(`${API_URL}/sessions`, fetchObject);
-	const json = await response.json();
-	await dispatch(receiveAuth(json));
+	if (response.ok) {
+		const json = await response.json();
+		await dispatch(receiveAuth(json));
+	} else {
+		message.error("Error signing in");
+		await dispatch(errorAuth());
+		handleError(response);
+	}
 };
 
 export type ActionTypesInvalidateAuth = ARequestInvalidateAuth | AReceiveInvalidateAuth;
