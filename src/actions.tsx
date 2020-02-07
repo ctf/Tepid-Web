@@ -205,67 +205,62 @@ export const receiveModifyQueue = (action: ModifyAction, putResponse: PutRespons
 	newQueue
 });
 
-const dispatchModifyQueue = (dispatch, action, queue, URL, fetchObject) => {
-	dispatch(requestModifyQueue(action, queue));
-	return fetch(URL, fetchObject)
-		.then(
-			response => {
-				if (response.ok) {
-					if (action === ModifyAction.DELETE) {
-						return {ok: true, id: queue._id}
-					}
-					return response.json()
-				} else {
-					handleError(response)
-				}
-			},
-		).then((body: PutResponse) => {
-			if (body.ok) {
-				if (action === ModifyAction.POST){
-					queue._id = body.id
-				}
-				dispatch(receiveModifyQueue(action, body, queue))
+const dispatchModifyQueue = async (dispatch, action, queue, URL, fetchObject) => {
+	await dispatch(requestModifyQueue(action, queue));
+	const response = await fetch(URL, fetchObject);
+
+	if (response.ok) {
+		if (action === ModifyAction.DELETE) {
+			return {ok: true, id: queue._id}
+		}
+		const json: PutResponse = await response.json();
+		if (json.ok) {
+			if (action === ModifyAction.POST){
+				queue._id = json.id
 			}
-		})
-};
-
-export const putQueue = (queue: PrintQueue) => {
-	return (dispatch, getState) => {
-		const state = getState();
-
-		const {action, URL} = queue._id === undefined ?
-			{action: ModifyAction.POST, URL: `${API_URL}/queues/`}
-			: {action: ModifyAction.PUT, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
-
-		const fetchObject = {
-			method: action,
-			headers: standardHeaders(state.auth),
-			body: JSON.stringify(queue)
-		};
-
-		return dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
+			await dispatch(receiveModifyQueue(action, json, queue))
+		}
+	} else {
+		handleError(response)
 	}
 };
 
-export const deleteQueue = (queue: PrintQueue) => {
-	return (dispatch, getState) => {
-		const state = getState();
+export const putQueue = (queue: PrintQueue) => async (dispatch, getState) => {
+	const state = getState();
 
-		if (queue._id === undefined) throw "no _id";
-		const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
+	const {action, URL} = queue._id === undefined
+		? {action: ModifyAction.POST, URL: `${API_URL}/queues/`}
+		: {action: ModifyAction.PUT, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
 
-		const fetchObject = {
-			method: 'DELETE',
-			headers: standardHeaders(state.auth),
-			body: JSON.stringify(queue)
-		};
+	const fetchObject = {
+		method: action,
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(queue)
+	};
 
-		return dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
-	}
+	return await dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
+};
+
+export const deleteQueue = (queue: PrintQueue) => async (dispatch, getState) => {
+	const state = getState();
+
+	if (queue._id === undefined) throw "no _id";
+	const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
+
+	const fetchObject = {
+		method: 'DELETE',
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(queue)
+	};
+
+	return await dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
 };
 
 // Destinations ----------------------------------------------------------------
-export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations | ARequestModifyDestination | AReceiveModifyDestination
+export type ActionTypesDestinations = ARequestDestinations
+	| AReceiveDestinations
+	| ARequestModifyDestination
+	| AReceiveModifyDestination
 
 export const REQUEST_DESTINATIONS = 'REQUEST_DESTINATIONS';
 interface ARequestDestinations {
@@ -334,7 +329,10 @@ interface ARequestModifyDestination {
 	destination: FullDestination,
 }
 
-export const requestModifyDestination = (action: ModifyAction, destination: FullDestination): ARequestModifyDestination => ({
+export const requestModifyDestination = (
+	action: ModifyAction,
+	destination: FullDestination
+): ARequestModifyDestination => ({
 	type: REQUEST_MODIFY_DESTINATION,
 	action,
 	destination,
@@ -349,71 +347,70 @@ interface AReceiveModifyDestination {
 	newDestination: FullDestination
 }
 
-export const receiveModifyDestination = (action: ModifyAction, putResponse: PutResponse, newDestination: FullDestination): AReceiveModifyDestination => ({
+export const receiveModifyDestination = (
+	action: ModifyAction,
+	putResponse: PutResponse,
+	newDestination: FullDestination
+): AReceiveModifyDestination => ({
 	type: RECEIVE_MODIFY_DESTINATION,
 	action,
 	putResponse,
 	newDestination
 });
 
-const dispatchModifyDestination = (dispatch, action, destination, URL, fetchObject) => {
-	dispatch(requestModifyDestination(action, destination));
-	return fetch(URL, fetchObject)
-		.then(
-			response => {
-				if (response.ok) {
-					if (action === ModifyAction.DELETE) {
-						return {ok: true, id: destination._id}
-					}
-					return response.json()
-				} else {
-					handleError(response)
-				}
-			},
-		).then((body: PutResponse) => {
-			if (body.ok) {
-				if (action === ModifyAction.POST){
-					destination._id = body.id
-				}
-				dispatch(receiveModifyDestination(action, body, destination))
+const dispatchModifyDestination = async (dispatch, action, destination, URL, fetchObject) => {
+	await dispatch(requestModifyDestination(action, destination));
+
+	const response = await fetch(URL, fetchObject);
+
+	if (response.ok) {
+		const body: PutResponse = action === ModifyAction.DELETE
+			? {ok: true, id: destination._id}
+			: (await response.json());
+		if (body.ok) {
+			if (action === ModifyAction.POST) {
+				destination._id = body.id;
 			}
-		})
-};
-
-
-export const putDestination = (destination: FullDestination) => {
-	return (dispatch, getState) => {
-		const state = getState();
-
-		const {action, URL} = destination._id === undefined ?
-			{action: ModifyAction.POST, URL: `${API_URL}/destinations/`}
-			: {action: ModifyAction.PUT, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
-
-		const fetchObject = {
-			method: action,
-			headers: standardHeaders(state.auth),
-			body: JSON.stringify(destination)
-		};
-
-		return dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
+			await dispatch(receiveModifyDestination(action, body, destination));
+		}
+	} else {
+		handleError(response)
 	}
 };
 
-export const deleteDestination = (destination: FullDestination) => {
-	return (dispatch, getState) => {
-		const state = getState();
 
-		if (destination._id === undefined) throw "no _id";
-		const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
+export const putDestination = (destination: FullDestination) => async (dispatch, getState) => {
+	const state = getState();
 
-		const fetchObject = {
-			method: 'DELETE',
-			headers: standardHeaders(state.auth),
-			body: JSON.stringify(destination)
-		};
+	const {action, URL} = destination._id === undefined
+		? {action: ModifyAction.POST, URL: `${API_URL}/destinations/`}
+		: {action: ModifyAction.PUT, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
 
-		return dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
-	}
+	const fetchObject = {
+		method: action,
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(destination)
+	};
+
+	await dispatchModifyDestination(dispatch, action, destination, URL, fetchObject);
+};
+
+export const deleteDestination = (destination: FullDestination) => async (dispatch, getState) => {
+	const state = getState();
+
+	if (destination._id === undefined) throw "no _id";
+	const {action, URL} = {
+		action: ModifyAction.DELETE,
+		URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`
+	};
+
+	const fetchObject = {
+		method: 'DELETE',
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(destination)
+	};
+
+	await dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
 };
 
 // Tickets ---------------------------------------------------------------------
@@ -953,7 +950,6 @@ export const doSetNick = (shortUser, salutation) => async (dispatch, getState) =
 
 	try {
 		const response = await fetch(`${API_URL}/users/${shortUser}/nick`, fetchObject);
-		const json = await response.json();  // TODO: Use this or discard it?
 		await dispatch(fetchAccount(state.auth, shortUser));
 	} catch (error) {
 		console.error(error);
