@@ -15,6 +15,7 @@ const mapStateToProps = (state, ownProps) => ({
 	shortUser: ownProps.match.params.shortUser
 		? ownProps.match.params.shortUser
 		: ownProps.shortUser,
+	accountsFetching: state.accounts.isFetching,
 	account: state.accounts.items[ownProps.match.params.shortUser
 		? ownProps.match.params.shortUser
 		: ownProps.shortUser],

@@ -28,21 +28,15 @@ function DestinationsPage({fetchNeededData}) {
 	);
 }
 
-const mapStateToProps = (state, ownProps) => {
-	return {
-		match: ownProps.match,
-		queues: state.destinations.items,
-		loading: state.destinations.isFetching || state.destinations.items.length === 0
-	};
-};
+const mapStateToProps = (state, ownProps) => ({
+	match: ownProps.match,
+	queues: state.destinations.items,
+	loading: state.destinations.isFetching || state.destinations.items.length === 0
+});
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		fetchNeededData: () => {
-			dispatch(fetchDestinationsIfNeeded());
-		}
-	};
-};
+const mapDispatchToProps = dispatch => ({
+	fetchNeededData: () => dispatch(fetchDestinationsIfNeeded())
+});
 
 const DestinationsPageContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(DestinationsPage));
 

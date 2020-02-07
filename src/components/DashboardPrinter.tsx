@@ -38,7 +38,7 @@ function AddTicketDialog({destination, ticket, modal}) {
 		>
 			<Form>
 				<Form.Item label={'Ticket'}>
-					<Input {...text}/>
+					<Input {...text} />
 				</Form.Item>
 			</Form>
 		</Modal>
@@ -66,7 +66,7 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 		fetchNeededData()
 	});
 
-	if (loadingDestinations) return (<div className="col"><Card loading={loadingDestinations}></Card></div>);
+	if (loadingDestinations) return (<div className="col"><Card loading={loadingDestinations} /></div>);
 
 	const queueDestinations = queue.destinations
 		.map(dest => destinations[dest])
@@ -111,7 +111,9 @@ function DashboardPrinter({queue, destinations, loadingDestinations, jobs, queue
 }
 
 const mapStateToProps = (state, ownProps) => {
-	const loading = state.queues.jobsByQueue[ownProps.queue._id] === undefined || state.queues.jobsByQueue[ownProps.queue._id].isFetching || state.destinations.isFetching;
+	const loading = state.queues.jobsByQueue[ownProps.queue._id] === undefined
+		|| state.queues.jobsByQueue[ownProps.queue._id].isFetching
+		|| state.destinations.isFetching;
 	const unloaded = state.queues.jobsByQueue[ownProps.queue._id].items.length === 0;
 
 	const loadingDestinations = Object.keys(state.destinations.items).length === 0;
@@ -122,18 +124,17 @@ const mapStateToProps = (state, ownProps) => {
 		destinations: state.destinations.items,
 		loading: unloaded || loading || loadingDestinations,
 		loadingDestinations: loadingDestinations,
-		loadingQueueJobs: unloaded || loading,
+		loadingQueueJobs: loading,
 		jobs: state.jobs
 	};
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		fetchNeededData: () => {
-			dispatch(fetchDestinationsIfNeeded()).then(() => dispatch(fetchQueueJobsIfNeeded(ownProps.queue._id)));
-		}
-	};
-};
+const mapDispatchToProps = (dispatch, ownProps) => ({
+	fetchNeededData: async () => {
+		await dispatch(fetchDestinationsIfNeeded());
+		await dispatch(fetchQueueJobsIfNeeded(ownProps.queue._id));
+	}
+});
 
 const DashboardPrinterContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(DashboardPrinter));
 

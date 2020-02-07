@@ -3,16 +3,16 @@ import React, {useEffect, useState} from 'react';
 import JobTable from './JobTable';
 import {DebounceInput} from "react-debounce-input";
 import useModal from "../hooks/useModal";
-import {Button, Form, Modal, Switch} from "antd";
+import {Button, Form, Modal, Skeleton, Switch} from "antd";
 
-function NoUserCard() {
+function UserStatusCard(content) {
 	return (
 		<div>
 			<div className="card no-padding">
 				<div className="user-profile">
 					<div className="row">
-						<div className="col no-padding no-borders">
-							<h2> Could not find user</h2>
+						<div className="col no-borders">
+							{content}
 						</div>
 					</div>
 				</div>
@@ -68,7 +68,7 @@ function QuotaBar({quota, maxQuota}) {
 				<div className="quota-label">Quota</div>
 				<div className={'quota-bar' + (quota === null ? ' loading' : '')}>
 					<div className="quota-inner-bar"
-						 style={{width: `${quota / maxQuota * 100}%`}}>
+						 style={{width: `calc(${quota / maxQuota * 100}% - 0.6rem)`}}>
 						<strong>{quota}</strong> pages remaining
 					</div>
 				</div>
@@ -103,17 +103,36 @@ function NickSetter({initialValue, placeHolder, onChange}) {
 	)
 }
 
-function Account({shortUser, account, jobs, auth, fetchNeededData, setColorPrinting, setExchangeStatus, setNick}) {
+const MONTHS = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December"
+];
+
+function Account({shortUser, account, accountsFetching, jobs, auth, fetchNeededData, setColorPrinting,
+					 setExchangeStatus, setNick}) {
 
 	useEffect(() => {
 		fetchNeededData(shortUser);
 	}, [shortUser]);
 
+	if (auth.isFetching || accountsFetching) {
+		return UserStatusCard(<div style={{padding: "1.2rem 1.8rem"}}>
+			<Skeleton />
+		</div>);
+	}
 
 	if (!account || !account.data._id) {
-		return (
-			NoUserCard()
-		)
+		return UserStatusCard(<h2>Could not find user</h2>);
 	}
 	const accountData = account.data;
 
@@ -123,6 +142,10 @@ function Account({shortUser, account, jobs, auth, fetchNeededData, setColorPrint
 	const role = accountData.role;
 	const canPrint = maxQuota > 0;
 	const isVolunteer = role === "ctfer" || role === "elder";
+	const registeredSince = (accountData.activeSince && accountData.activeSince > 0) ? (() => {
+		const d = new Date(accountData.activeSince);
+		return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+	})() : "Not Registered";
 	const paidFund = accountData.groups.reduce((acc, it) => acc || it.name === '000-21st Century Fund', false);
 	const isExchangeStudent = canPrint && !paidFund;
 
@@ -158,13 +181,17 @@ function Account({shortUser, account, jobs, auth, fetchNeededData, setColorPrint
 		badgeables.push('You!')
 	}
 
-	const badges = account === undefined
+	const badges = !account
 		? ''
 		: badgeables.map(badge => (<div className="badge" key={badge}>{badge}</div>));
 
-	const jobsElements = (account === undefined || jobs.isFetching) ? [] : account.jobs.items.map(it => jobs.items[it]);
+	const jobsLoading = !account || accountsFetching || jobs.isFetching;
+	const jobsElements = jobsLoading ? [] : account.jobs.items.map(it => jobs.items[it]);
 	const jobTable = canPrint ? (
-		<JobTable loading={jobsElements.length === 0} jobs={jobsElements} showUser={false} canRefund={permissionIsVolunteer}/>) : '';
+		<JobTable loading={jobsLoading}
+				  jobs={jobsElements}
+				  showUser={false}
+				  canRefund={permissionIsVolunteer} />) : '';
 
 	const handleSetColorPrinting = (colorEnabled) => {
 		setColorPrinting(accountData.shortUser, colorEnabled)
@@ -196,20 +223,19 @@ function Account({shortUser, account, jobs, auth, fetchNeededData, setColorPrint
 							<div className="col">
 								<strong>Short Username:</strong> {accountData.shortUser} <br/>
 								<strong>Long Username:</strong> {accountData.longUser} <br/>
-								<strong>Current Status:</strong> Active <br/>
-								<strong>Student Since:</strong> May 2015 <br/>
+								<strong>Registered Since:</strong> {registeredSince} <br/>
 								User <strong>has {paidFund ? '' : 'not '}</strong>paid into the 21st Century Fund
 							</div>
 							<div className="col">
-								<Form layout={"inline"}>
+								<Form layout="inline">
 									<NickSetter initialValue={accountData.nick}
 												placeHolder={accountData.salutation}
-												onChange={handleSetNick}/>
+												onChange={handleSetNick} />
 									<strong>Jobs Expire After:</strong> 1 Week <br/>
 									<ToggleColorSwitch value={accountData.colorPrinting}
-													   setColourPrinting={handleSetColorPrinting}/>
+													   setColourPrinting={handleSetColorPrinting} />
 									<ToggleExchangeSwitch value={isExchangeStudent} onChange={handleSetExchange}
-														  disabled={!permissionCanSetExchange}/>
+														  disabled={!permissionCanSetExchange} />
 								</Form>
 							</div>
 						</div>

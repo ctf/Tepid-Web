@@ -1,9 +1,11 @@
 import fetch from 'cross-fetch';
 
+import {message} from "antd";
+
 import {buildToken} from './tepid-utils';
 import {Destination, FullDestination, PrintJob, PrintQueue, PutResponse, QuotaData, User} from "./models";
 
-export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://localhost:8443/tepid';
+export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://testpid.science.mcgill.ca:8443/tepid';
 
 const authHeader = (auth) => ({
 	'Authorization': `Token ${buildToken(auth)}`
@@ -18,7 +20,7 @@ const standardHeaders = (auth) => ({
 export enum ModifyAction { POST = 'POST', PUT = 'PUT', DELETE = 'DELETE' }
 
 // Auth ------------------------------------------------------------------------
-export type ActionTypesAuth = ARequestAuth | AReceiveAuth
+export type ActionTypesAuth = ARequestAuth | AReceiveAuth | AnErrorAuth;
 
 export const REQUEST_AUTH = 'REQUEST_AUTH';
 interface ARequestAuth {
@@ -36,7 +38,7 @@ export const requestAuth = (credentials): ARequestAuth => ({
 export const RECEIVE_AUTH = 'RECEIVE_AUTH';
 interface AReceiveAuth {
 	type: typeof RECEIVE_AUTH,
-	user: string,
+	user: User,
 	role: string,
 	session: {
 		id: string,
@@ -57,25 +59,37 @@ export const receiveAuth = (json): AReceiveAuth => ({
 	receivedAt: new Date()
 });
 
-export const attemptAuth = function (credentials) {
-	return dispatch => {
-		// TODO: Check validity / handle errors
-		dispatch(requestAuth(credentials));
+export const ERROR_AUTH = 'ERROR_AUTH';
+interface AnErrorAuth {
+	type: typeof ERROR_AUTH
+}
+export const errorAuth = () => ({
+	type: ERROR_AUTH
+});
 
-		let fetchObject = {
-			method: 'POST',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({...credentials})
-		};
+export const attemptAuth = credentials => async dispatch => {
+	// TODO: Check validity / handle errors
+	await dispatch(requestAuth(credentials));
 
-		// noinspection JSUnresolvedFunction
-		return fetch(`${API_URL}/sessions`, fetchObject)
-			.then(response => response.json())
-			.then(json => dispatch(receiveAuth(json)));
+	const fetchObject = {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({...credentials})
 	};
+
+	// noinspection JSUnresolvedFunction
+	const response = await fetch(`${API_URL}/sessions`, fetchObject);
+	if (response.ok) {
+		const json = await response.json();
+		await dispatch(receiveAuth(json));
+	} else {
+		message.error("Error signing in");
+		await dispatch(errorAuth());
+		handleError(response);
+	}
 };
 
 export type ActionTypesInvalidateAuth = ARequestInvalidateAuth | AReceiveInvalidateAuth;
@@ -83,42 +97,32 @@ export const REQUEST_INVALIDATE_AUTH = 'REQUEST_INVALIDATE_AUTH';
 interface ARequestInvalidateAuth {
 	type: typeof REQUEST_INVALIDATE_AUTH,
 }
-export const requestInvalidateAuth = (): ARequestInvalidateAuth => {
-	return ({
-		type: REQUEST_INVALIDATE_AUTH
-	});
-};
+export const requestInvalidateAuth = (): ARequestInvalidateAuth => ({
+	type: REQUEST_INVALIDATE_AUTH
+});
 
 export const RECEIVE_INVALIDATE_AUTH = 'RECEIVE_INVALIDATE_AUTH';
 interface AReceiveInvalidateAuth {
 	type: typeof RECEIVE_INVALIDATE_AUTH,
 	success: boolean,
 }
-export const receiveInvalidateAuth = (success): AReceiveInvalidateAuth => {
-	return ({
-		type: RECEIVE_INVALIDATE_AUTH,
-		success
-	});
-};
+export const receiveInvalidateAuth = (success): AReceiveInvalidateAuth => ({
+	type: RECEIVE_INVALIDATE_AUTH,
+	success
+});
 
-export const invalidateAuth = () => {
-	return (dispatch, getState) => {
-		const state = getState();
-
-		const fetchObject = {
-			method: 'DELETE',
-			headers: authHeader(state.auth),
-		};
-
-		dispatch(requestInvalidateAuth());
-		return fetch(`${API_URL}/sessions/${state.auth.session.id}`, fetchObject)
-			.then(
-				response => response,
-				error => handleError(error),
-			).then((response) => {
-				dispatch(receiveInvalidateAuth(response["ok"]))
-			})
-
+export const invalidateAuth = () => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'DELETE',
+		headers: authHeader(state.auth),
+	};
+	try {
+		await dispatch(requestInvalidateAuth());
+		const response = await fetch(`${API_URL}/sessions/${state.auth.session.id}`, fetchObject);
+		await dispatch(receiveInvalidateAuth(response.ok));
+	} catch (error) {
+		handleError(error);  // TODO: ActionshouldFetchQueueJobs
 	}
 };
 
@@ -153,31 +157,22 @@ export const invalidateQueues = () => ({
 	type: INVALIDATE_QUEUES
 });
 
-const fetchQueues = () => dispatch => {
-	dispatch(requestQueues);
+const fetchQueues = () => async dispatch => {
+	await dispatch(requestQueues);
 	// noinspection JSUnresolvedFunction
-	return fetch(`${API_URL}/queues`)
-		.then(response => response.json())
-		.then(json => dispatch(receiveQueues(json)))
+	const response = await fetch(`${API_URL}/queues`);
+	const json = await response.json();
+	await dispatch(receiveQueues(json));
 };
 
 const shouldFetchQueues = state => {
 	const queues = state.queues;
-	if (queues.isFetching) {
-		return false;
-	} else if (Object.keys(queues.items).length === 0) {
-		return true;
-	} else {
-		return queues.didInvalidate;
-	}
+	return !queues.isFetching && (queues.items.length === 0 || queues.didInvalidate);
 };
 
-export const fetchQueuesIfNeeded = () => (dispatch, getState) => {
-	if (shouldFetchQueues(getState())) {
-		return dispatch(fetchQueues());
-	} else {
-		return Promise.resolve();
-	}
+export const fetchQueuesIfNeeded = () => async (dispatch, getState) => {
+	if (!shouldFetchQueues(getState())) return;
+	await dispatch(fetchQueues());
 };
 
 export const REQUEST_MODIFY_QUEUE = 'REQUEST_MODIFY_QUEUE';
@@ -210,67 +205,62 @@ export const receiveModifyQueue = (action: ModifyAction, putResponse: PutRespons
 	newQueue
 });
 
-const dispatchModifyQueue = (dispatch, action, queue, URL, fetchObject) => {
-	dispatch(requestModifyQueue(action, queue));
-	return fetch(URL, fetchObject)
-		.then(
-			response => {
-				if (response.ok) {
-					if (action === ModifyAction.DELETE) {
-						return {ok: true, id: queue._id}
-					}
-					return response.json()
-				} else {
-					handleError(response)
-				}
-			},
-		).then((body: PutResponse) => {
-			if (body.ok) {
-				if (action === ModifyAction.POST){
-					queue._id = body.id
-				}
-				dispatch(receiveModifyQueue(action, body, queue))
+const dispatchModifyQueue = async (dispatch, action, queue, URL, fetchObject) => {
+	await dispatch(requestModifyQueue(action, queue));
+	const response = await fetch(URL, fetchObject);
+
+	if (response.ok) {
+		if (action === ModifyAction.DELETE) {
+			return {ok: true, id: queue._id}
+		}
+		const json: PutResponse = await response.json();
+		if (json.ok) {
+			if (action === ModifyAction.POST){
+				queue._id = json.id
 			}
-		})
-};
-
-export const putQueue = (queue: PrintQueue) => {
-	return (dispatch, getState) => {
-		const state = getState();
-
-		const {action, URL} = queue._id === undefined ?
-			{action: ModifyAction.POST, URL: `${API_URL}/queues/`}
-			: {action: ModifyAction.PUT, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
-
-		const fetchObject = {
-			method: action,
-			headers: standardHeaders(state.auth),
-			body: JSON.stringify(queue)
-		};
-
-		return dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
+			await dispatch(receiveModifyQueue(action, json, queue))
+		}
+	} else {
+		handleError(response)
 	}
 };
 
-export const deleteQueue = (queue: PrintQueue) => {
-	return (dispatch, getState) => {
-		const state = getState();
+export const putQueue = (queue: PrintQueue) => async (dispatch, getState) => {
+	const state = getState();
 
-		if (queue._id === undefined) throw "no _id";
-		const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
+	const {action, URL} = queue._id === undefined
+		? {action: ModifyAction.POST, URL: `${API_URL}/queues/`}
+		: {action: ModifyAction.PUT, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
 
-		const fetchObject = {
-			method: 'DELETE',
-			headers: standardHeaders(state.auth),
-			body: JSON.stringify(queue)
-		};
+	const fetchObject = {
+		method: action,
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(queue)
+	};
 
-		return dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
-	}
+	return await dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
+};
+
+export const deleteQueue = (queue: PrintQueue) => async (dispatch, getState) => {
+	const state = getState();
+
+	if (queue._id === undefined) throw "no _id";
+	const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/queues/${encodeURIComponent(queue._id)}`};
+
+	const fetchObject = {
+		method: 'DELETE',
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(queue)
+	};
+
+	return await dispatchModifyQueue(dispatch, action, queue, URL, fetchObject)
 };
 
 // Destinations ----------------------------------------------------------------
-export type ActionTypesDestinations = ARequestDestinations | AReceiveDestinations | ARequestModifyDestination | AReceiveModifyDestination
+export type ActionTypesDestinations = ARequestDestinations
+	| AReceiveDestinations
+	| ARequestModifyDestination
+	| AReceiveModifyDestination
 
 export const REQUEST_DESTINATIONS = 'REQUEST_DESTINATIONS';
 interface ARequestDestinations {
@@ -292,8 +282,8 @@ export const receiveDestinations = (json): AReceiveDestinations => ({
 	receivedAt: new Date()
 });
 
-const fetchDestinations = auth => dispatch => {
-	dispatch(requestDestinations());
+const fetchDestinations = auth => async dispatch => {
+	await dispatch(requestDestinations());
 
 	const fetchObject = {
 		method: 'GET',
@@ -304,38 +294,30 @@ const fetchDestinations = auth => dispatch => {
 	};
 
 	// noinspection JSUnresolvedFunction
-	return fetch(`${API_URL}/destinations`, fetchObject)
-		.then(response => {
-			if (response.status === 401) {
-				dispatch(invalidateAuth()); // To be used for redirection
-				return [];
-			} else if (!response.ok) {
-				// TODO: Handle error better
-				console.error(response);
-				return [];
-			}
-			return response.json();
-		})
-		.then(json => dispatch(receiveDestinations(json)));
+	const response = await fetch(`${API_URL}/destinations`, fetchObject);
+
+	if (response.status === 401) {
+		await dispatch(invalidateAuth()); // To be used for redirection
+		return;
+	} else if (!response.ok) {
+		// TODO: Handle error better
+		console.error(response);
+		return;
+	}
+
+	const json = await response.json();
+	await dispatch(receiveDestinations(json));
 };
 
 const shouldFetchDestinations = state => {
 	const destinations = state.destinations;
-	if (destinations.isFetching) {
-		return false;
-	} else if (Object.keys(destinations.items).length === 0) {
-		return true;
-	} else {
-		return destinations.didInvalidate;
-	}
+	return !destinations.isFetching && (Object.keys(destinations.items).length === 0 || destinations.didInvalidate);
 };
 
-export const fetchDestinationsIfNeeded = () => (dispatch, getState) => {
+export const fetchDestinationsIfNeeded = () => async (dispatch, getState) => {
 	const state = getState();
 	if (shouldFetchDestinations(state)) {
-		return dispatch(fetchDestinations(state.auth));
-	} else {
-		return Promise.resolve();
+		await dispatch(fetchDestinations(state.auth));
 	}
 };
 
@@ -347,7 +329,10 @@ interface ARequestModifyDestination {
 	destination: FullDestination,
 }
 
-export const requestModifyDestination = (action: ModifyAction, destination: FullDestination): ARequestModifyDestination => ({
+export const requestModifyDestination = (
+	action: ModifyAction,
+	destination: FullDestination
+): ARequestModifyDestination => ({
 	type: REQUEST_MODIFY_DESTINATION,
 	action,
 	destination,
@@ -362,71 +347,70 @@ interface AReceiveModifyDestination {
 	newDestination: FullDestination
 }
 
-export const receiveModifyDestination = (action: ModifyAction, putResponse: PutResponse, newDestination: FullDestination): AReceiveModifyDestination => ({
+export const receiveModifyDestination = (
+	action: ModifyAction,
+	putResponse: PutResponse,
+	newDestination: FullDestination
+): AReceiveModifyDestination => ({
 	type: RECEIVE_MODIFY_DESTINATION,
 	action,
 	putResponse,
 	newDestination
 });
 
-const dispatchModifyDestination = (dispatch, action, destination, URL, fetchObject) => {
-	dispatch(requestModifyDestination(action, destination));
-	return fetch(URL, fetchObject)
-		.then(
-			response => {
-				if (response.ok) {
-					if (action === ModifyAction.DELETE) {
-						return {ok: true, id: destination._id}
-					}
-					return response.json()
-				} else {
-					handleError(response)
-				}
-			},
-		).then((body: PutResponse) => {
-			if (body.ok) {
-				if (action === ModifyAction.POST){
-					destination._id = body.id
-				}
-				dispatch(receiveModifyDestination(action, body, destination))
+const dispatchModifyDestination = async (dispatch, action, destination, URL, fetchObject) => {
+	await dispatch(requestModifyDestination(action, destination));
+
+	const response = await fetch(URL, fetchObject);
+
+	if (response.ok) {
+		const body: PutResponse = action === ModifyAction.DELETE
+			? {ok: true, id: destination._id}
+			: (await response.json());
+		if (body.ok) {
+			if (action === ModifyAction.POST) {
+				destination._id = body.id;
 			}
-		})
-};
-
-
-export const putDestination = (destination: FullDestination) => {
-	return (dispatch, getState) => {
-		const state = getState();
-
-		const {action, URL} = destination._id === undefined ?
-			{action: ModifyAction.POST, URL: `${API_URL}/destinations/`}
-			: {action: ModifyAction.PUT, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
-
-		const fetchObject = {
-			method: action,
-			headers: standardHeaders(state.auth),
-			body: JSON.stringify(destination)
-		};
-
-		return dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
+			await dispatch(receiveModifyDestination(action, body, destination));
+		}
+	} else {
+		handleError(response)
 	}
 };
 
-export const deleteDestination = (destination: FullDestination) => {
-	return (dispatch, getState) => {
-		const state = getState();
 
-		if (destination._id === undefined) throw "no _id";
-		const {action, URL} = {action: ModifyAction.DELETE, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
+export const putDestination = (destination: FullDestination) => async (dispatch, getState) => {
+	const state = getState();
 
-		const fetchObject = {
-			method: 'DELETE',
-			headers: standardHeaders(state.auth),
-			body: JSON.stringify(destination)
-		};
+	const {action, URL} = destination._id === undefined
+		? {action: ModifyAction.POST, URL: `${API_URL}/destinations/`}
+		: {action: ModifyAction.PUT, URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`};
 
-		return dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
-	}
+	const fetchObject = {
+		method: action,
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(destination)
+	};
+
+	await dispatchModifyDestination(dispatch, action, destination, URL, fetchObject);
+};
+
+export const deleteDestination = (destination: FullDestination) => async (dispatch, getState) => {
+	const state = getState();
+
+	if (destination._id === undefined) throw "no _id";
+	const {action, URL} = {
+		action: ModifyAction.DELETE,
+		URL: `${API_URL}/destinations/${encodeURIComponent(destination._id)}`
+	};
+
+	const fetchObject = {
+		method: 'DELETE',
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(destination)
+	};
+
+	await dispatchModifyDestination(dispatch, action, destination, URL, fetchObject)
 };
 
 // Tickets ---------------------------------------------------------------------
@@ -463,43 +447,41 @@ export const confirmDestinationTicket = (destination, ticket, up) => ({
 	destination,
 });
 
-const doManageDestinationTicket = (destination, up, reason) => {
-	return (dispatch, getState) => {
-		const state = getState();
 
-		const ticket = {
-			up: up,
-			reason,
-		};
-		const fetchObject = {
-			method: 'POST',
-			headers: standardHeaders(state.auth),
-			body: JSON.stringify(ticket)
-		};
+const parseTicketUpdateToStatus = (response) => {
+	const match = response.match(/.* marked as (.*)/)[1];
+	if (match === 'up') return true;
+	if (match === 'down') return false;
+	return null;
+};
 
-		dispatch(manageDestinationTicket(destination, ticket));
-		return fetch(`${API_URL}/destinations/${encodeURIComponent(destination._id)}/ticket`, fetchObject)
-			.then(
-				response => {
-					if (response.ok) {
-						return response.json()
-					} else {
-						handleError(null)
-					}
-				},
-			).then((body: PutResponse) => {
-				if (body.ok) {
-					dispatch(confirmDestinationTicket(destination, ticket, ticket.up))
-				}
-			})
+const doManageDestinationTicket = (destination, up, reason) => async (dispatch, getState) => {
+	const state = getState();
+
+	const ticket = {up, reason};
+	const fetchObject = {
+		method: 'POST',
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(ticket)
+	};
+
+	await dispatch(manageDestinationTicket(destination, ticket));
+	try {
+		const response = await fetch(`${API_URL}/destinations/${encodeURIComponent(destination._id)}`,
+			fetchObject);
+		const body = await response.text();
+		const status = parseTicketUpdateToStatus(body);
+		if (status !== null) {
+			await dispatch(confirmDestinationTicket(destination, ticket, status))
+		}
+	} catch (error) {
+		handleError(error);
 	}
 };
-export const submitDestinationTicket = (destination, reason) => {
-	return doManageDestinationTicket(destination, false, reason)
-};
-export const resolveDestinationTicket = (destination) => {
-	return doManageDestinationTicket(destination, true, '')
-};
+export const submitDestinationTicket = (destination, reason) =>
+	doManageDestinationTicket(destination, false, reason);
+export const resolveDestinationTicket = (destination) =>
+	doManageDestinationTicket(destination, true, '');
 
 
 // Jobs ------------------------------------------------------------------------
@@ -532,8 +514,8 @@ export const receiveQueueJobs = (queue, json) => ({
 	receivedAt: new Date(),
 });
 
-const fetchQueueJobs = (auth, queueName, limit = -1) => dispatch => {
-	dispatch(requestQueueJobs(queueName));
+const fetchQueueJobs = (auth, queueId, limit = -1) => async dispatch => {
+	await dispatch(requestQueueJobs(queueId));
 
 	const fetchObject = {
 		method: 'GET',
@@ -544,20 +526,21 @@ const fetchQueueJobs = (auth, queueName, limit = -1) => dispatch => {
 	};
 
 	// noinspection JSUnresolvedFunction
-	return fetch(`${API_URL}/queues/${queueName}/jobs`, fetchObject)
-		.then(response => {
-			if (response.status === 401) {
-				dispatch(invalidateAuth()); // To be used for redirection
-				return [];
-			} else if (!response.ok) {
-				// TODO: Handle error better
-				console.error(response);
-				return [];
-			}
-			return response.json();
-		})
-		.then(json => dispatch(receiveQueueJobs(queueName, json)));
+
+	const response = await fetch(`${API_URL}/queues/${queueId}/jobs`, fetchObject);
+	if (response.status === 401) {
+		await dispatch(invalidateAuth()); // To be used for redirection
+		return;
+	} else if (!response.ok) {
+		// TODO: Handle error better
+		console.error(response);
+		return;
+	}
+	const json = await response.json();
+	await dispatch(receiveQueueJobs(queueId, json));
 };
+
+const QUEUE_DELAY = 10000;  // 10 seconds
 
 const shouldFetchQueueJobs = (state, queueId) => {
 	if (Object.keys(state.queues.jobsByQueue).length === 0) {
@@ -565,34 +548,35 @@ const shouldFetchQueueJobs = (state, queueId) => {
 		return false;
 	}
 	const queueJobs = state.queues.jobsByQueue[queueId];
-	if (queueJobs.isFetching) {
-		return false;
-	} else if (queueJobs.items.length === 0) {
-		return true;
-	} else {
-		return queueJobs.didInvalidate;
-	}
+	const timeSinceLastUpdate = queueJobs.lastUpdated
+		? (new Date()).getTime() - queueJobs.lastUpdated.getTime()
+		: QUEUE_DELAY + 1;
+	return !queueJobs.isFetching &&
+		((queueJobs.items.length === 0 && timeSinceLastUpdate > QUEUE_DELAY)
+			|| queueJobs.didInvalidate);
 };
 
-export const fetchQueueJobsIfNeeded = (queueId) => (dispatch, getState) => {
-	return dispatch(fetchQueuesIfNeeded()).then(() => {
-		const state = getState();
-		if (shouldFetchQueueJobs(state, queueId)) {
-			return dispatch(fetchQueueJobs(state.auth, queueId));
-		} else {
-			return Promise.resolve();
-		}
-	});
+export const fetchQueueJobsIfNeeded = (queueId) => async (dispatch, getState) => {
+	await dispatch(fetchQueuesIfNeeded());
+	const state = getState();
+	if (shouldFetchQueueJobs(state, queueId)) {
+		await dispatch(fetchQueueJobs(state.auth, queueId));
+	}
 };
 
 
 export const fetchAllQueueJobsIfNeeded = () => (dispatch, getState) => {
 	const state = getState();
-	return Promise.all(Object.values(state.queues.items).map((queue: PrintQueue) => dispatch(fetchQueueJobsIfNeeded(queue._id))));
+	return Promise.all(Object.values(state.queues.items)
+		.map((queue: PrintQueue) => dispatch(fetchQueueJobsIfNeeded(queue._id))));
 };
 
 // -- Job Actions --------------------------------------------------------------
-export type ActionTypesJobActions = AAddJob | ARequestJobRefunded | AReceiveJobRefunded | ARequestJobReprint | AReceiveJobReprint
+export type ActionTypesJobActions = AAddJob
+	| ARequestJobRefunded
+	| AReceiveJobRefunded
+	| ARequestJobReprint
+	| AReceiveJobReprint;
 
 export const ADD_JOB = 'ADD_JOB';
 interface AAddJob {
@@ -628,26 +612,22 @@ export const receiveJobRefunded = (jobId, ok = false) => ({
 	ok,
 });
 
-export const doSetJobRefunded = (job, refunded) => {
-	return (dispatch, getState) => {
-		const state = getState();
-		const fetchObject = {
-			method: 'PUT',
-			headers: standardHeaders(state.auth),
-			body: refunded.toString()
-		};
+export const doSetJobRefunded = (job, refunded) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'PUT',
+		headers: standardHeaders(state.auth),
+		body: refunded.toString()
+	};
 
-		dispatch(requestJobRefunded(job._id, refunded));
+	await dispatch(requestJobRefunded(job._id, refunded));
 
-
-		return fetch(`${API_URL}/jobs/${job._id}/refunded`, fetchObject)
-			.then(
-				response => response.json(),
-				error => handleError(error)
-			).then((json) => {
-					dispatch(receiveJobRefunded(job._id, json.ok));
-				}
-			)
+	try {
+		const response = await fetch(`${API_URL}/jobs/job/${job._id}/refunded`, fetchObject);
+		const json = await response.json();
+		await dispatch(receiveJobRefunded(job._id, json.ok));
+	} catch (error) {
+		handleError(error);
 	}
 };
 
@@ -677,31 +657,29 @@ export const receiveJobReprint = (jobId, ok) => ({
 	ok
 });
 
-export const doJobReprint = (job: PrintJob) => {
-	return (dispatch, getState) => {
-		const state = getState();
-		const fetchObject = {
-			method: 'POST',
-			headers: standardHeaders(state.auth),
-		};
+export const doJobReprint = (job: PrintJob) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'POST',
+		headers: standardHeaders(state.auth),
+	};
 
-		dispatch(requestJobReprint(job._id));
+	await dispatch(requestJobReprint(job._id));
 
-		return fetch(`${API_URL}/jobs/${job._id}/reprint`, fetchObject)
-			.then(
-				response => {
-					if (response.ok) {
-						return response.json()
-					} else {
-						handleError(response)
-					}
-				})
-			.then(json => {
-				dispatch(receiveJobReprint(job._id, json.ok));
-				dispatch(fetchAccountJobs(state.auth, job.userIdentification));
-				dispatch(fetchQueueJobs(state.auth, job.queueId));
-			})
+	const response = await fetch(`${API_URL}/jobs/${job._id}/reprint`, fetchObject);
+
+	if (!response.ok) {
+		handleError(response);
+		return;
 	}
+
+	const json = await response.json();
+
+	await Promise.all([
+		dispatch(receiveJobReprint(job._id, json.ok)),
+		dispatch(fetchAccountJobs(state.auth, job.userIdentification)),
+		dispatch(fetchQueueJobs(state.auth, job.queueId)),
+	]);
 };
 
 
@@ -732,8 +710,8 @@ export const receiveAccount = (shortUser, json): AReceiveAccount => ({
 	receivedAt: new Date()
 });
 
-const fetchAccount = (auth, shortUser) => dispatch => {
-	dispatch(requestAccount(shortUser));
+const fetchAccount = (auth, shortUser) => async dispatch => {
+	await dispatch(requestAccount(shortUser));
 
 	const fetchObject = {
 		method: 'GET',
@@ -744,36 +722,30 @@ const fetchAccount = (auth, shortUser) => dispatch => {
 	};
 
 	// noinspection JSUnresolvedFunction
-	return fetch(`${API_URL}/users/${shortUser}`, fetchObject)
-		.then(response => {
-			if (response.status === 401) {
-				dispatch(invalidateAuth()); // To be used for redirection
-				return [];
-			} else if (!response.ok) {
-				// TODO: Handle error better
-				console.error(response);
-				return [];
-			}
-			return response.json();
-		})
-		.then(json => dispatch(receiveAccount(shortUser, json)));
+	const response = await fetch(`${API_URL}/users/${shortUser}`, fetchObject);
+
+	if (response.status === 401) {
+		await dispatch(invalidateAuth()); // To be used for redirection
+		return;
+	} else if (!response.ok) {
+		// TODO: Handle error better
+		console.error(response);
+		return;
+	}
+
+	const json = await response.json();
+	await dispatch(receiveAccount(shortUser, json));
 };
 
 const shouldFetchAccount = (state, shortUser) => {
 	const accounts = state.accounts.items;
-	if (!Object.keys(accounts).includes(shortUser)) {
-		return true;
-	} else {
-		return accounts[shortUser].didInvalidate;
-	}
+	return !Object.keys(accounts).includes(shortUser) || accounts[shortUser].didInvalidate;
 };
 
-export const fetchAccountIfNeeded = shortUser => (dispatch, getState) => {
+export const fetchAccountIfNeeded = shortUser => async (dispatch, getState) => {
 	const state = getState();
 	if (shouldFetchAccount(state, shortUser)) {
-		return dispatch(fetchAccount(state.auth, shortUser));
-	} else {
-		return Promise.resolve();
+		await dispatch(fetchAccount(state.auth, shortUser));
 	}
 };
 
@@ -801,8 +773,8 @@ export const receiveAccountQuota = (shortUser, quota) => ({
 	receivedAt: new Date()
 });
 
-const fetchAccountQuota = (auth, shortUser) => dispatch => {
-	dispatch(requestAccountQuota(shortUser));
+const fetchAccountQuota = (auth, shortUser) => async dispatch => {
+	await dispatch(requestAccountQuota(shortUser));
 
 	const fetchObject = {
 		method: 'GET',
@@ -813,40 +785,32 @@ const fetchAccountQuota = (auth, shortUser) => dispatch => {
 	};
 
 	// noinspection JSUnresolvedFunction
-	return fetch(`${API_URL}/users/${shortUser}/quota`, fetchObject)
-		.then(response => {
-			if (response.status === 401) {
-				dispatch(invalidateAuth()); // To be used for redirection
-				return [];
-			} else if (!response.ok) {
-				// TODO: Handle error better
-				console.error(response);
-				return [];
-			}
-			return response.json();
-		})
-		.then(json => dispatch(receiveAccountQuota(shortUser, json)));
+	const response = await fetch(`${API_URL}/users/${shortUser}/quota`, fetchObject);
+	if (response.status === 401) {
+		await dispatch(invalidateAuth()); // To be used for redirection
+		return;
+	} else if (!response.ok) {
+		// TODO: Handle error better
+		handleError(response);
+		return;
+	}
+	const json = await response.json();
+	await dispatch(receiveAccountQuota(shortUser, json));
 };
 
 const shouldFetchAccountQuota = (state, shortUser) => {
 	const accounts = state.accounts.items;
-	if (!Object.keys(accounts).includes(shortUser)) {
-		return false;
-	} else if (accounts[shortUser].quota.isFetching) {
-		return false;
-	} else if (!accounts[shortUser].quota.amount) { // TODO: Expiry time
-		return true;
-	} else {
-		return accounts[shortUser].quota.didInvalidate;
-	}
+	return Object.keys(accounts).includes(shortUser)
+		&& !accounts[shortUser].quota.isFetching && (
+			!accounts[shortUser].quota.amount  // Quota is 0; TODO: Expiry time
+			|| accounts[shortUser].quota.didInvalidate
+		);
 };
 
-export const fetchAccountQuotaIfNeeded = shortUser => (dispatch, getState) => {
+export const fetchAccountQuotaIfNeeded = shortUser => async (dispatch, getState) => {
 	const state = getState();
 	if (shouldFetchAccountQuota(state, shortUser)) {
-		return dispatch(fetchAccountQuota(state.auth, shortUser));
-	} else {
-		return Promise.resolve();
+		await dispatch(fetchAccountQuota(state.auth, shortUser));
 	}
 };
 
@@ -876,8 +840,8 @@ export const receiveAccountJobs = (shortUser, jobs) => ({
 	receivedAt: new Date()
 });
 
-const fetchAccountJobs = (auth, shortUser) => dispatch => {
-	dispatch(requestAccountJobs(shortUser));
+const fetchAccountJobs = (auth, shortUser) => async dispatch => {
+	await dispatch(requestAccountJobs(shortUser));
 	const fetchObject = {
 		method: 'GET',
 		headers: {
@@ -887,19 +851,18 @@ const fetchAccountJobs = (auth, shortUser) => dispatch => {
 	};
 
 	// noinspection JSUnresolvedFunction
-	return fetch(`${API_URL}/users/${shortUser}/jobs`, fetchObject)
-		.then(response => {
-			if (response.status === 401) {
-				dispatch(invalidateAuth()); // To be used for redirection
-				return [];
-			} else if (!response.ok) {
-				// TODO: Handle error better
-				console.error(response);
-				return [];
-			}
-			return response.json();
-		})
-		.then(json => dispatch(receiveAccountJobs(shortUser, json)));
+	const response = await fetch(`${API_URL}/users/${shortUser}/jobs`, fetchObject);
+
+	if (response.status === 401) {
+		await dispatch(invalidateAuth()); // To be used for redirection
+		return;
+	} else if (!response.ok) {
+		// TODO: Handle error better
+		console.error(response);
+		return;
+	}
+	const json = await response.json();
+	await dispatch(receiveAccountJobs(shortUser, json));
 };
 
 const shouldFetchAccountJobs = (state, shortUser) => {
@@ -915,94 +878,81 @@ const shouldFetchAccountJobs = (state, shortUser) => {
 	}
 };
 
-export const fetchAccountJobsIfNeeded = shortUser => (dispatch, getState) => {
+export const fetchAccountJobsIfNeeded = shortUser => async (dispatch, getState) => {
 	const state = getState();
 	if (shouldFetchAccountJobs(state, shortUser)) {
-		return dispatch(fetchAccountJobs(state.auth, shortUser));
-	} else {
-		return Promise.resolve();
+		await dispatch(fetchAccountJobs(state.auth, shortUser));
 	}
 };
 
-export const fetchAccountAndRelatedDataIfNeeded = shortUser => (dispatch, getState) => {
-	dispatch(fetchAccountIfNeeded(shortUser))
-		.then(() => {
-				Promise.all([
-					dispatch(fetchAccountQuotaIfNeeded(shortUser)),
-					dispatch(fetchAccountJobsIfNeeded(shortUser)),
-					dispatch(fetchDestinationsIfNeeded()),
-				])
-			}
-		)
+export const fetchAccountAndRelatedDataIfNeeded = shortUser => async dispatch => {
+	await dispatch(fetchAccountIfNeeded(shortUser));
+	await Promise.all([
+		dispatch(fetchAccountQuotaIfNeeded(shortUser)),
+		dispatch(fetchAccountJobsIfNeeded(shortUser)),
+		dispatch(fetchDestinationsIfNeeded()),
+	]);
 };
 
 function handleError(error) {
-	console.log("!!!!!!!!" + error)
+	console.log("!!!!!!!!" + error);
 }
 
-export const doSetColorPrinting = (shortUser, enabled) => {
-	return (dispatch, getState) => {
-		const state = getState();
-		const fetchObject = {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'text/plain',
-				'Accept': 'application/json',
-				'Authorization': `Token ${buildToken(state.auth)}`
-			},
-			body: enabled.toString()
-			// body: JSON.stringify(enabled)
-		};
-		return fetch(`${API_URL}/users/${shortUser}/color`, fetchObject)
-			.then(
-				response => response.json(),
-				error => handleError(error)
-			).then(() => {
-					dispatch(fetchAccount(state.auth, shortUser))
-				}
-			)
+export const doSetColorPrinting = (shortUser, enabled) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'text/plain',
+			'Accept': 'application/json',
+			'Authorization': `Token ${buildToken(state.auth)}`
+		},
+		body: enabled.toString()
+	};
+
+	try {
+		const response = await fetch(`${API_URL}/users/${shortUser}/color`, fetchObject);
+		const json = await response.json();  // TODO: Use this or discard it?
+		await dispatch(fetchAccount(state.auth, shortUser));
+	} catch (error) {
+		handleError(error);
 	}
 };
 
-export const doSetExchangeStatus = (shortUser, exchange) => {
-	return (dispatch, getState) => {
-		const state = getState();
-		const fetchObject = {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-				'Accept': 'application/json',
-				'Authorization': `Token ${buildToken(state.auth)}`
-			},
-			body: exchange.toString()
-			// body: JSON.stringify(enabled)
-		};
-		return fetch(`${API_URL}/users/${shortUser}/exchange`, fetchObject)
-			.then(
-				response => response.json(),
-				error => handleError(error)
-			).then(() => {
-					dispatch(fetchAccount(state.auth, shortUser))
-				}
-			)
+export const doSetExchangeStatus = (shortUser, exchange) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+			'Authorization': `Token ${buildToken(state.auth)}`
+		},
+		body: exchange.toString()
+	};
+
+	try {
+		const response = await fetch(`${API_URL}/users/${shortUser}/exchange`, fetchObject);
+		const json = await response.json();  // TODO: Use this or discard it?
+		await dispatch(fetchAccount(state.auth, shortUser));
+	} catch (error) {
+		handleError(error);
 	}
 };
 
-export const doSetNick = (shortUser, salutation) => {
-	return (dispatch, getState) => {
-		const state = getState();
-		const fetchObject = {
-			method: 'PUT',
-			headers: standardHeaders(state.auth),
-			body: salutation
-		};
-		return fetch(`${API_URL}/users/${shortUser}/nick`, fetchObject)
-			.then(
-				response => response.json(),
-				error => handleError(error)
-			).then(() => {
-				dispatch(fetchAccount(state.auth, shortUser))
-			})
+export const doSetNick = (shortUser, salutation) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'PUT',
+		headers: standardHeaders(state.auth),
+		body: salutation
+	};
+
+	try {
+		const response = await fetch(`${API_URL}/users/${shortUser}/nick`, fetchObject);
+		await dispatch(fetchAccount(state.auth, shortUser));
+	} catch (error) {
+		console.error(error);
 	}
 };
 
@@ -1012,36 +962,33 @@ export type ActionTypesUi = AReceiveUserAutosuggest;
 export const RECEIVE_USER_AUTOSUGGEST = 'RECEIVE_USER_AUTOSUGGEST';
 interface AReceiveUserAutosuggest {
 	type: typeof RECEIVE_USER_AUTOSUGGEST,
-	autosuggest: string,
+	autosuggest: string[],
 }
 export const receiveUserAutosuggest = (autosuggest): AReceiveUserAutosuggest => ({
 	type: RECEIVE_USER_AUTOSUGGEST,
 	autosuggest,
 });
 
-export const fetchAutoSuggest = (like, limit = 10) => {
-	return  (dispatch, getState) => {
-		const state = getState();
-		const fetchObject = {
-			method: 'GET',
-			headers: standardHeaders(state.auth)
-		};
-		return fetch(`${API_URL}/users/autosuggest/${like}?limit=${limit}`, fetchObject)
-			.then(
-				response => {
-					return (response.ok ? response.json() : handleError(response))
-				}
-			).then((json)=>{
-				dispatch(receiveUserAutosuggest(json))
-			}
-		)
+export const fetchAutoSuggest = (like, limit = 10) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'GET',
+		headers: standardHeaders(state.auth)
+	};
+
+	try {
+		const response = await fetch(`${API_URL}/users/autosuggest/${like}?limit=${limit}`, fetchObject);
+		const json = await response.json();
+		await dispatch(receiveUserAutosuggest(json));
+	} catch (error) {
+		handleError(error);
 	}
 };
 
 // Combined Actions ------------------------------------------------------------
 
-export const attemptAuthAndLoadInitialData = credentials => (dispatch, getState) => {
-	return dispatch(attemptAuth(credentials))
-		.then(() => dispatch(fetchQueuesIfNeeded()))
-		.then(() => dispatch(fetchAllQueueJobsIfNeeded()));
+export const attemptAuthAndLoadInitialData = credentials => async dispatch => {
+	await dispatch(attemptAuth(credentials));
+	await dispatch(fetchQueuesIfNeeded());
+	await dispatch(fetchAllQueueJobsIfNeeded());
 };

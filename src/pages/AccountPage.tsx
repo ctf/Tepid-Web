@@ -15,23 +15,17 @@ function AccountPage({match}) {
 			<main>
 				<PageHeader/>
 				<section id="page-content">
-					<CTFerRoute path={`${match.url}/:shortUser`} component={AccountContainer}/>
+					<CTFerRoute path={`${match.url}/:shortUser`} component={AccountContainer} />
 				</section>
 			</main>
 		</div>
 	);
 }
 
-const mapStateToProps = (state, ownProps) => {
-	return {
-		auth: state.auth
-	};
-};
+const mapStateToProps = state => ({
+	auth: state.auth
+});
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {};
-};
-
-const AccountPageContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(AccountPage));
+const AccountPageContainer = withRouter(connect(mapStateToProps)(AccountPage));
 
 export default AccountPageContainer;

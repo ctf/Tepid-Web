@@ -21,10 +21,10 @@ const tepidReducer = combineReducers({
 const rootReducer = (state, action) => {
 	if (action.type === REQUEST_INVALIDATE_AUTH || action.type === RECEIVE_INVALIDATE_AUTH) {
 		state = undefined;
-		storage.removeItem('persist:root')
+		storage.removeItem('persist:root');
 	}
 
-	return tepidReducer(state, action)
+	return tepidReducer(state, action);
 };
 
 export default rootReducer;

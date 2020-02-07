@@ -26,7 +26,7 @@ function InnerConfigPrintQueue({form, printQueue, destinations}: ConfigPrintQueu
 			const values = form.getFieldsValue();
 			console.log('Submit: ', values);
 			setPending(true);
-			const n = Object.assign({}, q, values)
+			const n = Object.assign({}, q, values);
 			sq(n);
 			dispatch(actions.putQueue(n)).then(
 				() => {

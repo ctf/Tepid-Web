@@ -46,21 +46,18 @@ function QueuesPage({queues, loading, match, fetchNeededData} : {queues: Map<Str
 	);
 }
 
-const mapStateToProps = (state, ownProps) => {
-	return {
-		match: ownProps.match,
-		queues: state.queues.items,
-		loading: state.queues.isFetching || state.queues.items.length === 0
-	};
-};
+const mapStateToProps = (state, ownProps) => ({
+	match: ownProps.match,
+	queues: state.queues.items,
+	loading: state.queues.isFetching || state.queues.items.length === 0
+});
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		fetchNeededData: () => {
-			dispatch(fetchQueuesIfNeeded()).then(() => fetchDestinationsIfNeeded());
-		}
-	};
-};
+const mapDispatchToProps = dispatch => ({
+	fetchNeededData: async () => {
+		await dispatch(fetchQueuesIfNeeded());
+		await dispatch(fetchDestinationsIfNeeded());
+	}
+});
 
 const QueuesPageContainer = withRouter(connect(mapStateToProps, mapDispatchToProps)(QueuesPage));
 

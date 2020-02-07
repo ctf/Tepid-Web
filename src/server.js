@@ -26,7 +26,7 @@ function handleRender(req, res) {
 
 	const finalState = store.getState();
 
-	fs.readFile(path.join(__dirname, '..', 'build', 'index.html'), 'utf8', function (err, data) {
+	fs.readFile(path.join(__dirname, '..', 'build', 'index.html'), 'utf8', (err, data) => {
 		if (err) throw err;
 		let document = data.replace(
 			/<div id="tepid-web-app-root"><\/div>/,

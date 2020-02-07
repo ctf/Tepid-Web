@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {connect, useDispatch, useSelector} from "react-redux"
 import {NavLink, withRouter} from 'react-router-dom';
-import {AutoComplete, Menu} from 'antd';
+import {AutoComplete, Dropdown, Icon, Menu} from 'antd';
 import {fetchAutoSuggest, invalidateAuth} from "../actions";
 import useMenu from "../hooks/useMenu";
 import useDebounce from "../hooks/useDebounce";
-import SubMenu from "antd/es/menu/SubMenu";
 
 const {Option} = AutoComplete;
 
@@ -81,19 +80,18 @@ function PageHeaderContent(props) {
 				<HeaderSearchBar history={props.history}/>
 			)}
 
-			<Menu mode={"inline"} style={{maxWidth: "40vw", width: "20%", minWidth: "200px"}}>
-				<SubMenu
-					key="account"
-					title={
-						<>
-							{props.auth.user.displayName}
-						</>
-					}
-				>
+			<Dropdown overlay={
+				<Menu>
 					<Menu.Item><NavLink to="/my-account">My Account</NavLink></Menu.Item>
 					<Menu.Item onClick={handleSignOut}>Sign Out</Menu.Item>
-				</SubMenu>
-			</Menu>
+				</Menu>
+			} trigger={["click"]}>
+				<a className="ant-dropdown-link"
+				   href="#"
+				   style={{color: "#555", lineHeight: "32px", marginLeft: "24px"}}>
+					{props.auth.user.displayName} <Icon type="down" />
+				</a>
+			</Dropdown>
 		</header>
 	);
 }

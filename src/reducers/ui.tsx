@@ -5,15 +5,19 @@ export interface UiState {
 }
 
 const initialState: UiState = {
-	autosuggest:[],
+	autosuggest: [],
 };
 
-const ui = function(state=initialState, action: ActionTypesUi){
-	switch(action.type){
+const ui = (
+	state = initialState,
+	action: ActionTypesUi
+): UiState => {
+	switch (action.type) {
 		case RECEIVE_USER_AUTOSUGGEST:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				autosuggest: action.autosuggest
-			});
+			};
 		default:
 			return state;
 

@@ -7,7 +7,7 @@ import {
 	RECEIVE_QUEUES,
 	REQUEST_MODIFY_QUEUE,
 	REQUEST_QUEUE_JOBS,
-	REQUEST_QUEUES
+	REQUEST_QUEUES,
 } from '../actions';
 import {dbObjToIds} from "./helpers";
 import {PrintJob, PrintQueue} from "../models";
@@ -28,15 +28,20 @@ const initialQueuesState: QueuesState = {
 	lastUpdated: null
 };
 
-const queues = function (state = initialQueuesState, action: ActionTypesQueues | ActionTypesQueueJobs) {
+const queues = (
+	state = initialQueuesState,
+	action: ActionTypesQueues | ActionTypesQueueJobs
+): QueuesState => {
 	switch (action.type) {
 		case REQUEST_QUEUES:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				isFetching: true,
 				didInvalidate: false
-			});
+			};
 		case RECEIVE_QUEUES:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				isFetching: false,
 				didInvalidate: false,
 				items: action.queues,
@@ -48,9 +53,10 @@ const queues = function (state = initialQueuesState, action: ActionTypesQueues |
 					}
 				}))),
 				lastUpdated: action.receivedAt
-			});
+			};
 		case REQUEST_QUEUE_JOBS:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				jobsByQueue: {
 					...state.jobsByQueue,
 					[action.queue]: {
@@ -58,9 +64,10 @@ const queues = function (state = initialQueuesState, action: ActionTypesQueues |
 						isFetching: true
 					}
 				}
-			});
+			};
 		case RECEIVE_QUEUE_JOBS:
-			return Object.assign({}, state, {
+			return {
+				...state,
 				jobsByQueue: {
 					...state.jobsByQueue,
 					[action.queue]: {
@@ -71,10 +78,10 @@ const queues = function (state = initialQueuesState, action: ActionTypesQueues |
 						lastUpdated: action.receivedAt
 					}
 				}
-			});
+			};
 		case REQUEST_MODIFY_QUEUE:
 			return state;
-		case RECEIVE_MODIFY_QUEUE: {
+		case RECEIVE_MODIFY_QUEUE:
 			if (action.putResponse.ok && action.putResponse.id !== undefined) {
 				if (action.action === ModifyAction.DELETE) {
 					const byId = {...state.items};
@@ -95,7 +102,6 @@ const queues = function (state = initialQueuesState, action: ActionTypesQueues |
 			} else {
 				return state
 			}
-		}
 		default:
 			return state;
 	}
