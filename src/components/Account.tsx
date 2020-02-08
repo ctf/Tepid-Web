@@ -4,6 +4,7 @@ import JobTable from './JobTable';
 import {DebounceInput} from "react-debounce-input";
 import useModal from "../hooks/useModal";
 import {Button, Form, Modal, Skeleton, Switch} from "antd";
+import {Link} from 'react-router-dom';
 
 function UserStatusCard(content) {
 	return (
@@ -151,6 +152,7 @@ function Account({shortUser, account, accountsFetching, jobs, auth, fetchNeededD
 
 	const permissionIsVolunteer = auth.role === "ctfer" || auth.role === "elder";
 	const permissionCanSetExchange = auth.role === "ctfer" || auth.role === "elder";
+	const permissionCanModifySemesters = auth.role === "elder";
 
 	const self = Object.keys(auth.user).includes('shortUser')
 		? accountData.shortUser === auth.user.shortUser
@@ -237,6 +239,11 @@ function Account({shortUser, account, accountsFetching, jobs, auth, fetchNeededD
 									<ToggleExchangeSwitch value={isExchangeStudent} onChange={handleSetExchange}
 														  disabled={!permissionCanSetExchange} />
 								</Form>
+								{permissionCanModifySemesters &&
+								<Link to={`/modify-semesters/${shortUser}`} activeClassName="active">
+									<i className="material-icons">settings</i> Modify Semesters
+								</Link>
+								}
 							</div>
 						</div>
 					</div>
