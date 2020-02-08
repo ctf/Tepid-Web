@@ -985,6 +985,41 @@ export const doFetchSemesters = (shortUser, params) => async (dispatch, getState
 		console.error(error)
 	}
 };
+
+export const doAddSemester = (shortUser, semester) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'POST',
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(semester),
+	};
+
+	console.log(semester);
+
+	try {
+		const response = await fetch(`${API_URL}/users/${shortUser}/semesters`, fetchObject);
+		await dispatch(doFetchSemesters(shortUser, {}));
+	} catch (error) {
+		console.error(error)
+	}
+};
+
+export const doRemoveSemester = (shortUser, semester) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'DELETE',
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(semester),
+	};
+
+	try {
+		const response = await fetch(`${API_URL}/users/${shortUser}/semesters`, fetchObject);
+		await dispatch(doFetchSemesters(shortUser, {}));
+	} catch (error) {
+		console.error(error)
+	}
+};
+
 // Account Actions -------------------------------------------------------------
 export type ActionTypesUi = AReceiveUserAutosuggest;
 
