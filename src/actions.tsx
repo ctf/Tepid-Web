@@ -3,7 +3,7 @@ import fetch from 'cross-fetch';
 import {message} from "antd";
 
 import {buildToken} from './tepid-utils';
-import {Destination, FullDestination, PrintJob, PrintQueue, PutResponse, QuotaData, User} from "./models";
+import {Destination, FullDestination, PrintJob, PrintQueue, PutResponse, QuotaData, Semester, User} from "./models";
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://testpid.science.mcgill.ca:8443/tepid';
 
@@ -956,6 +956,19 @@ export const doSetNick = (shortUser, salutation) => async (dispatch, getState) =
 	}
 };
 
+export const RECEIVE_SEMESTERS = 'RECEIVE_SEMESTERS';
+interface AReceiveSemesters {
+	type: typeof RECEIVE_SEMESTERS,
+	shortUser: string,
+	retrieved_semesters: Semester[],
+	params
+}
+export const receiveSemesters = (shortUser, retrieved_semesters, params): AReceiveSemesters => ({
+	type: RECEIVE_SEMESTERS,
+	shortUser,
+	retrieved_semesters,
+	params,
+});
 // Account Actions -------------------------------------------------------------
 export type ActionTypesUi = AReceiveUserAutosuggest;
 
