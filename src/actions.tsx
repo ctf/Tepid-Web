@@ -969,6 +969,22 @@ export const receiveSemesters = (shortUser, retrieved_semesters, params): ARecei
 	retrieved_semesters,
 	params,
 });
+
+export const doFetchSemesters = (shortUser, params) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'GET',
+		headers: standardHeaders(state.auth),
+	};
+
+	try {
+		const response = await fetch(`${API_URL}/users/${shortUser}/semesters`, fetchObject);
+		const json = await response.json();
+		await dispatch(receiveSemesters(shortUser, json, params));
+	} catch (error) {
+		console.error(error)
+	}
+};
 // Account Actions -------------------------------------------------------------
 export type ActionTypesUi = AReceiveUserAutosuggest;
 
