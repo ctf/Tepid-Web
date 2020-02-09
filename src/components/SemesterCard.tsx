@@ -11,6 +11,7 @@ interface SemesterArgs extends FormComponentProps {
 	shortUser: string,
 	semester: Semester,
 	isNew: boolean,
+	isSuggested: boolean,
 }
 
 export const semesterFormMeta = (s) => ({
@@ -21,7 +22,7 @@ export const semesterFormMeta = (s) => ({
 	]
 });
 
-function InnerSemester({form, shortUser, semester, isNew = false}: SemesterArgs) {
+function InnerSemester({form, shortUser, semester, isNew = false, isSuggested = false}: SemesterArgs) {
 	const [s, ss] = useState(semester);
 
 	const dispatch = useDispatch();
@@ -88,8 +89,11 @@ function InnerSemester({form, shortUser, semester, isNew = false}: SemesterArgs)
 					</Form.Item>
 				)}
 			</Form>
-			{!isNew && (
+			{(!isNew && !isSuggested) && (
 				<Button type="danger" onClick={handleDelete}> Delete </Button>
+			)}
+			{isSuggested && (
+				<Button type="primary" onClick={handleUpdate}> Add </Button>
 			)}
 		</Card>
 	)
