@@ -981,8 +981,10 @@ export const doFetchSemesters = (shortUser, params) => async (dispatch, getState
 		headers: standardHeaders(state.auth),
 	};
 
+	params.queryfor = params['queryfor'] || "granted";
+
 	try {
-		const response = await fetch(`${API_URL}/users/${shortUser}/semesters`, fetchObject);
+		const response = await fetch(`${API_URL}/users/${shortUser}/semesters?${objectToQueryString(params)}`, fetchObject);
 		const json = await response.json();
 		await dispatch(receiveSemesters(shortUser, json, params));
 	} catch (error) {
