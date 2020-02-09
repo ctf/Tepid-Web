@@ -5,6 +5,7 @@ import queues from './reducers/queues';
 import destinations from './reducers/destinations';
 import accounts from './reducers/accounts';
 import jobs from "./reducers/jobs";
+import semesters from "./reducers/semesters";
 import ui from "./reducers/ui";
 import {RECEIVE_INVALIDATE_AUTH, REQUEST_INVALIDATE_AUTH} from "./actions";
 import storage from 'redux-persist/lib/storage'
@@ -15,6 +16,7 @@ const tepidReducer = combineReducers({
 	destinations: destinations,
 	jobs: jobs,
 	accounts: accounts,
+	semesters: semesters,
 	ui: ui,
 });
 

@@ -15,7 +15,7 @@
 
 import * as url from "url";
 import * as portableFetch from "portable-fetch";
-import { Configuration } from "./configuration";
+import {Configuration} from "./configuration";
 
 const BASE_PATH = "http://localhost".replace(/\/+$/, "");
 
@@ -862,6 +862,14 @@ export interface User {
      * @memberof User
      */
     colorPrinting?: boolean;
+}
+
+
+type Season = "WINTER" | "SUMMER" | "FALL"
+
+export interface Semester {
+    season?: Season,
+    year?: number,
 }
 
 

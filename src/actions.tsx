@@ -3,7 +3,7 @@ import fetch from 'cross-fetch';
 import {message} from "antd";
 
 import {buildToken} from './tepid-utils';
-import {Destination, FullDestination, PrintJob, PrintQueue, PutResponse, QuotaData, User} from "./models";
+import {Destination, FullDestination, PrintJob, PrintQueue, PutResponse, QuotaData, Semester, User} from "./models";
 
 export const API_URL = process.env.REACT_APP_WEB_URL_PRODUCTION || 'https://testpid.science.mcgill.ca:8443/tepid';
 
@@ -16,6 +16,10 @@ const standardHeaders = (auth) => ({
 	'Accept': 'application/json',
 	'Authorization': `Token ${buildToken(auth)}`
 });
+
+function objectToQueryString(obj) {
+	return Object.keys(obj).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(obj[key])).join('&').replace(/%20/g, "+");
+}
 
 export enum ModifyAction { POST = 'POST', PUT = 'PUT', DELETE = 'DELETE' }
 
@@ -953,6 +957,72 @@ export const doSetNick = (shortUser, salutation) => async (dispatch, getState) =
 		await dispatch(fetchAccount(state.auth, shortUser));
 	} catch (error) {
 		console.error(error);
+	}
+};
+
+export const RECEIVE_SEMESTERS = 'RECEIVE_SEMESTERS';
+interface AReceiveSemesters {
+	type: typeof RECEIVE_SEMESTERS,
+	shortUser: string,
+	retrieved_semesters: Semester[],
+	params
+}
+export const receiveSemesters = (shortUser, retrieved_semesters, params): AReceiveSemesters => ({
+	type: RECEIVE_SEMESTERS,
+	shortUser,
+	retrieved_semesters,
+	params,
+});
+
+export const doFetchSemesters = (shortUser, params) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'GET',
+		headers: standardHeaders(state.auth),
+	};
+
+	params.queryfor = params['queryfor'] || "granted";
+
+	try {
+		const response = await fetch(`${API_URL}/users/${shortUser}/semesters?${objectToQueryString(params)}`, fetchObject);
+		const json = await response.json();
+		await dispatch(receiveSemesters(shortUser, json, params));
+	} catch (error) {
+		console.error(error)
+	}
+};
+
+export const doAddSemester = (shortUser, semester) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'POST',
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(semester),
+	};
+
+	console.log(semester);
+
+	try {
+		const response = await fetch(`${API_URL}/users/${shortUser}/semesters`, fetchObject);
+		await dispatch(doFetchSemesters(shortUser, {}));
+	} catch (error) {
+		console.error(error)
+	}
+};
+
+export const doRemoveSemester = (shortUser, semester) => async (dispatch, getState) => {
+	const state = getState();
+	const fetchObject = {
+		method: 'DELETE',
+		headers: standardHeaders(state.auth),
+		body: JSON.stringify(semester),
+	};
+
+	try {
+		const response = await fetch(`${API_URL}/users/${shortUser}/semesters`, fetchObject);
+		await dispatch(doFetchSemesters(shortUser, {}));
+	} catch (error) {
+		console.error(error)
 	}
 };
 
