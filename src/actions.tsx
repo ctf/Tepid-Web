@@ -17,6 +17,10 @@ const standardHeaders = (auth) => ({
 	'Authorization': `Token ${buildToken(auth)}`
 });
 
+function objectToQueryString(obj) {
+	return Object.keys(obj).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(obj[key])).join('&').replace(/%20/g, "+");
+}
+
 export enum ModifyAction { POST = 'POST', PUT = 'PUT', DELETE = 'DELETE' }
 
 // Auth ------------------------------------------------------------------------
