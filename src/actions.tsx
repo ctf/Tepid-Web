@@ -471,7 +471,7 @@ const doManageDestinationTicket = (destination, up, reason) => async (dispatch, 
 
 	await dispatch(manageDestinationTicket(destination, ticket));
 	try {
-		const response = await fetch(`${API_URL}/destinations/${encodeURIComponent(destination._id)}`,
+		const response = await fetch(`${API_URL}/destinations/${encodeURIComponent(destination._id)}/ticket`,
 			fetchObject);
 		const body = await response.text();
 		const status = parseTicketUpdateToStatus(body);
