@@ -627,7 +627,7 @@ export const doSetJobRefunded = (job, refunded) => async (dispatch, getState) =>
 	await dispatch(requestJobRefunded(job._id, refunded));
 
 	try {
-		const response = await fetch(`${API_URL}/jobs/job/${job._id}/refunded`, fetchObject);
+		const response = await fetch(`${API_URL}/jobs/${job._id}/refunded`, fetchObject);
 		const json = await response.json();
 		await dispatch(receiveJobRefunded(job._id, json.ok));
 	} catch (error) {
